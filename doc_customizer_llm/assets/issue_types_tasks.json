@@ -1,0 +1,30 @@
+{
+    "Documentation Replication on Other Examples": [
+      "Issues related to replicating the documentation examples on other different examples.", 
+      "Provide examples replicating the documentation on other examples along with explanation with respect to the question asked by the user."
+      ],
+    "Documentation Ambiguity": [
+      "Issues related to not understanding the content properly.", 
+      "Provide step by step explanations and examples to understand the content of the documentation with respect to the question asked by the user."
+      ],
+    "Documentation Completeness": [
+      "Issues that mention that the documentation is incomplete or missing information.", 
+      "Complete the documentation by adding the information with respect to the question asked by the user."
+      ],
+    "Documentation Replicability": [
+      "Issues related to replicating the documentation examples.", 
+      "Provide complete examples replicating the examples provided within the documentation with respect to the question asked by the user."
+      ],
+    "Inadequate Examples": [
+      "Issues that mention the documentation has insufficient examples.", 
+      "Provide multiple complete examples to showcase its usability with respect to the question asked by the user."
+      ],
+    "Lack of Alternative Solutions": [
+      "Issues that mention the unavailability of alternative solutions or documentation.", 
+      "Provide alternative solutions with respect to the question asked by the user."
+      ],
+    "Requesting (Additional) Documentation/ Examples": [
+      "Questions that request additional examples or documentations as a support.", 
+      "Provide links to reliable additional documentation or examples with respect to the question asked by the user."
+      ]
+}

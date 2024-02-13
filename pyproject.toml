@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "doc-customizer-llm"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+langchain = "^0.1.6"
+langchain-openai = "^0.0.5"
+chromadb = "^0.4.22"
+youtube-transcript-api = "^0.6.2"
+pytube = "^15.0.0"
+azureml-mlflow = "^1.55.0"
+mlflow = "^2.10.2"
+spacy = "^3.7.2"
+textstat = "^0.7.3"
+databricks-cli = "^0.18.0"
+google-api-python-client = "^2.117.0"
+unstructured = "^0.12.4"
+tiktoken = "0.5.2"
+pygments = "^2.17.2"
+ipykernel = "^6.29.2"
+langchain-community = "^0.0.19"
+tavily-python = "^0.3.1"
+langchainhub = "^0.1.14"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

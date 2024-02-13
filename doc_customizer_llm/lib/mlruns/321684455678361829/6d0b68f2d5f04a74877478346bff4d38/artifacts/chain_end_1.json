@@ -1,0 +1,19 @@
+{
+  "action": "on_chain_end",
+  "outputs": "outputs=[{'text': \"The user is asking for examples on how to retrain a model that was saved using the `tf.saved_model.save()` function in TensorFlow. They have tried loading the saved model using `tf.saved_model.load()` but are unable to train it again as the loaded model lacks the necessary method `model.fit()`.\\n\\nTo address this issue, the documentation can provide multiple complete examples that showcase the usability of the `tf.saved_model.save()` function and how to retrain the saved model. These examples should include the necessary steps to load the saved model and perform training on new datasets.\\n\\nExample 1: Retraining a saved model using `tf.saved_model.save()` and `tf.saved_model.load()`\\n\\n```python\\n# Training and saving the model\\nmodel = tf.keras.Sequential([...])  # Define your model architecture\\nmodel.compile([...])  # Compile the model with loss and optimizer\\nmodel.fit(train_data, epochs=10)  # Train the model\\ntf.saved_model.save(model, 'saved_model')  # Save the model\\n\\n# Loading the saved model and retraining\\nloaded_model = tf.saved_model.load('saved_model')  # Load the saved model\\nloaded_model.compile([...])  # Compile the loaded model with loss and optimizer\\nloaded_model.fit(new_train_data, epochs=5)  # Retrain the model on new dataset\\n```\\n\\nExample 2: Retraining a saved model using `tf.saved_model.save()` and custom training loop\\n\\n```python\\n# Training and saving the model\\nmodel = tf.keras.Sequential([...])  # Define your model architecture\\noptimizer = tf.keras.optimizers.Adam()\\nloss_fn = tf.keras.losses.SparseCategoricalCrossentropy()\\nfor epoch in range(10):\\n    for batch in train_data:\\n        with tf.GradientTape() as tape:\\n            logits = model(batch['input'])\\n            loss_value = loss_fn(batch['target'], logits)\\n        grads = tape.gradient(loss_value, model.trainable_variables)\\n        optimizer.apply_gradients(zip(grads, model.trainable_variables))\\ntf.saved_model.save(model, 'saved_model')  # Save the model\\n\\n# Loading the saved model and retraining\\nloaded_model = tf.saved_model.load('saved_model')  # Load the saved model\\noptimizer = tf.keras.optimizers.Adam()\\nloss_fn = tf.keras.losses.SparseCategoricalCrossentropy()\\nfor epoch in range(5):\\n    for batch in new_train_data:\\n        with tf.GradientTape() as tape:\\n            logits = loaded_model(batch['input'])\\n            loss_value = loss_fn(batch['target'], logits)\\n        grads = tape.gradient(loss_value, loaded_model.trainable_variables)\\n        optimizer.apply_gradients(zip(grads, loaded_model.trainable_variables))\\n```\\n\\nThese examples demonstrate how to save a model using `tf.saved_model.save()` and then load and retrain the saved model using `tf.saved_model.load()`. The examples include both the usage of `model.fit()` and a custom training loop to showcase different approaches to retraining the model.\"}]",
+  "step": 5,
+  "starts": 2,
+  "ends": 2,
+  "errors": 0,
+  "text_ctr": 1,
+  "chain_starts": 1,
+  "chain_ends": 1,
+  "llm_starts": 1,
+  "llm_ends": 1,
+  "llm_streams": 0,
+  "tool_starts": 0,
+  "tool_ends": 0,
+  "agent_ends": 0,
+  "retriever_starts": 0,
+  "retriever_ends": 0
+}

@@ -1,0 +1,23 @@
+{
+  "action": "on_llm_end",
+  "token_usage_completion_tokens": 612,
+  "token_usage_prompt_tokens": 2058,
+  "token_usage_total_tokens": 2670,
+  "model_name": "gpt-3.5-turbo",
+  "system_fingerprint": null,
+  "step": 4,
+  "starts": 2,
+  "ends": 1,
+  "errors": 0,
+  "text_ctr": 1,
+  "chain_starts": 1,
+  "chain_ends": 0,
+  "llm_starts": 1,
+  "llm_ends": 1,
+  "llm_streams": 0,
+  "tool_starts": 0,
+  "tool_ends": 0,
+  "agent_ends": 0,
+  "retriever_starts": 0,
+  "retriever_ends": 0
+}

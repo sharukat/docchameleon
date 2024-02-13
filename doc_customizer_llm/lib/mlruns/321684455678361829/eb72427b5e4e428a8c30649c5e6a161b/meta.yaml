@@ -1,0 +1,15 @@
+artifact_uri: file:///content/drive/MyDrive/yorku/research/code/automatic_doc_customizer/lib/mlruns/321684455678361829/eb72427b5e4e428a8c30649c5e6a161b/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '321684455678361829'
+lifecycle_stage: active
+run_id: eb72427b5e4e428a8c30649c5e6a161b
+run_name: langchainrun-KE00R9I
+run_uuid: eb72427b5e4e428a8c30649c5e6a161b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1707455263663
+status: 1
+tags: []
+user_id: unknown
