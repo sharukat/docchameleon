@@ -25,6 +25,10 @@ ipykernel = "^6.29.2"
 langchain-community = "^0.0.19"
 tavily-python = "^0.3.1"
 langchainhub = "^0.1.14"
+openai = "^1.12.0"
+setfit = "^1.0.3"
+scikit-learn = "1.2.2"
+ipywidgets = "^8.1.2"
 
 
 [build-system]

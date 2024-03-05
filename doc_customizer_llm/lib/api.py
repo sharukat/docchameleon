@@ -1,8 +1,10 @@
 import time
 import pandas as pd
-import global_settings as s
+
 from urllib.parse import urljoin
-import utils as utils
+
+import lib.global_settings as s
+import lib.utils as utils
 
 from dotenv import load_dotenv, find_dotenv
 dotenv_path = find_dotenv()
@@ -75,3 +77,55 @@ def so_answers(question_ids, chunk_size: int):
     df = pd.DataFrame(responses)
     df = df.drop_duplicates(subset='question_id', keep='last')
     return df
+
+
+def query_so(query: str):
+    """
+    The query_so function takes in a query and returns the response from the stackexchange api
+
+    Args:
+        query: str: The query to be passed to the stackexchange api
+
+    Returns:
+        A dataframe with the response
+    """
+    
+    base_url = "https://api.stackexchange.com/2.3/"
+
+    # URL to retrieve the response from the stackexchange api based on the search query
+    search_url = f"search/excerpts?key={API_KEY}&order=desc&sort=activity&q={query}&accepted=True&answers=1&tagged=TensorFlow;Python&site=stackoverflow&filter=!3tlXYAfMSMBBM)Mj)"
+    url_a = base_url + search_url
+    response = utils.get_response(url_a)
+
+    q_ids = []
+    results = []
+    if response['items']:
+        for i in range(len(response['items'])):
+            q_ids.append(response['items'][i]['question_id'])
+
+        split_list = list(utils.split(q_ids, 100))
+        for x in range(len(split_list)):
+            questions_ids = ';'.join(map(str, split_list[x]))
+
+            #URL to retrieve the answers based on the question ids (upto 100 question ids separated by ';')
+            answer_url =f"questions/{questions_ids}/answers?key={API_KEY}&order=desc&sort=activity&site=stackoverflow&filter=!-KbrbfAqA48jRifMLR7sYu7doHuftBYCT"
+            url_b = base_url + answer_url
+            answers = utils.get_response(url_b)
+
+            for item in answers['items']:
+                res_dict = {
+                    "QuestionId": item['question_id'],
+                    "AnswerId": item['answer_id'],
+                    "URL": item['link'],
+                    "QuestionTitle": item['title'],
+                    "Answer": item['body'],
+                    "IsAccepted": item['is_accepted'],
+                    "CreationDate": item['creation_date']
+
+                }
+                results.append(res_dict)
+    
+    else:
+        return "No response found for the given query on Stack Overflow"
+
+    return results

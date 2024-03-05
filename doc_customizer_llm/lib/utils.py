@@ -5,7 +5,7 @@ import requests
 import ast
 import numpy as np
 import pandas as pd
-import global_settings as s
+import lib.global_settings as s
 
 from statistics import mean
 from datetime import datetime
@@ -172,6 +172,7 @@ def processed_dataset(df, type='questions'):
     ]
     dataset = pd.DataFrame(user_dataset)
     return dataset
+
 
 def process_response(response, type):
     upvote_counts = [item['up_vote_count'] for item in response['items']]
