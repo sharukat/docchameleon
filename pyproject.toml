@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
-langchain = "^0.1.6"
+langchain = "0.1.11"
 langchain-openai = "^0.0.5"
 chromadb = "^0.4.22"
 youtube-transcript-api = "^0.6.2"
@@ -22,13 +22,15 @@ unstructured = "^0.12.4"
 tiktoken = "0.5.2"
 pygments = "^2.17.2"
 ipykernel = "^6.29.2"
-langchain-community = "^0.0.19"
+langchain-community = "0.0.25"
 tavily-python = "^0.3.1"
 langchainhub = "^0.1.14"
 openai = "^1.12.0"
 setfit = "^1.0.3"
 scikit-learn = "1.2.2"
 ipywidgets = "^8.1.2"
+cohere = "^4.52"
+huggingface-hub = "^0.21.4"
 
 
 [build-system]

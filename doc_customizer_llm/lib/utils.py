@@ -1,4 +1,6 @@
+import re
 from pathlib import Path
+from bs4 import BeautifulSoup
 import glob
 import json
 import requests
@@ -192,3 +194,21 @@ def process_response(response, type):
         reputation = (total_up_votes * 10) - (total_down_votes * 2)
         return {'reputation': reputation}
 
+
+# Preprocess the text
+def code_removal(text):
+  # Remove code snippets enclosed in <code>...</code> tags
+  text = re.sub(r'<pre><code>.*?</code></pre>', '', text, flags=re.DOTALL)
+  text = re.sub(r'<blockquote>.*?</blockquote>', '', text, flags=re.DOTALL)
+  return text
+
+
+def text_preprocessor(text):
+    text = code_removal(text)
+    soup = BeautifulSoup(text, "html.parser")
+    paragraphs = soup.find_all("p", recursive=False)
+    paragraphs = [p for p in paragraphs if not any(tag in str(p) for tag in ["<table>", "<tr>", "<td>", "<section>"])]
+    content = "\n".join(str(paragraph) for paragraph in paragraphs)
+    content = re.sub(r'<[^>]*>', '', content)
+    content = ' '.join(content.split())
+    return content

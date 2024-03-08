@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/sharukat/Documents/ResearchYU/Code/doc-customizer-llm/doc_customizer_llm/mlruns/0/865220a1394d489493dec922f75302c2/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 865220a1394d489493dec922f75302c2
+run_name: orderly-ape-383
+run_uuid: 865220a1394d489493dec922f75302c2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1709792013155
+status: 1
+tags: []
+user_id: sharukat

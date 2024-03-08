@@ -93,7 +93,7 @@ def query_so(query: str):
     base_url = "https://api.stackexchange.com/2.3/"
 
     # URL to retrieve the response from the stackexchange api based on the search query
-    search_url = f"search/excerpts?key={API_KEY}&order=desc&sort=activity&q={query}&accepted=True&answers=1&tagged=TensorFlow;Python&site=stackoverflow&filter=!3tlXYAfMSMBBM)Mj)"
+    search_url = f"search/excerpts?key={API_KEY}&order=desc&sort=activity&q={query}&accepted=True&answers=1&tagged=TensorFlow;&site=stackoverflow&filter=!3tlXYAfMSMBBM)Mj)"
     url_a = base_url + search_url
     response = utils.get_response(url_a)
 
@@ -124,8 +124,4 @@ def query_so(query: str):
 
                 }
                 results.append(res_dict)
-    
-    else:
-        return "No response found for the given query on Stack Overflow"
-
     return results
