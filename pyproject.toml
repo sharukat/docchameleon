@@ -31,7 +31,24 @@ scikit-learn = "1.2.2"
 ipywidgets = "^8.1.2"
 cohere = "^4.52"
 huggingface-hub = "^0.21.4"
+seaborn = "^0.13.2"
+transformers = "^4.38.2"
+accelerate = "^0.28.0"
+playwright = "^1.42.0"
+beautifulsoup4 = "^4.12.3"
+langchain-anthropic = "^0.1.4"
+langchain-core = "^0.1.31"
+langsmith = "^0.1.25"
 
+
+[[tool.poetry.source]]
+name = "pip"
+url = "https://pypi.org/simple/"
+priority = "explicit"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.3"
 
 [build-system]
 requires = ["poetry-core"]
