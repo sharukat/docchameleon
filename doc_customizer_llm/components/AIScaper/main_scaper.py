@@ -32,7 +32,7 @@ os.environ["LANGCHAIN_PROJECT"] = "langchain-webscrape"
 
 llm = ChatAnthropic(temperature=0, model_name="claude-3-sonnet-20240229")
 
-def main(web_page: str):
+def ai_webscraper(web_page: str, response_type: str):
     print(f"AI-based Web Scraping Initiated!: {web_page}")
     sync_browser = create_sync_playwright_browser()
     toolkit = PlayWrightBrowserToolkit.from_browser(sync_browser=sync_browser)
@@ -44,16 +44,25 @@ def main(web_page: str):
         agent = AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
         verbose=True
     )
+    if response_type == "code":
+        system = """
+        Your task is to web scrape the given URL and extract all the code present on that webpage as it is (only the code). 
+        The extracted code should be output in markdown format. Avoid adding any other text other than code in to output response.
 
-    system = f"You are a helpful assistant that scrape given url to extract all the code as it is and return the result in markdown format"
+        Here's an example of how your markdown output should look:
+
+        <example>
+        ```
+        code block
+        ```
+        </example>
+        """
+    elif response_type == "summary":
+        system = """
+        Your task is to web scrape the given URL and extract relevant context from the description and create a meaningful description.
+        """
+        
     human = f"url : {web_page}"
     prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
     result = agent_chain.run(prompt)
-    print(result)
-
-
-# ==========================================================================================================================
-# TEST EXECUTIONS
-# ==========================================================================================================================
-
-main(web_page="https://www.geeksforgeeks.org/save-and-load-models-in-tensorflow/")
+    return result

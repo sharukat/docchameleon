@@ -1,93 +1,42 @@
+# Customized Content
+
+In TensorFlow 2.x, placeholders are no longer necessary, as you can directly pass data into operations. The recommended way to migrate from `tf.compat.v1.placeholder` is to use `tf.keras.Input` or simply pass tensors directly.
+
+However, if you want to replicate the exact behavior of a scalar placeholder with an empty shape `[]`, you can use `tf.keras.Input` with `shape=None` or `shape=(None,)`. Here's an example:
+
 ```python
-# import required modules
 import tensorflow as tf
-import numpy as np
-import matplotlib.pyplot as plt
-from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Dropout
-from tensorflow.keras.layers import GlobalMaxPooling2D, MaxPooling2D
-from tensorflow.keras.layers import BatchNormalization
-from tensorflow.keras.models import Model
-from tensorflow.keras.models import load_model
 
-# Load in the data
-cifar10 = tf.keras.datasets.cifar10
+# TF 1.x placeholder
+x1 = tf.compat.v1.placeholder(tf.float32, [], name="x1")
 
-# Distribute it to train and test set
-(x_train, y_train), (x_test, y_test) = cifar10.load_data()
-print(x_train.shape, y_train.shape, x_test.shape, y_test.shape)
+# Equivalent in TF 2.x using tf.keras.Input
+x2 = tf.keras.Input(shape=None, dtype=tf.float32, name="x2")
 
-# Reduce pixel values
-x_train, x_test = x_train / 255.0, x_test / 255.0
-
-# flatten the label values
-y_train, y_test = y_train.flatten(), y_test.flatten()
-
-# number of classes
-K = len(set(y_train))
-# calculate total number of classes for output layer
-print("number of classes:", K)
-
-# Build the model using the functional API
-# input layer
-i = Input(shape=x_train[0].shape)
-x = Conv2D(32, (3, 3), activation='relu', padding='same')(i)
-x = BatchNormalization()(x)
-x = Conv2D(32, (3, 3), activation='relu', padding='same')(x)
-x = BatchNormalization()(x)
-x = MaxPooling2D((2, 2))(x)
-x = Conv2D(64, (3, 3), activation='relu', padding='same')(x)
-x = BatchNormalization()(x)
-x = Conv2D(64, (3, 3), activation='relu', padding='same')(x)
-x = BatchNormalization()(x)
-x = MaxPooling2D((2, 2))(x)
-x = Conv2D(128, (3, 3), activation='relu', padding='same')(x)
-x = BatchNormalization()(x)
-x = Conv2D(128, (3, 3), activation='relu', padding='same')(x)
-x = BatchNormalization()(x)
-x = MaxPooling2D((2, 2))(x)
-x = Flatten()(x)
-x = Dropout(0.2)(x)
-# Hidden layer
-x = Dense(1024, activation='relu')(x)
-x = Dropout(0.2)(x)
-# last hidden layer i.e.. output layer
-x = Dense(K, activation='softmax')(x)
-
-model = Model(i, x)
-
-# saving and loading the .h5 model
-# save model
-model.save('gfgModel.h5')
-print('Model Saved!')
-
-# load model
-savedModel = load_model('gfgModel.h5')
-
-# saving and loading the model weights
-# save model
-model.save_weights('gfgModelWeights')
-print('Model Saved!')
-
-# load model
-savedModel = model.load_weights('gfgModelWeights')
-print('Model Loaded!')
-
-# saving and loading the .h5 model
-# save model
-model.save_weights('gfgModelWeights.h5')
-print('Model Saved!')
-
-# load model
-savedModel = model.load_weights('gfgModelWeights.h5')
-print('Model Loaded!')
+# Check shapes
+print(tf.shape(x1))  # Output: Tensor("Shape:0", shape=(0,), dtype=int32)
+print(tf.shape(x2))  # Output: Tensor("Shape_1:0", shape=(1,), dtype=int32)
 ```
 
-This code demonstrates how to save and load TensorFlow models in Python in different formats:
-- Saving and loading the entire model in .h5 format using `model.save()` and `load_model()`
-- Saving and loading just the model weights using `model.save_weights()` and `model.load_weights()`
-- Saving the weights in .h5 format as well using `model.save_weights()`
+In the above code, `x2` is defined using `tf.keras.Input` with `shape=None`, which allows it to accept a scalar input similar to the TF 1.x placeholder `x1`.
 
-The key points are:
-- The `save()` method saves the model architecture, weights, and optimizer state
-- `save_weights()` only saves the model weights
-- Models are loaded with `load_model()` and weights with `load_weights
+When you check the shapes using `tf.shape`, you'll notice that `x1` has a shape of `(0,)`, indicating a scalar, while `x2` has a shape of `(1,)`, indicating a tensor with a single dimension. However, both `x1` and `x2` will behave similarly when used in computations.
+
+It's important to note that in TensorFlow 2.x, eager execution is enabled by default, so you can directly pass data into operations without the need for placeholders and sessions. For example:
+
+```python
+# Directly pass data
+result = some_op(tf.constant(42.0))
+```
+
+I hope this helps clarify how to migrate your TensorFlow 1.x placeholder code to TensorFlow 2.x while maintaining a similar behavior. Let me know if you have any further questions!
+
+## Additional Resources
+
+<Web URLs>
+['https://github.com/tensorflow/tensorflow/issues/27516', 'https://indianaiproduction.com/create-tensorflow-placeholder/', 'https://www.geeksforgeeks.org/placeholders-in-tensorflow/', 'https://medium.com/red-buffer/tensorflow-1-0-to-tensorflow-2-0-coding-changes-636b49a604b', 'https://indiantechwarrior.com/tensorflow-constants-placeholders-and-variables-in-tf-1-x-and-tf-2-x/', 'https://www.databricks.com/tensorflow/placeholders']
+</Web URLs>
+
+<Course URLs>
+['https://www.udemy.com/course/complete-tensorflow-2-and-keras-deep-learning-bootcamp/']
+</Course URLs>

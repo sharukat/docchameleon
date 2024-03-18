@@ -13,7 +13,7 @@
       ],
     "Documentation Replicability": [
       "Issues related to replicating the documentation examples.", 
-      "Provide complete examples replicating the examples provided within the documentation with respect to the question asked by the user."
+      "Your task is to generate complete executable code example with an explanation to address the user's quesetion body by only using the knowledge provided as 'context'."
       ],
     "Inadequate Examples": [
       "Issues that mention the documentation has insufficient examples.", 

@@ -1,9 +1,11 @@
 import re
+import os
 from pathlib import Path
 from bs4 import BeautifulSoup
 import glob
 import json
 import requests
+import markdown
 import ast
 import numpy as np
 import pandas as pd
@@ -212,3 +214,63 @@ def text_preprocessor(text):
     content = re.sub(r'<[^>]*>', '', content)
     content = ' '.join(content.split())
     return content
+
+
+def validate_tf_api_name(name):
+  """Validates that the given name is a valid TensorFlow API name.
+
+  Args:
+    name: The name to be validated.
+
+  Raises:
+    ValueError: If the name is not in the correct format.
+  """
+
+  if not name.startswith("tf."):
+    raise ValueError(f"Invalid TensorFlow API name '{name}'. API names should always start with 'tf.'.")
+
+
+
+def check_url(url):
+    """Checks if a URL is working by sending a HEAD request and verifying a 200 status code.
+
+    Args:
+        url: The URL to check.
+
+    Returns:
+        True if the URL is working, False otherwise.
+    """
+
+    try:
+        response = requests.head(url)
+        return response.status_code == 200
+    except requests.exceptions.RequestException as e:
+        print(f"Error checking URL: {e}")
+        return False
+    
+
+
+def remove_broken_urls(url_list):
+  """
+  Iterates through a list of URLs, checks their status, and removes non-working ones.
+
+  Args:
+      url_list: A list containing URLs to be checked.
+
+  Returns:
+      A new list with only working URLs.
+  """
+  working_urls = []
+  for url in url_list:
+    if check_url(url):
+      working_urls.append(url)
+  return working_urls
+
+
+
+def create_markdown_file(response, filename):
+    """Creates and saves a Markdown file with the given response."""
+    path = os.path.join(s.ROOT, "doc_customizer_llm")
+    with open( os.path.join(path, filename), "w") as file:
+        file.write(str(response))
+    print(f"Response saved in {path} folder")
