@@ -93,6 +93,10 @@ def get_channel_videos(query):
 
 def find_start_time(doc, transcript):
     '''
+    We find the starting point where the first 5 words of doc match within the entire transcript. Since doc is a continuous substring of the entire transcript, we are guaranteed
+    to find a starting time for the given doc.
+    Each text in transcipt contains only a few words, hence it might not contain all first 5 words of doc. So, we also check the next 'text' of transcript.
+
     Parameters:
         doc (Doc): Recommended parent document based on similarity search
         transcript (Json): Json transcript of the recommended video for doc
@@ -119,6 +123,9 @@ def find_start_time(doc, transcript):
 
 def relevant_score_videos(question_title, relevant_docs, transcript_jsons):
     '''
+    Need to suggest youtube videos based on relevant_docs. If a doc has a similarity score > 0.5, then we want to print out it's relevance_score, 
+    recommended video and the start time for that video.
+
     Parameters:
         question_title (str): Question title to search recommended videos for
         relevant_docs (list): List of relevant Docs based on similarity search and Cohere ReRank
@@ -139,11 +146,11 @@ def relevant_score_videos(question_title, relevant_docs, transcript_jsons):
             relevant_videos_start_time[doc.metadata['video_id']] = [relevance_score, start_time]
 
     if len(relevant_videos_start_time):
-        print('Recommended videos for question title: ', question_title)
+        print('\nRecommended videos for question title: ', question_title)
         for key, value in relevant_videos_start_time.items():
 
-            print(f'Relevance Score: {value[0]}')
-            print(f'https://www.youtube.com/watch?v={key} at time= {value[1]}')
+            print(f'\nRelevance Score: {value[0]}')
+            print(f'https://www.youtube.com/watch?v={key} at time = {value[1]}')
     else:
         print('No recommended videos for question title: ', question_title)
 
@@ -185,7 +192,7 @@ for i in range(len(question_title)):
     recommended_videos = get_channel_videos(question_title[i])
     generated_transcripts, transcript_jsons = get_transcripts(recommended_videos)
     parent_retriever.add_documents(generated_transcripts)
-    
+
     compressed_docs = compression_retriever.get_relevant_documents(query=question_body[i])
     # print(compressed_docs)
     relevant_score_videos(question_title[i], compressed_docs, transcript_jsons)
