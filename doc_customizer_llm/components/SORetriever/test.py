@@ -1,4 +1,4 @@
-from main_retriever import retrieve_relevant_from_so
+from so_retrieval import retrieve_relevant_from_so
 
 # ==========================================================================================================================
 # TEST EXECUTIONS

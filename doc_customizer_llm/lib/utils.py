@@ -274,3 +274,7 @@ def create_markdown_file(response, filename):
     with open( os.path.join(path, filename), "w") as file:
         file.write(str(response))
     print(f"Response saved in {path} folder")
+
+
+def update_cell(df, column: str, row_index: int, value: str):
+  df.loc[row_index, column] = value

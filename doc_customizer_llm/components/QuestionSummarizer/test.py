@@ -1,4 +1,4 @@
-from claude_summarizer import ai_question_summarizer
+from summarize import question_summarizer
 
 # ==========================================================================================================================
 # TEST EXECUTIONS
@@ -16,5 +16,4 @@ body = """"
     Thanks and regards</p>
 """
 
-response = ai_question_summarizer(title, body)
-print(response)
+response = question_summarizer(title, body)

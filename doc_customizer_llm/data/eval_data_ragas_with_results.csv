@@ -1,0 +1,775 @@
+QuestionId,QuestionAPI,IssueType,Title,Question,GroundTruth,Answer,Context,Intent
+55909188,tf.nn.conv2d,Documentation Replication on Other Examples,How can I apply a TensorFlow 2D Convolution (tf.nn.conv2d) to a single (non-batch) 2D image?,"<p>I would like to use the function <code>tf.nn.conv2d()</code> on a <strong>single</strong> image example, but the TensorFlow documentation seems to only mention applying this transformation to a <strong>batch</strong> of images. </p>
+
+<p>The docs mention that the input image must be of shape <code>[batch, in_height, in_width, in_channels]</code> and the kernel must be of shape <code>[filter_height, filter_width, in_channels, out_channels]</code>. However, what is the most straightforward way to achieve 2D convolution with input shape <code>[in_height, in_width, in_channels]</code>?</p>
+
+<p>Here is an example of the current approach, where <code>img</code> has shape (height, width, channels):</p>
+
+<pre><code>img = tf.random_uniform((10,10,3))  # a single image
+img = tf.nn.conv2d([img], kernel)[0] # creating a batch of 1, then indexing the single example
+</code></pre>
+
+<p>I am reshaping the input as follows:</p>
+
+<p><code>[in_height, in_width, in_channels]-&gt;[1, in_height, in_width, in_channels]-&gt;[in_height, in_width, in_channels]</code> </p>
+
+<p>This feels like an unnecessary and costly operation when I am only interested in transforming one example.</p>
+
+<p>Is there a simple/standard way to do this that doesn't involve reshaping?</p>
+","<p>AFAIK there is no way around it. It seems (<a href=""https://stackoverflow.com/questions/50779869/does-tensorflow-tf-slice-incur-allocation-and-or-memory-copy"">here</a> and <a href=""https://stackoverflow.com/questions/53398721/tensorflow-can-reshape-create-a-copy"">here</a>) that the first operation creates a copy (someone correct me if I'm wrong). You may use <a href=""https://www.tensorflow.org/api_docs/python/tf/expand_dims"" rel=""nofollow noreferrer""><code>tf.expand_dims</code></a> instead though, it's IMO more readable because of it's verbosity.</p>
+
+<p>On the other hand, taking <code>0</code> element from the tensor should not perform a copy in this case and is almost free.</p>
+
+<p><strong>Most importantly</strong>, except for a little inconvenience with syntax (e.g. <code>[0]</code>) those operations definitely <strong>are not costly</strong>, especially in the context of performing convolution.</p>
+
+<p>BTW. Other ready alternative layers like the ones in <code>tf.keras</code>, require batch as first dimension as well.</p>
+","# Customized Content
+
+To apply the `tf.nn.conv2d()` function to a single image instead of a batch of images, you indeed need to adjust the shape of your input image to match the expected input shape of `[batch, in_height, in_width, in_channels]`. However, TensorFlow provides a more elegant way to add a batch dimension to your image without explicitly reshaping it as you've done. You can use the `tf.expand_dims()` function to add a new axis, effectively transforming your image into a batch of one. This method is more readable and directly conveys the intention of adding a batch dimension.
+
+Here's how you can do it:
+
+```python
+import tensorflow as tf
+import numpy as np
+
+# Assuming img has shape (height, width, channels)
+img = tf.random.uniform((10, 10, 3), dtype=tf.float32)
+
+# Use tf.expand_dims to add the batch dimension
+img_batch = tf.expand_dims(img, axis=0)
+
+# Define your kernel/filter here. Example:
+kernel = tf.random.uniform((3, 3, 3, 8), dtype=tf.float32)  # Example kernel
+
+# Apply tf.nn.conv2d
+output = tf.nn.conv2d(img_batch, kernel, strides=[1, 1, 1, 1], padding='VALID')
+
+# If needed, remove the batch dimension to get back to the original shape
+output_img = tf.squeeze(output, axis=0)
+
+print(output_img.shape)
+```
+
+In this example, `tf.expand_dims(img, axis=0)` adds a new dimension at the start, effectively making the shape of `img_batch` as `[1, height, width, channels]`, which is suitable for `tf.nn.conv2d()`. After the convolution, if you want to revert to the original shape (without the batch dimension), you can use `tf.squeeze(output, axis=0)`, which removes dimensions of size 1 from the shape of the tensor.
+
+This approach is standard and recommended when dealing with operations that expect a batch dimension, even when you're only processing a single image or data point.
+
+## Additional Resources
+
+#### Stack Overflow Q&A
+- [Does TensorFlow tf.slice incur allocation and/or memory copy?](https://stackoverflow.com/questions/50779869/does-tensorflow-tf-slice-incur-allocation-and-or-memory-copy)
+- [TensorFlow: Can reshape create a copy?](https://stackoverflow.com/questions/53398721/tensorflow-can-reshape-create-a-copy)
+- [How can I apply a TensorFlow 2D Convolution (tf.nn.conv2d) to a single (non-batch) 2D image?](https://stackoverflow.com/questions/55909188/how-can-i-apply-a-tensorflow-2d-convolution-tf-nn-conv2d-to-a-single-non-batc/55910879#55910879)
+
+#### Related Web URLs
+- [Dive into Deep Learning: Convolutional Neural Networks](http://d2l.ai/chapter_convolutional-neural-networks/conv-layer.html)
+- [TensorFlow convolution of 2D array](https://stackoverflow.com/questions/42743199/tensorflow-convolution-of-2d-array)
+
+#### Related Courses
+- [Convolutional Neural Networks in TensorFlow](https://www.coursera.org/learn/convolutional-neural-networks-tensorflow)
+- [TensorFlow 2 for Deep Learning Specialization](https://www.coursera.org/specializations/tensorflow2-deeplearning)
+- [TensorFlow Developer Certificate in AI and Machine Learning](https://www.udemy.com/course/tensorflow-developer-certificate-machine-learning-zero-to-mastery/)
+- [Deep Learning with TensorFlow](https://www.edx.org/learn/tensorflow)",[''],The user is seeking a simpler or standard method to apply a 2D convolution using tf.nn.conv2d on a single image without having to reshape it into a batch format.
+53032922,tf.while_loop,Documentation Replication on Other Examples,TensorFlow while loop with condition dependent on body,"<p>I want to have a while loop with the condition dependent on a tensor computed in the loop body, but I don't know how to accomplish this with <a href=""https://www.tensorflow.org/api_docs/python/tf/while_loop"" rel=""nofollow noreferrer""><code>tf.while_loop()</code></a>.</p>
+
+<p>My input processing includes random cropping, but some crops can lead to low-quality examples and I want to discard those and try a new random crop until an example of sufficient quality is obtained. The inputs are cropped by</p>
+
+<pre><code>import numpy as np
+import tensorflow as tf
+IMAGE_SHAPE = [960, 720]
+CROP_SHAPE = [320, 240]
+max_begin_index = np.array(IMAGE_SHAPE) - np.array(CROP_SHAPE)
+crop_begin_index = tf.round(tf.random_uniform([2]) * max_begin_index)
+img_crop = tf.slice(img, crop_begin_index, crop_shape + [-1])
+</code></pre>
+
+<p>and the condition is</p>
+
+<pre><code>cond = tf.count_nonzero(img_crop &gt; 0) &gt; 0.5 * tf.size(img_crop)
+</code></pre>
+
+<p>Going over the documentation and examples of <code>tf.while_loop(cond, body, loop_vars, ...)</code>, what I understand is that both <code>cond</code> and <code>body</code> should take the same arguments given in <code>loop_vars</code>.
+I don't see how I can have <code>cond</code> depend on <code>img_crop</code> which would be calculated inside <code>body</code>, and isn't provided in <code>loop_vars</code>.</p>
+
+<p>I could equivalently compute <code>cond</code> using <code>crop_begin_index</code> without actually cropping, but it depends on the random values computed inside the loop, so I have the same problem.</p>
+
+<p>Is this indeed a limitation of TF looping? If not, how can I rewrite my code to use <code>tf.while_loop()</code>?</p>
+","<p>The arguments that are passed on to the <code>condition</code> function are the arguments returned from your <code>body</code> function. So you just have to return that value that you want to base your condition on in the <code>body</code> function, then carry out the condition on that value in your <code>cond</code> function. Something like, </p>
+
+<pre><code>def body(image_shape, crop_shape, img_crop):
+    max_begin_index = np.array(IMAGE_SHAPE) - np.array(CROP_SHAPE)
+    crop_begin_index = tf.round(tf.random_uniform([2]) * max_begin_index)
+    img_crop = tf.slice(img, crop_begin_index, crop_shape + [-1])
+    return (image_shape, crop_shape, img_crop)
+
+def cond(image_shape, crop_shape, img_crop):
+    return tf.count_nonzero(img_crop &gt; 0) &gt; 0.5 * tf.size(img_crop)
+
+image_shape, crop_shape, img_crop = tf.while_loop(cond=cond, body=body, loop_vars=([960, 720], [320, 240], img_crop))
+</code></pre>
+
+<p>Don't have access to an interpreter right now, so there might be some syntax problems there, but something like that. </p>
+
+<p>Also, if I recall correctly, the body and the condition need to be pure functions, you cannot alter the outer state from within the functions.</p>
+
+<p>Also note, you'll need to specify some initial value for <code>img_crop</code> in the loop vars.</p>
+
+<p>Moreover, by default, <code>tf.while_loop</code> expects the shapes of all the <code>loop_vars</code> to remain the same across all loop runs. You can modify this through the <code>shape_invariants</code> argument. </p>
+","# Customized Content
+
+To address your question about using `tf.while_loop` with a condition dependent on a tensor computed in the loop body, you can indeed achieve this by ensuring that the tensor you want to condition on is returned by the body function and passed as one of the loop variables. This way, the condition function can depend on the value computed inside the loop.
+
+Here's how you can structure your code to use `tf.while_loop` for your specific use case of discarding low-quality image crops and trying new random crops until a sufficient quality example is obtained:
+
+```python
+import numpy as np
+import tensorflow as tf
+
+# Define your image and crop shapes
+IMAGE_SHAPE = [960, 720]
+CROP_SHAPE = [320, 240]
+
+# Initial values for loop variables
+img = tf.placeholder(tf.float32, shape=[None, None, None])  # Placeholder for your input image
+initial_img_crop = tf.zeros([320, 240, 3])  # Initial dummy value for img_crop
+
+def body(crop_begin_index, img_crop):
+    max_begin_index = np.array(IMAGE_SHAPE) - np.array(CROP_SHAPE)
+    crop_begin_index = tf.round(tf.random.uniform([2]) * max_begin_index)
+    img_crop = tf.slice(img, tf.cast(crop_begin_index, tf.int32), CROP_SHAPE + [-1])
+    return crop_begin_index, img_crop
+
+def cond(crop_begin_index, img_crop):
+    return tf.less(tf.count_nonzero(img_crop > 0), 0.5 * tf.size(img_crop, out_type=tf.int64))
+
+# Execute the while loop
+_, img_crop_final = tf.while_loop(cond, body, [tf.zeros([2], tf.float32), initial_img_crop])
+
+# Note: You'll need to run this within a TensorFlow session and feed an actual image to `img`
+```
+
+This code snippet initializes `img_crop` with a dummy value and updates it within the loop body based on random cropping. The condition checks if the number of non-zero pixels in the cropped image is less than half of the total number of pixels, indicating a low-quality crop. If the condition is true, the loop continues, trying another random crop until a sufficient quality example is obtained.
+
+Remember, you'll need to run this within a TensorFlow session, and you must feed an actual image to the `img` placeholder. Also, ensure that TensorFlow 1.x is being used or adapt the code using `tf.compat.v1` if you're working with TensorFlow 2.x, as `tf.placeholder` and `tf.while_loop` might behave differently or be deprecated in TensorFlow 2.x.
+
+## Additional Resources
+
+#### Stack Overflow Q&A
+- [TensorFlow while loop with condition dependent on body](https://stackoverflow.com/questions/53032922/tensorflow-while-loop-with-condition-dependent-on-body)
+
+#### Related Web URLs
+- [TensorFlow while_loop documentation](https://www.tensorflow.org/api_docs/python/tf/while_loop)
+- [How to use tf.while_loop in TensorFlow](https://stackoverflow.com/questions/37441140/how-to-use-tf-while-loop-in-tensorflow)
+
+#### Related Courses
+- [TensorFlow 2 Deep Learning Specialization on Coursera](https://www.coursera.org/specializations/tensorflow2-deeplearning)
+- [TensorFlow: Advanced Techniques Specialization on Coursera](https://www.coursera.org/specializations/tensorflow-advanced-techniques)
+- [Getting Started with TensorFlow 2 on Coursera](https://www.coursera.org/learn/getting-started-with-tensor-flow2)","[""Stack Overflow Public questions & answers\n\nStack Overflow for Teams Where developers & technologists share private knowledge with coworkers\n\nTalent Build your employer brand\n\nAdvertising Reach developers & technologists worldwide\n\nCollectives™ on Stack Overflow\n\nFind centralized, trusted content and collaborate around the technologies you use most. Learn more about Collectives\n\nConnect and share knowledge within a single location that is structured and easy to search. Learn more about Teams\n\nTensorFlow while loop with condition dependent on body\n\nAsked 4 years, 3 months ago\n\nModified 4 years, 3 months ago\n\nI want to have a while loop with the condition dependent on a tensor computed in the loop body, but I don't know how to accomplish this with tf.while_loop().\n\nMy input processing includes random cropping, but some crops can lead to low-quality examples and I want to discard those and try a new random crop until an example of sufficient quality is obtained. The inputs are cropped by\n\nimport numpy as np import tensorflow as tf IMAGE_SHAPE = [960, 720] CROP_SHAPE = [320, 240] max_begin_index = np.array(IMAGE_SHAPE) - np.array(CROP_SHAPE) crop_begin_index = tf.round(tf.random_uniform([2]) * max_begin_index) img_crop = tf.slice(img, crop_begin_index, crop_shape + [-1])\n\nand the condition is\n\ncond = tf.count_nonzero(img_crop > 0) > 0.5 * tf.size(img_crop)\n\nGoing over the documentation and examples of tf.while_loop(cond, body, loop_vars, ...), what I understand is that both cond and body should take the same arguments given in loop_vars. I don't see how I can have cond depend on img_crop which would be calculated inside body, and isn't provided in loop_vars.\n\nI could equivalently compute cond using crop_begin_index without actually cropping, but it depends on the random values computed inside the loop, so I have the same problem.\n\nIs this indeed a limitation of TF looping? If not, how can I rewrite my code to use tf.while_loop()?\n\nasked Oct 28, 2018 at 15:05\n\n2,57222 gold badges2323 silver badges3636 bronze badges\n\nSorted by: Reset to default\n\nHighest score (default)\n\nTrending (recent votes count more)\n\nDate modified (newest first)\n\nDate created (oldest first)\n\nThe arguments that are passed on to the condition function are the arguments returned from your body function. So you just have to return that value that you want to base your condition on in the body function, then carry out the condition on that value in your cond function. Something like,\n\ndef body(image_shape, crop_shape, img_crop): max_begin_index = np.array(IMAGE_SHAPE) - np.array(CROP_SHAPE) crop_begin_index = tf.round(tf.random_uniform([2]) * max_begin_index) img_crop = tf.slice(img, crop_begin_index, crop_shape + [-1]) return (image_shape, crop_shape, img_crop) def cond(image_shape, crop_shape, img_crop): return tf.count_nonzero(img_crop > 0) > 0.5 * tf.size(img_crop) image_shape, crop_shape, img_crop = tf.while_loop(cond=cond, body=body, loop_vars=([960, 720], [320, 240], img_crop))""]","The user is trying to understand how to implement a while loop in TensorFlow where the loop's condition depends on a tensor that is computed within the loop's body. Specifically, they want to repeatedly perform random cropping on an image until a crop of sufficient quality, based on a certain condition, is obtained."
+59555206,tf.keras,Documentation Replication on Other Examples,keras to tf.keras Conversion: Dense layer dimensions not defined?,"<p>So I've built a convnet using pure <code>keras</code>. It compiles and operates exactly as intended, but I need to convert it to use <code>tf.keras</code> so that I can make use of <code>tfmot</code>. Having read documentation, I attempted to convert it, only to get the following error:</p>
+
+<p><code>The last dimension of the inputs to Dense should be defined. Found None.</code> </p>
+
+<p>Any idea what I'm doing wrong?</p>
+
+<p>Thanks!</p>
+
+<p>Original <code>keras</code> model:</p>
+
+<pre><code>input_layer = keras.layers.Input(shape=(100,))
+reshape_layer = keras.layers.Reshape((-1, 100, 1))(input_layer)
+conv_layer_1 = keras.layers.Convolution2D(filters=30, kernel_size=(10, 1), strides=(1, 1), padding=""same"", activation=""relu"")(reshape_layer)
+conv_layer_2 = keras.layers.Convolution2D(filters=30, kernel_size=(8, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_1)
+conv_layer_3 = keras.layers.Convolution2D(filters=40, kernel_size=(6, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_2)
+conv_layer_4 = keras.layers.Convolution2D(filters=50, kernel_size=(5, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_3)
+conv_layer_5 = keras.layers.Convolution2D(filters=50, kernel_size=(5, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_4)
+flatten_layer = keras.layers.Flatten()(conv_layer_5)
+label_layer = keras.layers.Dense(200, activation=""relu"")(flatten_layer)
+output_layer = keras.layers.Dense(1, activation=""linear"")(label_layer)
+
+model = keras.Model(inputs=input_layer, outputs=output_layer)
+</code></pre>
+
+<p>Converted <code>tf.keras</code> model:</p>
+
+<pre><code>input_layer = tf.keras.layers.InputLayer(input_shape=(100,))
+reshape_layer = tf.keras.layers.Reshape((-1, 100, 1))(input_layer)
+conv_layer_1 = tf.keras.layers.Convolution2D(filters=30, kernel_size=(10, 1), strides=(1, 1), padding=""same"", activation=""relu"")(reshape_layer)
+conv_layer_2 = tf.keras.layers.Convolution2D(filters=30, kernel_size=(8, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_1)
+conv_layer_3 = tf.keras.layers.Convolution2D(filters=40, kernel_size=(6, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_2)
+conv_layer_4 = tf.keras.layers.Convolution2D(filters=50, kernel_size=(5, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_3)
+conv_layer_5 = tf.keras.layers.Convolution2D(filters=50, kernel_size=(5, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_4)
+flatten_layer = tf.keras.layers.Flatten()(conv_layer_5)
+label_layer = tf.keras.layers.Dense(200, activation=""relu"")(flatten_layer)
+output_layer = tf.keras.layers.Dense(1, activation=""linear"")(label_layer)
+
+model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+</code></pre>
+
+<p>EDIT 1:</p>
+
+<p>I thought maybe I could get around the issue by saving the <code>keras</code> model after creation and loading it as a <code>tf.keras</code> model immediately before compilation / training. That throws the same error! </p>
+","<p>There's few issues with your code. Fix them and you should be good to go,</p>
+
+<h2>Issue 1: Use <code>Input</code> instead of <code>InputLayer</code></h2>
+
+<p>The standard is to use <code>Input</code> layer instead of <code>InputLayer</code> (which infact uses <code>InputLayer</code> internally). You also need to change <code>input_shape</code> to <code>shape</code> if you are using <code>Input</code> layer.</p>
+
+<pre><code>input_layer = tf.keras.layers.Input(shape=(100,))
+</code></pre>
+
+<h2>Issue 2: 2 <code>None</code> dimensions in the output</h2>
+
+<p>When you execute the following line, you get two <code>None</code> dimensions in your output. </p>
+
+<pre><code>reshape_layer = tf.keras.layers.Reshape((-1, 100, 1))(input_layer)
+</code></pre>
+
+<p>Which is why you are getting the above error. When defining the <code>Reshape</code> layer you don't define the <code>batch</code> dimension, which will be None. And that's the only dimension you can have as <code>None</code> if you want to use a <code>Dense</code> layer. Otherwise, the <code>Dense</code> layer cannot infer the shape of its weights (which is why you get the error). So change that to,</p>
+
+<pre><code>reshape_layer = tf.keras.layers.Reshape((1, 100, 1))(input_layer)
+</code></pre>
+
+<p>The rest stays the same.</p>
+
+<pre><code>conv_layer_1 = tf.keras.layers.Convolution2D(filters=30, kernel_size=(10, 1), strides=(1, 1), padding=""same"", activation=""relu"")(reshape_layer)
+conv_layer_2 = tf.keras.layers.Convolution2D(filters=30, kernel_size=(8, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_1)
+conv_layer_3 = tf.keras.layers.Convolution2D(filters=40, kernel_size=(6, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_2)
+conv_layer_4 = tf.keras.layers.Convolution2D(filters=50, kernel_size=(5, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_3)
+conv_layer_5 = tf.keras.layers.Convolution2D(filters=50, kernel_size=(5, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_4)
+flatten_layer = tf.keras.layers.Flatten()(conv_layer_5)
+label_layer = tf.keras.layers.Dense(200, activation=""relu"")(flatten_layer)
+output_layer = tf.keras.layers.Dense(1, activation=""linear"")(label_layer)
+
+model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+model.summary()
+</code></pre>
+","# Customized Content
+
+The error you're encountering, `The last dimension of the inputs to Dense should be defined. Found None.`, typically occurs when the model's layers cannot infer the shapes they're supposed to work with, especially when transitioning from convolutional layers to dense layers. This is a common issue when converting models from `keras` to `tf.keras`, as the latter may handle tensor shapes slightly differently.
+
+To resolve this issue, let's address the conversion process step by step, ensuring that each layer correctly understands its input shape. The primary focus will be on the `InputLayer` and `Reshape` layers, as these are crucial for setting up the initial dimensions that flow through the network.
+
+## Corrected `tf.keras` Model
+
+```python
+import tensorflow as tf
+
+# Correctly define the input layer
+input_layer = tf.keras.layers.Input(shape=(100,))
+
+# Use the Reshape layer correctly. The -1 in the original code is ambiguous when transitioning to Dense layers.
+# Assuming the intention was to keep the same total dimensionality, we avoid using -1 in the reshape target shape.
+reshape_layer = tf.keras.layers.Reshape((100, 1, 1))(input_layer)
+
+# Convolutional layers as defined in the original model
+conv_layer_1 = tf.keras.layers.Conv2D(filters=30, kernel_size=(10, 1), strides=(1, 1), padding=""same"", activation=""relu"")(reshape_layer)
+conv_layer_2 = tf.keras.layers.Conv2D(filters=30, kernel_size=(8, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_1)
+conv_layer_3 = tf.keras.layers.Conv2D(filters=40, kernel_size=(6, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_2)
+conv_layer_4 = tf.keras.layers.Conv2D(filters=50, kernel_size=(5, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_3)
+conv_layer_5 = tf.keras.layers.Conv2D(filters=50, kernel_size=(5, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_4)
+
+# Flatten the output of the last convolutional layer before feeding it into Dense layers
+flatten_layer = tf.keras.layers.Flatten()(conv_layer_5)
+
+# Dense layers
+label_layer = tf.keras.layers.Dense(200, activation=""relu"")(flatten_layer)
+output_layer = tf.keras.layers.Dense(1, activation=""linear"")(label_layer)
+
+# Construct the model
+model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+
+# Compile the model (optional here, but necessary before training)
+model.compile(optimizer='adam', loss='mean_squared_error')
+
+# Display the model's architecture
+model.summary()
+```
+
+### Key Changes and Explanations:
+
+- **Input Layer**: Changed from `InputLayer` with `input_shape` to `Input` with `shape`. This is a more conventional way to define input layers in `tf.keras`, ensuring the model starts with a clearly defined input shape.
+- **Reshape Layer**: The original use of `-1` in the reshape dimensions can lead to ambiguity, especially when transitioning to dense layers that require a fully defined shape. By specifying `(100, 1, 1)`, we make the input shape explicit for the convolutional layers that follow. This change ensures that the model can infer the correct shape for all layers, including the dense layers at the end of the model.
+
+By making these adjustments, the model should now compile and run without the dimensionality error, allowing you to proceed with training and utilizing `tfmot` as intended.
+
+## Additional Resources
+
+#### Stack Overflow Q&A
+- [keras to tf.keras Conversion: Dense layer dimensions not defined?](https://stackoverflow.com/questions/59555206/keras-to-tf-keras-conversion-dense-layer-dimensions-not-defined/59556499#59556499)
+
+#### Related Web URLs
+- [The last dimension of the inputs to a Dense layer should be defined](https://copyprogramming.com/howto/the-last-dimension-of-the-inputs-to-a-dense-layer-should-be-defined-found-none-full-input-shape-received-none-none)
+- [TensorFlow GitHub Issue: Dense layer dimensionality](https://github.com/tensorflow/tensorflow/issues/35464)
+
+#### Related Courses
+- [Introduction to Deep Learning with Keras on Coursera](https://www.coursera.org/learn/introduction-to-deep-learning-with-keras)
+- [Complete TensorFlow 2 and Keras Deep Learning Bootcamp on Udemy](https://www.udemy.com/course/complete-tensorflow-2-and-keras-deep-learning-bootcamp/)
+- [IBM Deep Learning Fundamentals with Keras on edX](https://www.edx.org/learn/deep-learning/ibm-deep-learning-fundamentals-with-keras)","['None found for the last dimension in the inputs of a Dense layer. Full input shape received: (None, None)\n\nAuthor: Mary Grogan Date: 2023-06-04\n\nTo achieve a consistent sequence length, it is necessary to add zero padding to the input. The code provided below can be used for tokenization and padding purposes. However, it should be noted that using a tensor with a ragged last dimension (where the lengths of sentences vary) is not possible when working with the model. I have attempted this method before but encountered an error, which is displayed below. The error can be avoided by including data augmentation. To resolve the issue, it is recommended that you remove the specified code.\n\nThe last dimension of the inputs to a Dense layer should be defined. Found None. Full input shape received: (None, None)\n\nKeras Tensor Flow Error : ValueError: The last dimension of the inputs to `Dense` should be defined. Found `None`\n\nUse `sentence-transformers` inside of a keras model\n\nWhat is the output shape of a dense layer?\n\nWhy does keras ignore the first dimension?\n\nWhat is input_dim in LSTM?\n\nWhat flows between layers in keras?\n\nThe last dimension of the inputs to a Dense layer should be defined. Found None. Full input shape received: (None, None)\n\nI am encountering difficulties while incorporating data augmentation in the Keras TensorFlow framework, as I endeavor to establish a binary prediction model. Here\'s the code I\'m working with.\n\ntrain_datagen = ImageDataGenerator(rescale=1./255) test_datagen = ImageDataGenerator(rescale=1./255) train_dir = \'C:/train\' test_dir = \'C:/test\' train_data = train_datagen.flow_from_directory(train_dir,target_size=(224,224),class_mode=\'binary\',seed=42) test_data = test_datagen.flow_from_directory(test_dir,target_size=(224,224),class_mode=\'binary\',seed=42) tf.random.set_seed(42) from tensorflow.keras.layers.experimental import preprocessing data_augmentation = keras.Sequential([ preprocessing.RandomFlip(""horizontal""), preprocessing.RandomZoom(0.2), preprocessing.RandomRotation(0.2), preprocessing.RandomHeight(0.2), preprocessing.RandomWidth(0.2), ], name=\'data_augmentation\') model_1 = tf.keras.Sequential([ tf.keras.layers.Input(shape=(224,224,3),name=\'input_layer\'), data_augmentation, tf.keras.layers.Conv2D(20,3,activation=\'relu\'), tf.keras.layers.MaxPool2D(pool_size=2), tf.keras.layers.Conv2D(20,3,activation=\'relu\'), tf.keras.layers.MaxPool2D(pool_size=2), tf.keras.layers.Flatten(), tf.keras.layers.Dense(1,activation=\'sigmoid\') ]) model_1.compile(loss=tf.keras.losses.binary_crossentropy, optimizer=\'Adam\', metrics=[\'accuracy\']) model_1.fit(train_data,epochs=10,validation_data=test_data)\n\nI attempted this method previously, but encountered an error once more.\ninputs = tf.keras.layers.Input(shape=(224,224,3),name=\'input_layer\') x = data_augmentation(inputs) x = tf.keras.layers.Conv2D(20,3,activation=\'relu\')(**** = tf.keras.layers.Conv2D(20,3,activation=\'relu\')(**** = tf.keras.layers.MaxPool2D(pool_size=2)(**** = tf.keras.layers.Flatten()(x) outputs = tf.keras.layers.Dense(1,activation=\'sigmoid\')(x) model_1 = tf.keras.Model(inputs,outputs)\n\nand this is error message:\n\nTraceback (most recent call last): File ""C:/Users/pondy/PycharmProjects/pythonProject2/main.py"", line 60, in\n\nmodel_1 = tf.keras.Sequential([ File ""C:\\Users\\pondy\\PycharmProjects\\pythonProject2\\venv\\lib\\site-packages\\tensorflow\\python\\training\\tracking\\base.py"", line 530, in _method_wrapper result = method(self, *args, **kwargs) File ""C:\\Users\\pondy\\PycharmProjects\\pythonProject2\\venv\\lib\\site-packages\\keras\\utils\\traceback_utils.py"", line 67, in error_handler raise e.with_traceback(filtered_tb) from None File ""C:\\Users\\pondy\\PycharmProjects\\pythonProject2\\venv\\lib\\site-packages\\keras\\layers\\core\\dense.py"", line 139, in build raise ValueError(\'The last dimension of the inputs to a Dense layer \' ValueError: The last dimension of the inputs to a Dense layer should be defined. Found None. Full input shape received: (None, None) Process finished with exit code 1\n\nIn case data_augmentation was not included, there won\'t be an error. Appreciate your assistance <3.\n\nyour code will work if you remove\n\npreprocessing.RandomHeight(0.2), preprocessing.RandomWidth(0.2),\n\nError: ValueError: The last dimension of the inputs to, Sorted by: 19 You have None in the length of the sequence in the second model. i2 = Input (shape= (None, 104)) You can\'t flatten a variable length and have a known size. You need a known size for Dense. Either you use a fixed length instead of None, or you use a GlobalMaxPooling1D or a GlobalAveragePooling1D instead of Flatten. Share Usage examplei2 = Input(shape=(None, 104))Feedback\n\ndimension of the inputs to a dense inside of a keras model keras tensor flow error valueerror the last dimension\n\nKeras Tensor Flow Error : ValueError: The last dimension of the inputs to `Dense` should be defined. Found `None`\n\nI am new to Tensorflow and have this code for the first time.\n\nimport tensorflow as tf # Task: predict whether each sentence is a question or not. sentences = tf.constant( [\'What makes you think she is a witch?\', \'She turned me into a newt.\', \'A newt?\', \'Well, I got better.\']) is_question = tf.constant([True, False, True, False]) # Build the Keras model. keras_model = tf.keras.Sequential([ tf.keras.layers.Input(shape=[None], ragged=True), tf.keras.layers.Dense(128, activation=\'relu\'), tf.keras.layers.Dense(10) ]) keras_model.compile(loss=\'mse\', optimizer=\'rmsprop\',metrics=[\'accuracy\']) keras_model.fit(sentences, is_question, epochs=5) test_loss, test_acc = keras_model.evaluate(sentences, is_question) print(\'\\nTest accuracy:\', test_acc)\n\nHowever, upon my attempt to utilize it, an error occurs.\nDescribe the expected behavior\n\nIf I were using normal Keras, I\'d expect no errors trying to do the above and for the model to compile subsequently without issue.\n\nCode to reproduce the issue See the code in my snippet above.\n\nThe text was updated successfully, but these errors were encountered:\n\nHarshini-Gadige assigned karmel\n\n@omalleyt12 -- I recall you worked on something similar recently; can you comment on what is expected here?\n\nNote that in 1.12 the above gives a different error:\n\n--------------------------------------------------------------------------- ValueError Traceback (most recent call last) <ipython-input-4-0347ad7938f4> in <module>() 2 from tensorflow.keras.layers import Input, Dense 3 i = Input(shape=(4,), sparse=True) ----> 4 d = Dense(4)(i) google3/third_party/tensorflow/python/keras/engine/base_layer.py in __call__(self, inputs, *args, **kwargs) 532 if not self.built: 533 # Build layer if applicable (if the `build` method has been overridden). --> 534 self._maybe_build(inputs) 535 # We must set self.built since user defined build functions are not 536 # constrained to set self.built. google3/third_party/tensorflow/python/keras/engine/base_layer.py in _maybe_build(self, inputs) 1592 # Only call `build` if the user has manually overridden the build method. 1593 if not hasattr(self.build, \'_is_default\'): -> 1594 self.build(input_shapes) 1595 1596 google3/third_party/tensorflow/python/keras/layers/core.py in build(self, input_shape) 928 input_shape = tensor_shape.TensorShape(input_shape) 929 if tensor_shape.dimension_value(input_shape[-1]) is None: --> 930 raise ValueError(\'The last dimension of the inputs to `Dense` \' 931 \'should be defined. Found `None`.\') 932 last_dim = tensor_shape.dimension_value(input_shape[-1]) ValueError: The last dimension of the inputs to `Dense` should be defined. Found `None`.\n\n@karmel @omalleyt12 I looked into this issue last week. There are several things that need to be fixed. One is that sparse.placeholder could not recognize (None, 4). It will always converts to (None, None) so that the error of:\n\nValueError: The last dimension of the inputs to `Dense` should be defined. Found `None`.\n\nI created a PR #24048 to fix the above shape inforamtion issue first.\n\nThere might be some other places that need to be fixed to make @JamesGlooTeam example work though.\n\n(Note: as pointed out by @omalleyt12, the error is based in 1.12 and is different from the original error posted by @JamesGlooTeam )\n\nomalleyt12 commented\n\nThis is because for SparseTensors, the shape is actually a Tensor. Tensors can\'t have None values.\n\nYou can get around this on the Input layer by defining your batch_size:\n\nx = keras.Input(batch_size=10, shape=(4,), sparse=True)\n\nHowever, Dense layers (and most layers in general it seems) don\'t support sparse inputs, so you would need to subclass Layer in order to call tf.sparse.sparse_dense_matmul on your inputs, or create a Lambda layer to convert your sparse inputs to dense.\nimport tensorflow as tf from transformers import AutoTokenizer, TFAutoModel MODEL_PATH = \'sentence-transformers/all-MiniLM-L6-v2\' tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH) model = TFAutoModel.from_pretrained(MODEL_PATH, from_pt=True) class SBert(tf.keras.layers.Layer): def __init__(self, tokenizer, model): super(SBert, self).__init__() self.tokenizer = tokenizer self.model = model def tf_encode(self, inputs): def encode(inputs): inputs = [x[0].decode(""utf-8"") for x in inputs.numpy()] outputs = self.tokenizer(inputs, padding=True, truncation=True, return_tensors=\'tf\') return outputs[\'input_ids\'], outputs[\'token_type_ids\'], outputs[\'attention_mask\'] return tf.py_function(func=encode, inp=[inputs], Tout=[tf.int32, tf.int32, tf.int32]) def process(self, i, t, a): def __call(i, t, a): model_output = self.model({\'input_ids\': i.numpy(), \'token_type_ids\': t.numpy(), \'attention_mask\': a.numpy()}) return model_output[0] return tf.py_function(func=__call, inp=[i, t, a], Tout=[tf.float32]) def mean_pooling(self, model_output, attention_mask): token_embeddings = tf.squeeze(tf.stack(model_output), axis=0) input_mask_expanded = tf.cast( tf.broadcast_to(tf.expand_dims(attention_mask, -1), tf.shape(token_embeddings)), tf.float32 ) a = tf.math.reduce_sum(token_embeddings * input_mask_expanded, axis=1) b = tf.clip_by_value(tf.math.reduce_sum(input_mask_expanded, axis=1), 1e-9, tf.float32.max) embeddings = a / b embeddings, _ = tf.linalg.normalize(embeddings, 2, axis=1) return embeddings def call(self, inputs): input_ids, token_type_ids, attention_mask = self.tf_encode(inputs) model_output = self.process(input_ids, token_type_ids, attention_mask) embeddings = self.mean_pooling(model_output, attention_mask) return embeddings sbert = SBert(tokenizer, model) inputs = tf.keras.layers.Input((1,), dtype=tf.string) outputs = sbert(inputs) model = tf.keras.Model(inputs, outputs) model(tf.constant([\'some text\', \'more text\']))\n\nTensorShape([2, 384]).shape\n\nThe last dimension of the inputs to a Dense layer should, The last dimension of the inputs to a Dense layer should be defined. Found None. Full input shape received: (None, None) Ask Question line 139, in build raise ValueError(\'The last dimension of the inputs to a Dense layer \' ValueError: Found None. Full input shape received: (None, None)\n\nRead other technology post: Transcoding 100+ files from H.264 to H.265\n\nAccessing the last dimension of an ndimensional matrix in Matlab\n\nIntegrating Sentence Transformers into a Keras Model\n\nReshape Error: The Tensor Contains 327680 Values, Which is Not a Multiple of 25088 as Required\n\nReshaping Error: Tensor with 8434176 values cannot be reshaped to a shape that is not a multiple of 78400\n\nDifficulty in Constructing Tensorflow Model with Huggingface Weights\n\nStrategies for managing a batch size of 0 in Tensorflow\'s tf.layers.max_pooling2d\n\nModel fitting error encountered while using ImageDataGenerator and tf.data.Dataset']","The user is trying to understand why they are receiving an error stating 'The last dimension of the inputs to Dense should be defined. Found None.' when attempting to convert their convolutional neural network model from keras to tf.keras, despite the model compiling and operating as intended in keras."
+48914952,tf.unique,Documentation Replication on Other Examples,num_buckets as a parameter in a tensorflow feature column,"<p>Currently Tensorflow documentation define a categorical vocabulary column this way:</p>
+
+<pre><code>vocabulary_feature_column =
+tf.feature_column.categorical_column_with_vocabulary_list(
+    key=""feature_name_from_input_fn"",
+    vocabulary_list=[""kitchenware"", ""electronics"", ""sports""]) 
+</code></pre>
+
+<p>However this suppose that we input manually the vocabulary list.
+In case of large dataset with many columns and many unique values I would like to automate the process this way:</p>
+
+<pre><code>for k in categorical_feature_names:
+    vocabulary_feature_column =
+        tf.feature_column.categorical_column_with_vocabulary_list(
+        key=""feature_name_from_input_fn"",
+        vocabulary_list=list_of_unique_values_in_the_column) 
+</code></pre>
+
+<p>To do so I need to retrieve the parameter <code>list_of_unique_values_in_the_column</code>.
+Is there anyway to do that with Tensorflow? </p>
+
+<p>I know there is tf.unique that could return unique values in a tensor but I don't get how I could feed the column to it so it returns the right vocabulary list.</p>
+","<p>If <code>list_of_unique_values_in_the_column</code> is known, you can save them in one file and read by <a href=""https://www.tensorflow.org/versions/master/api_docs/python/tf/feature_column/categorical_column_with_vocabulary_file"" rel=""nofollow noreferrer""> tf.feature_column.categorical_column_with_vocabulary_file</a>. If unknown, you can use <a href=""https://www.tensorflow.org/versions/master/api_docs/python/tf/feature_column/categorical_column_with_hash_bucket"" rel=""nofollow noreferrer""> tf.feature_column.categorical_column_with_hash_bucket </a> with a large enough size.</p>
+","# Customized Content
+
+To automate the process of creating a vocabulary list for a categorical feature column in TensorFlow, especially when dealing with large datasets, you can indeed utilize the `tf.unique` operation to extract unique values from a tensor. Here's how you can apply this to generate `vocabulary_feature_column` dynamically:
+
+```python
+import tensorflow as tf
+
+# Example dataset
+dataset = {
+    'feature_name_from_input_fn': ['kitchenware', 'electronics', 'sports', 'electronics', 'kitchenware']
+}
+
+# Convert the dataset to a TensorFlow tensor
+feature_tensor = tf.constant(dataset['feature_name_from_input_fn'])
+
+# Use tf.unique to find unique values
+y, idx = tf.unique(feature_tensor)
+
+# Convert the unique values tensor to a Python list for the vocabulary list
+vocabulary_list = y.numpy().tolist()
+
+# Assuming 'feature_name_from_input_fn' is the key for your feature column
+vocabulary_feature_column = tf.feature_column.categorical_column_with_vocabulary_list(
+    key=""feature_name_from_input_fn"",
+    vocabulary_list=vocabulary_list)
+
+print(""Vocabulary List:"", vocabulary_list)
+```
+
+Please note, the `y.numpy().tolist()` part is used to convert the tensor of unique values to a Python list. This step requires eager execution mode in TensorFlow, which is enabled by default in TensorFlow 2.x. If you're using TensorFlow 1.x, you'll need to explicitly start a TensorFlow session to evaluate tensors.
+
+This approach allows you to dynamically create a vocabulary list from your dataset without manually specifying it. This is particularly useful for large datasets with many unique categorical values.
+
+## Additional Resources
+
+#### Stack Overflow Q&A
+- [num_buckets as a parameter in a tensorflow feature column](https://stackoverflow.com/questions/48914952/num-buckets-as-a-parameter-in-a-tensorflow-feature-column/48917633#48917633)
+
+#### Related Web URLs
+- [How to represent categorical columns in TensorFlow](https://medium.com/@mahuthu/how-to-represent-categorical-columns-in-tensorflow-52dcb67f06f1)
+- [Introducing TensorFlow Feature Columns](https://developers.googleblog.com/2017/11/introducing-tensorflow-feature-columns.html)
+- [Should I use individual vocabulary files for each TensorFlow categorical column?](https://stackoverflow.com/questions/49883048/should-i-use-individual-vocabulary-files-for-each-tensorflow-categorical-column)
+- [TensorFlow feature column for variable list of values](https://stackoverflow.com/questions/48697799/tensorflow-feature-column-for-variable-list-of-values)
+
+#### Related Courses
+- [Generative Deep Learning with TensorFlow](https://www.coursera.org/programs/infosys-tech-specialization-3-6rr50/learn/generative-deep-learning-with-tensorflow?specialization=tensorflow-advanced-techniques)
+- [Natural Language Processing in TensorFlow](https://www.coursera.org/learn/natural-language-processing-tensorflow)
+- [TensorFlow: Advanced Techniques Specialization](https://www.coursera.org/specializations/tensorflow-advanced-techniques)
+- [Create Neural Networks with TensorFlow](https://www.udemy.com/course/create-neural-networks-with-tensorflow/)
+- [Deep Learning with TensorFlow Certification Training](https://www.udemy.com/course/deep-learning-with-tensorflow-certification-training/)
+- [TensorFlow 2: Practical Advanced](https://www.udemy.com/course/tensorflow-2-practical-advanced/)","['Specifying a three-element boundaries vector creates a four-element bucketized vector.\n\nCategorical identity column\n\nCategorical identity columns are a special case of bucketized columns. In traditional bucketized columns, each bucket represents a range of values (for example, from 1960 to 1979). In a categorical identity column, each bucket represents a single, unique integer. For example, let\'s say you want to represent the integer range [0, 4). (That is, you want to represent the integers 0, 1, 2, or 3.) In this case, the categorical identity mapping looks like this:\n\nFigure 5. A categorical identity column mapping. Note that this is a one-hot encoding, not a binary numerical encoding.\n\nSo, why would you want to represent values as categorical identity columns? As with bucketized columns, a model can learn a separate weight for each class in a categorical identity column. For example, instead of using a string to represent the product_class, let\'s represent each class with a unique integer value. That is:\n\nCall tf.feature_column.categorical_column_with_identity() to implement a categorical identity column. For example:\n\n# Create a categorical output for input ""feature_name_from_input_fn"", # which must be of integer type. Value is expected to be >= 0 and < num_buckets identity_feature_column = tf.feature_column.categorical_column_with_identity( key=\'feature_name_from_input_fn\', num_buckets=4) # Values [0, 4) # The \'feature_name_from_input_fn\' above needs to match an integer key that is # returned from input_fn (see below). So for this case, \'Integer_1\' or # \'Integer_2\' would be valid strings instead of \'feature_name_from_input_fn\'. # For more information, please check out Part 1 of this blog series. def input_fn(): ...<code>... return ({ \'Integer_1\':[values], ..<etc>.., \'Integer_2\':[values] }, [Label_values])\n\nCategorical vocabulary column\n\nWe cannot input strings directly to a model. Instead, we must first map strings to numeric or categorical values. Categorical vocabulary columns provide a good way to represent strings as a one-hot vector. For example:\n\nFigure 6. Mapping string values to vocabulary columns.\n\nAs you can see, categorical vocabulary columns are kind of an enum version of categorical identity columns. TensorFlow provides two different functions to create categorical vocabulary columns:\n\ntf.feature_column.categorical_column_with_vocabulary_list()\n\ntf.feature_column.categorical_column_with_vocabulary_file()\n\nThe tf.feature_column.categorical_column_with_vocabulary_list() function maps each string to an integer based on an explicit vocabulary list. For example:\n\n# Given input ""feature_name_from_input_fn"" which is a string, # create a categorical feature to our model by mapping the input to one of # the elements in the vocabulary list. vocabulary_feature_column = tf.feature_column.categorical_column_with_vocabulary_list( key=""feature_name_from_input_fn"", vocabulary_list=[""kitchenware"", ""electronics"", ""sports""])\nThe preceding function has a significant drawback; namely, there\'s way too much typing when the vocabulary list is long. For these cases, call tf.feature_column.categorical_column_with_vocabulary_file() instead, which lets you place the vocabulary words in a separate file. For example:\n\n# Given input ""feature_name_from_input_fn"" which is a string, # create a categorical feature to our model by mapping the input to one of # the elements in the vocabulary file vocabulary_feature_column = tf.feature_column.categorical_column_with_vocabulary_file( key=""feature_name_from_input_fn"", vocabulary_file=""product_class.txt"", vocabulary_size=3) # product_class.txt should have one line for vocabulary element, in our case: kitchenware electronics sports\n\nUsing hash buckets to limit categories\n\nSo far, we\'ve worked with a naively small number of categories. For example, our product_class example has only 3 categories. Often though, the number of categories can be so big that it\'s not possible to have individual categories for each vocabulary word or integer because that would consume too much memory. For these cases, we can instead turn the question around and ask, ""How many categories am I willing to have for my input?"" In fact, the tf.feature_column.categorical_column_with_hash_buckets() function enables you to specify the number of categories. For example, the following code shows how this function calculates a hash value of the input, then puts it into one of the hash_bucket_size categories using the modulo operator:\n\n# Create categorical output for input ""feature_name_from_input_fn"". # Category becomes: hash_value(""feature_name_from_input_fn"") % hash_bucket_size hashed_feature_column = tf.feature_column.categorical_column_with_hash_bucket( key = ""feature_name_from_input_fn"", hash_buckets_size = 100) # The number of categories\n\nAt this point, you might rightfully think: ""This is crazy!"" After all, we are forcing the different input values to a smaller set of categories. This means that two, probably completely unrelated inputs, will be mapped to the same category, and consequently mean the same thing to the neural network. Figure 7 illustrates this dilemma, showing that kitchenware and sports both get assigned to category (hash bucket) 12:\n\nFigure 7. Representing data in hash buckets.\n\nAs with many counterintuitive phenomena in machine learning, it turns out that hashing often works well in practice. That\'s because hash categories provide the model with some separation. The model can use additional features to further separate kitchenware from sports.\n\nThe last categorical column we\'ll cover allows us to combine multiple input features into a single one. Combining features, better known as feature crosses, enables the model to learn separate weights specifically for whatever that feature combination means.\nHow to represent categorical columns in TensorFlow.\n\nHow do we represent categorical columns?\n\nIn TensorFlow, you can represent categorical columns in various ways depending on the type of categorical data you’re dealing with. Here are some common techniques for encoding categorical columns in TensorFlow :\n\nOne-Hot Encoding (tf.one_hot):\n\nOne-hot encoding is a common method for converting categorical values into a binary matrix. Each category is represented as a unique binary vector, where only one element is “hot” (1), and the rest are “cold” (0).\n\nTensorFlow provides the tf.one_hot function to perform one-hot encoding. Here\'s an example of how to use it:\n\nimport tensorflow as tf # Define the categorical column as a list of category labels categorical_column = [\'category_a\', \'category_b\', \'category_c\'] # Perform one-hot encoding one_hot_encoded = tf.one_hot(categorical_column, depth=len(categorical_column))\n\n2. Embedding Layers (tf.keras.layers.Embedding):\n\nWhen dealing with high-cardinality categorical columns (those with many unique categories), one-hot encoding can result in a very large and sparse input. In such cases, using an embedding layer can be more efficient.\n\nAn embedding layer maps each category to a dense vector of lower dimensionality. These embeddings are learned during the training process.\n\nHere’s an example of how to use an embedding layer in TensorFlow:\n\nimport tensorflow as tf # Define the input layer with categorical values as integers input_layer = tf.keras.layers.Input(shape=(1,)) # Define the embedding layer embedding_layer = tf.keras.layers.Embedding(input_dim=num_categories, output_dim=embedding_dim)(input_layer)\n\n3. Integer Encoding:\n\nIn some cases, you might choose to represent categorical values as integers, especially when using traditional machine learning models. You can use integer encoding to map each category to a unique integer.\n\nTensorFlow doesn’t provide a specific function for this, but you can perform integer encoding using Python and NumPy.\n\nimport numpy as np # Define the categorical column as a list of category labels categorical_column = [\'category_a\', \'category_b\', \'category_c\'] # Create a mapping from category to integer category_to_int = {category: i for i, category in enumerate(categorical_column)} # Perform integer encoding integer_encoded = [category_to_int[category] for category in categorical_column]\n\n4. Categorical Feature Columns (tf.feature_column):\n\nTensorFlow provides the tf.feature_column module, which offers a high-level API for handling various types of feature columns, including categorical columns.\n\nYou can create categorical feature columns using tf.feature_column.categorical_column_with_vocabulary_list or tf.feature_column.categorical_column_with_hash_bucket.\n\nThe vocabulary_list is a list of unique category labels that represent the possible values of a categorical feature. Each element in the list corresponds to a category']","The user is seeking a method to automatically generate a vocabulary list for a TensorFlow categorical feature column from a dataset with many unique values, rather than manually specifying the vocabulary list."
+59361689,tf.keras.backend,Documentation Replication on Other Examples,Redundancies in tf.keras.backend and tensorflow libraries,"<p>I have been working in TensorFlow for about a year now, and I am transitioning from TF 1.x to TF 2.0, and I am looking for some guidance on how to use the <code>tf.keras.backend</code> library in TF 2.0. I understand that the transition to TF 2.0 is supposed to remove a lot of redundancies in modeling and building graphs, since there were many ways to create equivalent layers in earlier TensorFlow versions (and I'm insanely grateful for that change!), but I'm getting stuck on understanding when to use <code>tf.keras.backend</code>, because the operations appear redundant with other TensorFlow libraries. </p>
+
+<p>I see that some of the functions in <code>tf.keras.backend</code> are redundant with other TensorFlow libraries. For instance, <code>tf.keras.backend.abs</code> and <code>tf.math.abs</code> are not aliases (or at least, they're not listed as aliases in the documentation), but both take the absolute value of a tensor. After examining the source code, it looks like <code>tf.keras.backend.abs</code> calls the <code>tf.math.abs</code> function, and so I really do not understand why they are not aliases. Other <code>tf.keras.backend</code> operations don't appear to be duplicated in TensorFlow libraries, but it looks like there are TensorFlow functions that can do equivalent things. For instance, <code>tf.keras.backend.cast_to_floatx</code> can be substituted with <code>tf.dtypes.cast</code> as long as you explicitly specify the dtype. I am wondering two things:</p>
+
+<ol>
+<li>when is it best to use the <code>tf.keras.backend</code> library instead of the equivalent TensorFlow functions?</li>
+<li>is there a difference in these functions (and other equivalent <code>tf.keras.backend</code> functions) that I am missing?</li>
+</ol>
+","<p>Short answer: Prefer tensorflow's native API such as <code>tf.math.*</code> to the<code>tf.keras.backend.*</code> API wherever possible.</p>
+
+<p>Longer answer:</p>
+
+<ul>
+<li>The <code>tf.keras.backend.*</code> API can be <em>mostly</em> viewed as a remnant of the <code>keras.backend.*</code> API. The latter is a design that serves the ""exchangeable backend"" design of the original (non-TF-specific) keras. This relates to the historical aspect of keras, which supports multiple backend libraries, among which tensorflow used to be just one of them. Back in 2015 and 2016, other backends, such as Theano and MXNet were quite popular too. But going into 2017 and 2018, tensorflow became the dominant backend of keras users. Eventually keras became a part of the tensorflow API (in 2.x and later minor versions of 1.x). In the old multi-backend world, the <code>backend.*</code> API provides a backend-independent abstraction over the myriad of supported backend. But in the tf.keras world, the value of the backend API is much more limited.</li>
+<li>The various functions in <code>tf.keras.backend.*</code> can be divided into a few categories:
+
+<ol>
+<li>Thin wrappers around the equivalent or mostly-equivalent tensorflow native API. Examples: <a href=""https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/keras/backend.py#L2363"" rel=""noreferrer"">tf.keras.backend.less</a>, <a href=""https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/keras/backend.py#L2431"" rel=""noreferrer"">tf.keras.backend.sin</a></li>
+<li>Slightly thicker wrappers around tensorflow native APIs, with more features included. Examples: <a href=""https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/keras/backend.py#L2589"" rel=""noreferrer"">tf.keras.backend.batch_normalization</a>, <a href=""https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/keras/backend.py#L4869"" rel=""noreferrer"">tf.keras.backend.conv2d</a>(<a href=""https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/keras/backend.py#L4869"" rel=""noreferrer"">https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/keras/backend.py#L4869</a>). They often perform proprocessing and implement other logics, which make your life easier than using native tensorflow API.</li>
+<li>Unique functions that don't have equivalent in the native tensorflow API. Examples: <a href=""https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/keras/backend.py#L3809"" rel=""noreferrer"">tf.keras.backend.rnn</a>, <a href=""https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/keras/backend.py#L342"" rel=""noreferrer"">tf.keras.backend.set_learning_phase</a></li>
+</ol></li>
+</ul>
+
+<p>For category 1, use native tensorflow APIs. For categories 2 and 3, you may want to use the <code>tf.keras.backend.*</code> API, as long as you can find it in the documentation page: <a href=""https://www.tensorflow.org/api_docs/python/"" rel=""noreferrer"">https://www.tensorflow.org/api_docs/python/</a>, because the documented ones have backward compatibility guarantees, so that you don't need to worry about a future version of tensorflow removing it or changing its behavior.</p>
+","# Customized Content
+
+Understanding when to use `tf.keras.backend` functions over TensorFlow's native functions can be a bit confusing, especially when transitioning from TensorFlow 1.x to TensorFlow 2.0. The `tf.keras.backend` module provides a set of functions that abstract away differences between different backends, such as TensorFlow, Theano, and CNTK. However, with TensorFlow 2.0, Keras has been integrated more deeply into TensorFlow, and `tf.keras` has become the recommended API for developing models, which might raise questions about the necessity and use cases of `tf.keras.backend`.
+
+To address your questions:
+
+1. **When is it best to use the `tf.keras.backend` library instead of the equivalent TensorFlow functions?**
+
+   It's generally best to use TensorFlow's native functions (e.g., `tf.math.abs`, `tf.dtypes.cast`) for operations that have direct equivalents in the TensorFlow API. These functions are more likely to be optimized for performance and might integrate better with TensorFlow's ecosystem and future updates.
+
+   However, `tf.keras.backend` functions can be particularly useful when writing code that needs to be backend-agnostic, meaning it could run on top of different deep learning frameworks that Keras supports (or supported). This is less relevant now that Keras is tightly integrated with TensorFlow, but it can still be useful for code that was written with this in mind or for maintaining compatibility with older Keras code.
+
+2. **Is there a difference in these functions (and other equivalent `tf.keras.backend` functions) that I am missing?**
+
+   Many `tf.keras.backend` functions are indeed wrappers around TensorFlow operations, designed to provide a unified interface that was backend-agnostic. While they might perform the same operations as their TensorFlow counterparts, the key difference was in their ability to switch backends. With the current focus on TensorFlow, this distinction is less critical. However, some `tf.keras.backend` functions might include additional logic or preprocessing steps that are specific to neural network model development, making them more convenient in certain contexts.
+
+To illustrate the use of `tf.keras.backend` and its relation to TensorFlow's native functions, let's replicate an example from the documentation, focusing on a function that demonstrates the backend's utility in neural network operations:
+
+```python
+import tensorflow as tf
+
+# Example of using tf.keras.backend function
+def custom_activation(x):
+    return tf.keras.backend.relu(x, alpha=0.0, max_value=None, threshold=0.0)
+
+# Equivalent operation using TensorFlow's native function
+def custom_activation_tf(x):
+    return tf.nn.relu(x)
+
+# Test data
+x = tf.constant([-3.0, -1.5, 0.0, 1.5, 3.0])
+
+# Applying the custom activation functions
+y_keras_backend = custom_activation(x)
+y_tensorflow = custom_activation_tf(x)
+
+print(""Output using tf.keras.backend:"", y_keras_backend.numpy())
+print(""Output using TensorFlow native function:"", y_tensorflow.numpy())
+```
+
+In this example, we define a custom activation function using both `tf.keras.backend.relu` and TensorFlow's native `tf.nn.relu`. While both functions achieve the same result for this specific operation, using `tf.keras.backend` might offer additional parameters or behaviors that are consistent across different backends, which was more relevant when Keras supported multiple backends.
+
+## Additional Resources
+
+#### Stack Overflow Q&A
+- [Redundancies in tf.keras.backend and tensorflow libraries](https://stackoverflow.com/questions/59361689/redundancies-in-tf-keras-backend-and-tensorflow-libraries/59364358#59364358)
+
+#### Related Web URLs
+- [Why does Keras need TensorFlow as backend?](https://datascience.stackexchange.com/questions/65736/why-does-keras-need-tensorflow-as-backend)
+- [Keras Backend Configuration](https://www.tutorialspoint.com/keras/keras_backend_configuration.htm)
+- [Keras as a simplified interface to TensorFlow: tutorial](https://blog.keras.io/keras-as-a-simplified-interface-to-tensorflow-tutorial.html)
+- [Installing Keras with TensorFlow backend](https://pyimagesearch.com/2016/11/14/installing-keras-with-tensorflow-backend/)
+
+#### Related Courses
+- [Custom Models, Layers, and Loss Functions with TensorFlow](https://www.coursera.org/programs/on-demand-courses-for-google-c4stl/learn/custom-models-layers-loss-functions-with-tensorflow?specialization=tensorflow-advanced-techniques)
+- [Introduction to TensorFlow for Artificial Intelligence, Machine Learning, and Deep Learning](https://www.coursera.org/learn/intro-tensorflow)
+- [TensorFlow: Advanced Techniques Specialization](https://www.coursera.org/specializations/tensorflow-advanced-techniques)
+- [Practical Deep Learning with Keras](https://www.udemy.com/course/practical-deep-learning-with-keras/)
+- [TensorFlow and Keras for Neural Networks and Deep Learning](https://www.udemy.com/course/tensorflow-and-keras-for-neural-networks-and-deep-learning/)","['– star Jan 3, 2020 at 5:18\n\nThe first point to note is that Keras can potentially use many backends (e.g. Theano before it was discontinued, Microsoft Cognitive Toolkit, to name a couple). It just so happens that Keras has proven to be the most popular among the community. As a result, TensorFlow has adapted to the extent that Keras is now the default API in TensorFlow 2.0.\n\nOne of the biggest changes is the way libraries are now loaded using tf.keras.\n\nConsider this example. Let\'s say one wishes to run a Sequential model using Keras. To do so, one must import the relevant libraries.\n\nIn the first version of TensorFlow, it would be done as follows:\n\nfrom tensorflow.python.keras.models import Sequential from tensorflow.python.keras.layers import Dense from tensorflow.python.keras.wrappers.scikit_learn import KerasRegressor\n\nThe model is defined as such:\n\nmodel = Sequential() model.add(Dense(8, activation=\'relu\', input_shape=(4,))) model.add(Dense(1, activation=\'sigmoid\'))\n\nNow, let\'s contrast this to the TensorFlow 2.0 notation:\n\nfrom tensorflow.keras import models from tensorflow.keras import layers model = models.Sequential() model.add(layers.Dense(8, activation=\'relu\', input_shape=(4,))) model.add(layers.Dense(1, activation=\'sigmoid\'))\n\nThe Sequential function is now being defined using models, and layers is the only other library imported. Whereas in TensorFlow v1.0, Sequential, Dense, and KerasRegressor all had to be imported separately to generate the model.\n\nUsing the above example as a reference point, one can say that Keras now uses TensorFlow as a backend most frequently - simply because it has proven to be the most popular. As a result, TensorFlow has adapted to making the syntax for calling Keras more user-friendly, and thus Keras has become the default API in v2.0.\n\nYou might also find this article of use for further information on this topic: https://www.pyimagesearch.com/2019/10/21/keras-vs-tf-keras-whats-the-difference-in-tensorflow-2-0/\n\nedited Jan 2, 2020 at 22:35\n\nanswered Jan 2, 2020 at 17:47\n\nMichael GroganMichael Grogan\n\n58722 silver badges77 bronze badges $\\endgroup$ 1\n\n$\\begingroup$ i can write a simple neural network with keras . I can write simple neural network in tensoflow as well .when the same task can be done on both why do we need to club tensorflow with keras ? i found from many blog post that keras is API and Tensorflow is framework ,can you tell me how exactly this make difference why keras cannot stand on its own ? why excatly keras need a backend and why tensorflow dose not need a backend ? $\\endgroup$\n\n– star Jan 3, 2020 at 5:06\n\nKeras used to use 2 backends(Theano and Tensorflow), but now only supports Tensorflow because of the discontinuation of Theano. The reason why Keras uses Tensorflow as it\'s backend is because it is an abstraction layer.\nStack Exchange Network\n\nStack Exchange network consists of 183 Q&A communities including Stack Overflow, the largest, most trusted online community for developers to learn, share their knowledge, and build their careers. Visit Stack Exchange\n\nData Science Stack Exchange is a question and answer site for Data science professionals, Machine Learning specialists, and those interested in learning more about the field. It only takes a minute to sign up. Sign up to join this community\n\nAnybody can ask a question\n\nThe best answers are voted up and rise to the top\n\nConnect and share knowledge within a single location that is structured and easy to search. Learn more about Teams\n\nWhy does Keras need TensorFlow as backend?\n\nModified 2 years ago\n\nWhy does Keras need the TensorFlow engine? I am not getting correct directions on why we need Keras. We can use TensorFlow to build a neural network model, but why do most people use Keras with TensorFlow as backend?\n\nImprove this question\n\nedited Jan 4, 2020 at 22:13\n\n28911 gold badge66 silver badges1313 bronze badges\n\nasked Jan 2, 2020 at 15:31\n\n1,44177 gold badges1919 silver badges2929 bronze badges $\\endgroup$ 2\n\n$\\begingroup$ Keras is just a ""little helper"" on top of TF. Keras comes with so many useful gadgets (e.g. early stopping, data generator, data augmentation) so that there is no need to write all the code. Also writing in TF can be a little complex. Keras is much more convenient in many situations. $\\endgroup$\n\n– Peter Jan 2, 2020 at 17:44\n\n$\\begingroup$ if both can do the same task why should we club keras with tensorflow ? $\\endgroup$\n\n– star Jan 3, 2020 at 5:14\n\nSorted by: Reset to default\n\nHighest score (default)\n\nDate modified (newest first)\n\nDate created (oldest first)\n\nThis makes more sense when understood in its historical context. These were the chronological events:\n\nApril 2009 Theano 0.1 is released. It would dominate the deep learning framework scene for many many years.\n\nJune 2015 Keras is created by François Chollet. The goal was to create an abstraction layer to make Theano easier to use, enabling fast prototyping.\n\nAugust 2015 Google hires François Chollet.\n\nNovember 2015 Tensorflow is released by Google, with much inspiration from Theano and its declarative computational graph paradigm.\n\nDecember 2015 Keras is refactored to allow for pluggable backend engines, and now it offers backend implementations for Theano and Tensorflow.\n\nOther backends were later supported by Keras (CNTK, MxNet), but they never got much traction.\n\nTime passes by and the overlap between Tensorflow and Keras grows. Tensorflow ends up duplicating many of the functionalities in Keras (apart from the multiple APIs within Tensorflow that also had big overlaps).\n\nSeptember 2017 Theano is discontinued.\nSeptember 2017 Theano is discontinued.\n\nNovember 2017 Keras is bundled with Tensorflow as tf.keras. From this point on there are 2 different Keras: the one bundled with Tensorflow and the one that supports multiple backend engines. Both are maintained by the same people and are kept in sync at API level.\n\nAt some point, the roadmap for Tensorflow 2.0 is defined, choosing to pursue an imperative model like PyTorch. The person leading the Tensorflow API refactoring is François Chollet. This refactoring included a reorganization of the functionality to avoid duplications.\n\nNovember 2018 some crucial functionalities of Tensorflow are to be moved to tf.keras, generating a heated debate\n\nSeptember 2019 Keras 2.3 is announced to be the last release of the multi-backend version of Keras\n\nNow, THE ANSWER to your question: Tensorflow is the most used Keras backend because it is the only one with a relevant user base that is under active development and, furthermore, the only version of Keras that is actively developed and maintained is one with Tensorflow.\n\nAt the beginning of Keras, the overlap with Tensorflow was small. Tensorflow was a bit difficult to use, and Keras simplified it a lot.\n\nLater, Tensorflow incorporated many functionalities similar to Keras\'. Keras became less necessary.\n\nThen, apart from the multi-backend version, Keras was bundled with Tensorflow. Their separation line blurred over the years.\n\nThe multi-backend Keras version was discontinued. Now the only Keras is the one bundled with Tensorflow.\n\nUpdate: the relationship between Keras and Tensorflow is best understood with an example:\n\nThe dependency between Keras and Tensorflow is internal to Keras, it is not exposed to the programmer working with Keras. For example, in the source code of Keras, there is an implementation of a convolutional layer; this implementation calls package keras.backend to actually run the convolution computation; depending on the Keras configuration file, this backend is set to use the Tensorflow backend implementation in keras.backend.tensorflow_backend.py; this Keras file just invokes Tensorflow to compute the convolution\n\nUpdate 2: new important events in the timeline:\n\nAugust 2021: Tensorflow 2.6.0 no longer has Keras as part of it. Keras has now its own PIP package (keras) and lives on its own github repo.\n\nedited Jan 7, 2022 at 16:01\n\nanswered Jan 2, 2020 at 19:36\n\n24.3k11 gold badge4646 silver badges7474 bronze badges $\\endgroup$ 13\n\n$\\begingroup$ i can write a simple neural network with keras . I can write simple neural network in tensoflow as well .when the same task can be done on both why do we need to club tensorflow with keras ? i found from many blog post that keras is API and Tensorflow is framework ,can you tell me how exactly this make difference why keras cannot stand on its own ? $\\endgroup$\n\n– star Jan 3, 2020 at 5:02']","The user is trying to understand when to use the tf.keras.backend library instead of equivalent TensorFlow functions and if there is any difference between these functions that they might be missing, especially in the context of transitioning from TensorFlow 1.x to TensorFlow 2.0."
+74005009,tf.data.Dataset,Documentation Replicability,How to create output_signature for tensorflow.dataset.from_generator,"<p>I have a generator yielding data and labels <code>yield data, labels</code> where the data is
+an <code>numpy.ndarray</code> with variable rows and 500 columns of type <code>dtype=float32</code> and the labels are integers of <code>numpy.int64</code>.</p>
+<p>I'm trying to pass this data into TensorFlow from_generator function to create a TensorFlow dataset: <code>tf.data.Dataset.from_generator</code></p>
+<p>The <a href=""https://www.tensorflow.org/api_docs/python/tf/data/Dataset#from_generator"" rel=""nofollow noreferrer"">docs</a> say that the from_generator function needs a parameter <code>output_signature</code> as an input. But I'm having trouble understanding how to build this output_signature.</p>
+<p>How can I make the output_signature for the generator I described?</p>
+<p>Thank you!</p>
+<p>Edit:
+I used <code>tf.type_spec_from_value</code> to get this:</p>
+<pre><code>dataset = tf.data.Dataset.from_generator(
+   datagen_row,
+   output_signature=(
+      tf.TensorSpec(shape=(None, 512), dtype=tf.float32, name=None),
+      tf.TensorSpec(shape=(), dtype=tf.int64, name=None)
+   )
+)
+</code></pre>
+<p>But is it correct to use None when the number of rows is varying for the first data type?</p>
+","<p>if your datagen_row() function yields input_data, label with format 500 and 1
+than your output_signature should be:</p>
+<pre><code>  output_signature=(
+  tf.TensorSpec(shape=(None, 500), dtype=tf.float32, name=None),
+  tf.TensorSpec(shape=(), dtype=tf.int64, name=None))
+</code></pre>
+<p>where the first TensorSpec is for the data format and the second one for the label format.
+But it would be helpful if you post the function + maybe data examples or data shape here. Otherwise it is hard to help.</p>
+","Based on your description, it seems you are correctly using `tf.data.Dataset.from_generator` to create a TensorFlow dataset from a generator that yields data with variable rows and a fixed number of columns (500 columns in your case), along with labels. Your use of `tf.TensorSpec(shape=(None, 512), dtype=tf.float32)` for the data and `tf.TensorSpec(shape=(), dtype=tf.int64)` for the labels is almost correct, except for the mismatch in the number of columns (512 vs. 500 as mentioned in your question). 
+
+To address your specific question about using `None` for the number of rows: yes, it is correct to use `None` in the `shape` argument of `tf.TensorSpec` for dimensions that are variable. In your case, using `None` for the number of rows allows the dataset to handle batches of data where the number of rows can vary between batches.
+
+However, you should correct the number of columns to match your description (500 columns). Here's how you can define the `output_signature`:
+
+```python
+dataset = tf.data.Dataset.from_generator(
+   datagen_row,
+   output_signature=(
+      tf.TensorSpec(shape=(None, 500), dtype=tf.float32, name=None),  # Corrected to 500 columns
+      tf.TensorSpec(shape=(), dtype=tf.int64, name=None)
+   )
+)
+```
+
+This `output_signature` tells TensorFlow that your dataset will produce batches of data where each batch consists of two parts: 
+
+1. A floating-point tensor with a variable number of rows and 500 columns.
+2. An integer tensor with a scalar value (representing the label).
+
+By specifying `None` for the first dimension (number of rows) in your data tensor, you correctly indicate that this dimension can vary, allowing for flexibility in the size of your batches.
+
+## Additional Resources
+
+#### Stack Overflow Q&A
+- [How to create output_signature for tensorflow.dataset.from_generator](https://stackoverflow.com/questions/74005009/how-to-create-output-signature-for-tensorflow-dataset-from-generator/74224171#74224171)
+
+#### Related Web URLs
+- [Stack Overflow Discussion on tf.data.Dataset.from_generator](https://stackoverflow.com/questions/74005009/how-to-create-output-signature-for-tensorflow-dataset-from-generator)
+- [Saturn Cloud Blog on TensorFlow Dataset from_generator with Variable Batch Size](https://saturncloud.io/blog/how-to-use-tensorflow-dataset-fromgenerator-with-variable-batch-size/)
+- [Stack Overflow Example of output_signature for Complex Object](https://stackoverflow.com/questions/65794527/example-of-output-signature-output-types-output-shapes-for-complex-object-ca)
+- [TensorFlow Serving SignatureDefs](https://www.tensorflow.org/tfx/serving/signature_defs)
+
+#### Related Courses
+- [Generative Deep Learning with TensorFlow on Coursera](https://www.coursera.org/learn/generative-deep-learning-with-tensorflow)
+- [TensorFlow in Practice Professional Certificate on Coursera](https://www.coursera.org/professional-certificates/tensorflow-in-practice)
+- [Getting Started with TensorFlow 2 on Coursera](https://www.coursera.org/learn/getting-started-with-tensor-flow2)
+- [Deep Learning with TensorFlow 2 on Udemy](https://www.udemy.com/course/deep-learning-tensorflow-2/)","[""Stack Overflow Public questions & answers\n\nStack Overflow for Teams Where developers & technologists share private knowledge with coworkers\n\nTalent Build your employer brand\n\nAdvertising Reach developers & technologists worldwide\n\nLabs The future of collective knowledge sharing\n\nHow are we doing? Please help us improve Stack Overflow. Take our short survey\n\nCollectives™ on Stack Overflow\n\nFind centralized, trusted content and collaborate around the technologies you use most. Learn more about Collectives\n\nConnect and share knowledge within a single location that is structured and easy to search. Learn more about Teams\n\nGet early access and see previews of new features. Learn more about Labs\n\nTake our short survey\n\nHow to create output_signature for tensorflow.dataset.from_generator\n\nAsked 1 year, 5 months ago\n\nModified 1 year, 5 months ago\n\nI have a generator yielding data and labels yield data, labels where the data is an numpy.ndarray with variable rows and 500 columns of type dtype=float32 and the labels are integers of numpy.int64.\n\nI'm trying to pass this data into TensorFlow from_generator function to create a TensorFlow dataset: tf.data.Dataset.from_generator\n\nThe docs say that the from_generator function needs a parameter output_signature as an input. But I'm having trouble understanding how to build this output_signature.\n\nHow can I make the output_signature for the generator I described?\n\nEdit: I used tf.type_spec_from_value to get this:\n\ndataset = tf.data.Dataset.from_generator( datagen_row, output_signature=( tf.TensorSpec(shape=(None, 512), dtype=tf.float32, name=None), tf.TensorSpec(shape=(), dtype=tf.int64, name=None) ) )\n\nBut is it correct to use None when the number of rows is varying for the first data type?\n\nImprove this question\n\nedited Oct 9, 2022 at 13:10\n\nasked Oct 9, 2022 at 13:04\n\n1,11411 gold badge1212 silver badges2727 bronze badges 1\n\nIf possible, add some dummy data with generator.\n\n– Innat Oct 9, 2022 at 14:26\n\nSorted by: Reset to default\n\nHighest score (default)\n\nTrending (recent votes count more)\n\nDate modified (newest first)\n\nDate created (oldest first)\n\nif your datagen_row() function yields input_data, label with format 500 and 1 than your output_signature should be:\n\noutput_signature=( tf.TensorSpec(shape=(None, 500), dtype=tf.float32, name=None), tf.TensorSpec(shape=(), dtype=tf.int64, name=None))\n\nwhere the first TensorSpec is for the data format and the second one for the label format. But it would be helpful if you post the function + maybe data examples or data shape here. Otherwise it is hard to help.\n\nanswered Oct 27, 2022 at 14:58\n\nFinn MeyerFinn Meyer\n\nNot the answer you're looking for? Browse other questions tagged\n\ntensorflow or ask your own question.\n\nIs AI making your code worse?\n\nChanging how community leadership works on Stack Exchange: a proposal and...\n\n2024 Community Moderator Election Results\n\nTemporary policy: Generative AI (e.g., ChatGPT) is banned\nStack Overflow Public questions & answers\n\nStack Overflow for Teams Where developers & technologists share private knowledge with coworkers\n\nTalent Build your employer brand\n\nAdvertising Reach developers & technologists worldwide\n\nLabs The future of collective knowledge sharing\n\nCollectives™ on Stack Overflow\n\nFind centralized, trusted content and collaborate around the technologies you use most. Learn more about Collectives\n\nConnect and share knowledge within a single location that is structured and easy to search. Learn more about Teams\n\nGet early access and see previews of new features. Learn more about Labs\n\nExample of output_signature , output_types & output_shapes for complex object called by tf.data.Dataset.from_generator\n\nAsked 3 years, 2 months ago\n\nModified 3 years, 2 months ago\n\nI've a generator function that yields the following tuple: yield (transformed_input_array, set_y)\n\ntransformed_input_array is a list of ndarrays with the following shape: (1024, 104), (1024, 142), (1024, 1), (1024, 1), (1024, 1), (1024, 1), (1024, 140) and the following types: tf.float64, tf.float64, tf.int8, tf.int16, tf.int8, tf.int8, tf.float64 set_y is a ndarray of shape 1024 and type of int64\n\nI've wrapped my generator with tf.data.Dataset.from_generator function, here is the code:\n\ndataset = tf.data.Dataset.from_generator( generator, # output_signature=( # tf.TensorSpec(shape=(), dtype=(tf.float64, tf.float64, tf.int8, tf.int16, tf.int8, tf.int8, tf.float64)), # tf.TensorSpec(shape=1024, dtype=tf.int64)) output_types=(tf.float64, tf.float64, tf.int8, tf.int16, tf.int8, tf.int8, tf.float64, tf.int64), output_shapes=((1024, 104), (1024, 142), (1024, 1), (1024, 1), (1024, 1), (1024, 1), (1024, 140), 1024) )\n\nBut when I run the training, I get the following error:\n\nValueError: Data is expected to be in format x, (x,), (x, y), or (x, y, sample_weight), found: (<tf.Tensor 'IteratorGetNext:0' shape=(1024, 104) dtype=float64>, <tf.Tensor 'IteratorGetNext:1' shape=(1024, 142) dtype=float64>, <tf.Tensor 'IteratorGetNext:2' shape=(1024, 1) dtype=int8>, <tf.Tensor 'It eratorGetNext:3' shape=(1024, 1) dtype=int16>, <tf.Tensor 'IteratorGetNext:4' shape=(1024, 1) dtype=int8>, <tf.Tensor 'IteratorGetNext:5' shape=(1024, 1) dtype=int8>, <tf.Tensor 'IteratorGetNext:6' shape=(1024, 140) dtype=float64>, <tf.Tensor 'ExpandDims:0' shape=(1024, 1) dtype=int64>)\n\nIf I try to run with output_signature param (commented out code), I get the following error:\n\nTypeError: Cannot convert value (tf.float64, tf.float64, tf.int8, tf.int16, tf.int8, tf.int8, tf.float64) to a TensorFlow DType.\n\nCan someone provide an example, of how I should treat complex type (list of ndarrays)? Couldn't find any example in TF documentation..\n\nImprove this question\n\nasked Jan 19, 2021 at 15:29\n\n71011 gold badge88 silver badges1313 bronze badges 2\n\nThis function may help tf.type_spec_from_value returns a tf.TypeSpec that represents the given value.\n\n– Animeta Nov 1, 2021 at 14:41""]","The user is seeking to understand how to correctly create an output_signature for a TensorFlow dataset generated from a generator function, especially when dealing with variable row sizes in the data."
+57449484,tf.compat.v1.layers.batch_normalization,Documentation Replicability,What is trainable parameter in tensorflow?,"<p>tf.compat.v1.layers.batch_normalization takes <code>trainable</code> as an input. The documentation says:</p>
+
+<blockquote>
+  <p>Boolean, if True also add variables to the graph collection GraphKeys.TRAINABLE_VARIABLES (see tf.Variable).</p>
+</blockquote>
+
+<p>I think only scaling factor (gamma) and offset (beta) should be added to trainable variables and I am skeptical if even moving averages will get added to GraphKeys.TRAINABLE_VARIABLES. Can somebody tell me how trainable input is influencing the behavior of batch_normalization</p>
+","<p>First of all, this function is <a href=""https://www.tensorflow.org/api_docs/python/tf/layers/batch_normalization"" rel=""nofollow noreferrer"">deprecated</a> and should not be used.</p>
+
+<p><code>trainable</code> arguments means that scaling factor (gamma) and offset (beta) will be trainable and it's true by default.</p>
+
+<p>When it comes to moving averages, those <strong>are not trainable</strong>, they are only updated after each batch pass, those are not parameters (<code>tf.Variable</code> objects).</p>
+
+<p>Please notice, you can set <code>trainable</code> to false, in such case, if <code>beta</code> and <code>gamma</code> are set to defaults (zero and one respectively), they won't affect the moving averages. You can turn them off by issuing <code>center</code> (for <code>beta</code>) or <code>scale</code> (for <code>gamma</code>).</p>
+","# Customized Content
+
+In TensorFlow, a trainable parameter refers to variables that the training process can modify. The `trainable` argument in the `tf.compat.v1.layers.batch_normalization` function specifies whether the layer's variables (gamma and beta) should be considered as trainable parameters. When set to `True`, these variables are added to the collection `GraphKeys.TRAINABLE_VARIABLES`, making them subject to optimization during the training process.
+
+The moving averages (moving mean and moving variance) are not considered trainable parameters because they are not directly optimized during training. Instead, they are updated through a different mechanism that computes their new values based on the current batch's statistics. Therefore, setting the `trainable` flag to `True` or `False` does not affect the moving averages; it only affects whether gamma and beta are trainable.
+
+Here's a simple example to illustrate how to use `tf.compat.v1.layers.batch_normalization` with the `trainable` parameter:
+
+```python
+import tensorflow as tf
+
+# Placeholder for inputs
+x = tf.placeholder(tf.float32, shape=[None, 28, 28, 1])
+
+# Batch normalization layer
+x_norm = tf.compat.v1.layers.batch_normalization(x, training=True, trainable=True)
+
+# Define the optimizer and training operation
+optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.01)
+train_op = optimizer.minimize(loss)
+
+# Update operations for moving averages
+update_ops = tf.compat.v1.get_collection(tf.GraphKeys.UPDATE_OPS)
+train_op = tf.group([train_op, update_ops])
+
+# Now, `train_op` will update beta and gamma if they are trainable,
+# as well as the moving averages.
+```
+
+In this example, the batch normalization layer is configured with `trainable=True`, meaning that the gamma and beta parameters will be updated during training. The moving averages are updated separately through the `update_ops` mechanism, which is necessary for the batch normalization to function correctly during both training and inference.
+
+## Additional Resources
+
+#### Stack Overflow Q&A
+- [What is trainable parameter in tensorflow?](https://stackoverflow.com/questions/57449484/what-is-trainable-parameter-in-tensorflow)
+
+#### Related Web URLs
+- [What's the differences between tf.GraphKeys.TRAINABLE_VARIABLES and tf.GraphKeys](https://stackoverflow.com/questions/48260394/whats-the-differences-between-tf-graphkeys-trainable-variables-and-tf-graphkeys)
+- [Keras BatchNormalization](https://keras.io/api/layers/normalization_layers/batch_normalization/)
+- [Batch Normalization for Training of Deep Neural Networks](https://machinelearningmastery.com/batch-normalization-for-training-of-deep-neural-networks/)
+
+#### Related Courses
+- [TensorFlow Advanced Techniques Specialization](https://www.coursera.org/specializations/tensorflow-advanced-techniques)
+- [Hyperparameter Tuning with TensorFlow](https://www.coursera.org/projects/hyperparameter-tuning)
+- [Why Does Batch Norm Work?](https://www.coursera.org/lecture/deep-neural-network/why-does-batch-norm-work-81oTm?ref=floydhub-blog)
+- [Deep Learning Specialization](https://www.coursera.org/learn/deep-neural-network)
+- [TensorFlow in Practice Specialization](https://www.coursera.org/professional-certificates/tensorflow-in-practice)","[""Stack Overflow Public questions & answers\n\nStack Overflow for Teams Where developers & technologists share private knowledge with coworkers\n\nTalent Build your employer brand\n\nAdvertising Reach developers & technologists worldwide\n\nCollectives™ on Stack Overflow\n\nFind centralized, trusted content and collaborate around the technologies you use most. Learn more about Collectives\n\nConnect and share knowledge within a single location that is structured and easy to search. Learn more about Teams\n\nWhat is trainable parameter in tensorflow?\n\nAsked 3 years, 10 months ago\n\nModified 3 years, 10 months ago\n\ntf.compat.v1.layers.batch_normalization takes trainable as an input. The documentation says:\n\nBoolean, if True also add variables to the graph collection GraphKeys.TRAINABLE_VARIABLES (see tf.Variable).\n\nI think only scaling factor (gamma) and offset (beta) should be added to trainable variables and I am skeptical if even moving averages will get added to GraphKeys.TRAINABLE_VARIABLES. Can somebody tell me how trainable input is influencing the behavior of batch_normalization\n\nImprove this question\n\nedited Aug 11, 2019 at 11:18\n\nasked Aug 11, 2019 at 11:11\n\nfigs_and_nutsfigs_and_nuts\n\n4,56622 gold badges3030 silver badges5555 bronze badges\n\nSorted by: Reset to default\n\nHighest score (default)\n\nTrending (recent votes count more)\n\nDate modified (newest first)\n\nDate created (oldest first)\n\nFirst of all, this function is deprecated and should not be used.\n\ntrainable arguments means that scaling factor (gamma) and offset (beta) will be trainable and it's true by default.\n\nWhen it comes to moving averages, those are not trainable, they are only updated after each batch pass, those are not parameters (tf.Variable objects).\n\nPlease notice, you can set trainable to false, in such case, if beta and gamma are set to defaults (zero and one respectively), they won't affect the moving averages. You can turn them off by issuing center (for beta) or scale (for gamma).\n\nanswered Aug 11, 2019 at 11:39\n\nSzymon MaszkeSzymon Maszke\n\n22.3k33 gold badges4141 silver badges8282 bronze badges\n\nNot the answer you're looking for? Browse other questions tagged\n\ndeep-learning or ask your own question.\n\nSelf-healing code is the future of software development\n\nHow to keep your new tool from gathering dust\n\nWe are graduating the updated button styling for vote arrows\n\nStatement from SO: June 5, 2023 Moderator Action\n\nDoes the policy change for AI-generated content affect users who (want to)...\n\nTemporary policy: ChatGPT is banned\n\n15 What is the default variable initializer in Tensorflow?\n\n4 Tensorflow's tensorflow variable_scope values parameter meaning\n\n0 How are variables added to tf.trainable_variables?\n\n1 parameters value in tensorflow\n\n6 Number of CNN learnable parameters - Python / TensorFlow\n\n44 What is the definition of a non-trainable parameter?\n\n1 What is a callable in Tensorflow?\n\n1 Understanding ResourceVariables in tensorflow\n\n0 What does the `model.parameters()` include?""]","The user is seeking to understand how the 'trainable' input parameter affects the behavior of the batch_normalization function in TensorFlow, specifically questioning whether it influences the addition of moving averages to the GraphKeys.TRAINABLE_VARIABLES collection."
+63004540,tf.pad,Documentation Replicability,How to pad 1 dimensinal vector in tensorflow? Getting InvalidArgumentError: paddings must be a matrix with 2 columns with tf.pad,"<p>I am trying to use tf.pad. Here is my attempt to pad the tensor to length 20, with values 10.</p>
+<pre><code>tf.pad(tf.constant([1, 2, 3, 45]), paddings=20, constant_values=10)
+</code></pre>
+<p>I get this error message</p>
+<pre><code>InvalidArgumentError: paddings must be a matrix with 2 columns: [2,1] [Op:PadV2]
+</code></pre>
+<p>I am looking at the documentation</p>
+<p><a href=""https://www.tensorflow.org/api_docs/python/tf/pad"" rel=""nofollow noreferrer"">https://www.tensorflow.org/api_docs/python/tf/pad</a></p>
+<blockquote>
+<p>paddings is an integer tensor with shape [n, 2], where n is the rank of tensor. For each dimension D of input, paddings[D, 0] indicates how many values to add before the contents of tensor in that dimension, and paddings[D, 1] indicates how many values to add after the contents of tensor in that dimension</p>
+</blockquote>
+<p>But I am unable to figure out how to shape the pad value</p>
+","<p>You have to specify the padding at the beginning and the padding at the end of your vector by matrix of shape (1,2) :</p>
+<pre><code>tf.pad(tf.constant([1, 2, 3, 45]), [[ 0 , 20]], constant_values=10)
+</code></pre>
+<p>if you have three-dimensional tensor (rank = 3 e.g : (225,225,3) ) the padding matrix has to be of shape (3, 2 ) where &quot;3&quot; is the rank, and &quot;2&quot; to specify the padding at the beginning and end of each dimension.</p>
+<p>For example, a padding matrix  = [ [0,2], [5,5], [2,0] ], means that we want to pad the first dimension by 0 at the beginning (=no padding) and 2 at the end .padding the second dimension by 5 at beginning and 5 at the end.</p>
+","# Customized Content
+
+To pad a 1-dimensional vector in TensorFlow and resolve the `InvalidArgumentError` you encountered, you need to correctly format the `paddings` argument as a 2D tensor that specifies how many values to add before and after the tensor in each dimension. Since you're working with a 1-dimensional vector and want to pad it to a length of 20 with values of 10, you'll need to calculate the padding required at the beginning and end of the vector.
+
+Given your vector `[1, 2, 3, 45]`, it has a length of 4. To pad it to a length of 20, you need to add 16 values. If you want to evenly distribute the padding, you can add 8 values at the beginning and 8 at the end. Here's how you can do it:
+
+```python
+import tensorflow as tf
+
+# Original vector
+vector = tf.constant([1, 2, 3, 45])
+
+# Calculate padding
+total_length = 20  # Desired length
+current_length = tf.size(vector)
+padding_size = total_length - current_length
+padding_before = padding_size // 2
+padding_after = padding_size - padding_before
+
+# Apply padding
+padded_vector = tf.pad(vector, [[padding_before, padding_after]], constant_values=10)
+
+print(padded_vector)
+```
+
+This code snippet first calculates how much padding is needed to reach the desired length of 20. It then divides this padding size into two parts to add before and after the original vector. Finally, it uses `tf.pad` with the calculated paddings and a `constant_values` of 10 to pad the vector.
+
+Remember, the `paddings` argument in `tf.pad` requires a 2D tensor where the first column is the padding before and the second column is the padding after, for each dimension of the input tensor. Since your vector is 1-dimensional, `paddings` should be of shape `[1, 2]`.
+
+## Additional Resources
+
+#### Stack Overflow Q&A
+- [How to pad 1 dimensional vector in tensorflow? Getting InvalidArgumentError: paddings must be a matrix with 2 columns with tf.pad](https://stackoverflow.com/questions/63004540/how-to-pad-1-dimensinal-vector-in-tensorflow-getting-invalidargumenterror-padd/63005207#63005207)
+
+#### Related Web URLs
+- [TensorFlow Pad Documentation](https://www.tensorflow.org/api_docs/python/tf/pad)
+- [TensorFlow: Pad unknown size tensor to a specific size](https://stackoverflow.com/questions/42334646/tensorflow-pad-unknown-size-tensor-to-a-specific-size)
+- [TensorFlow: How to add padding to a tensor](https://www.geeksforgeeks.org/tensorflow-how-to-add-padding-to-a-tensor/)
+
+#### Related Courses
+- [Getting Started with TensorFlow 2](https://www.coursera.org/learn/getting-started-with-tensor-flow2)
+- [Custom Models, Layers, and Loss Functions with TensorFlow](https://www.coursera.org/learn/custom-models-layers-loss-functions-with-tensorflow)
+- [TensorFlow Developer Certificate in AI and Machine Learning](https://www.udemy.com/course/tensorflow-developer-certificate-machine-learning-zero-to-mastery/)","['Stack Overflow Public questions & answers\n\nStack Overflow for Teams Where developers & technologists share private knowledge with coworkers\n\nTalent Build your employer brand\n\nAdvertising Reach developers & technologists worldwide\n\nCollectives™ on Stack Overflow\n\nFind centralized, trusted content and collaborate around the technologies you use most. Learn more about Collectives\n\nConnect and share knowledge within a single location that is structured and easy to search. Learn more about Teams\n\nHow to pad 1 dimensinal vector in tensorflow? Getting InvalidArgumentError: paddings must be a matrix with 2 columns with tf.pad\n\nAsked 2 years, 6 months ago\n\nModified 2 years, 6 months ago\n\nI am trying to use tf.pad. Here is my attempt to pad the tensor to length 20, with values 10.\n\ntf.pad(tf.constant([1, 2, 3, 45]), paddings=20, constant_values=10)\n\nI get this error message\n\nInvalidArgumentError: paddings must be a matrix with 2 columns: [2,1] [Op:PadV2]\n\nI am looking at the documentation\n\nhttps://www.tensorflow.org/api_docs/python/tf/pad\n\npaddings is an integer tensor with shape [n, 2], where n is the rank of tensor. For each dimension D of input, paddings[D, 0] indicates how many values to add before the contents of tensor in that dimension, and paddings[D, 1] indicates how many values to add after the contents of tensor in that dimension\n\nBut I am unable to figure out how to shape the pad value\n\nasked Jul 20, 2020 at 22:12\n\nSantoshGupta7SantoshGupta7\n\n5,2971111 gold badges5151 silver badges107107 bronze badges\n\nSorted by: Reset to default\n\nHighest score (default)\n\nTrending (recent votes count more)\n\nDate modified (newest first)\n\nDate created (oldest first)\n\nYou have to specify the padding at the beginning and the padding at the end of your vector by matrix of shape (1,2) :\n\ntf.pad(tf.constant([1, 2, 3, 45]), [[ 0 , 20]], constant_values=10)\n\nif you have three-dimensional tensor (rank = 3 e.g : (225,225,3) ) the padding matrix has to be of shape (3, 2 ) where ""3"" is the rank, and ""2"" to specify the padding at the beginning and end of each dimension.\n\nFor example, a padding matrix = [ [0,2], [5,5], [2,0] ], means that we want to pad the first dimension by 0 at the beginning (=no padding) and 2 at the end .padding the second dimension by 5 at beginning and 5 at the end.\n\nedited Jul 20, 2020 at 23:55\n\nanswered Jul 20, 2020 at 23:28\n\n1,07488 silver badges77 bronze badges\n\nNot the answer you\'re looking for? Browse other questions tagged\n\ntensorflow or ask your own question.\n\nDoes your professor pass the Turing test? (Ep. 537)\n\nCoding 102: Writing code other people can read\n\nAccessibility Update: Colors\n\nCollectives: The next iteration\n\nWe’ve made changes to our Privacy Notice for Collectives™\n\nTemporary policy: ChatGPT is banned\n\nShould we burninate the [amazon] tag?\n\n3 tf.rank function in Tensorflow\n\n1 Tensorflow: InvalidArgumentError (see above for traceback): You must feed a value for placeholder tensor \'arg0\' with dtype string\n0 How to pad a 4-D tensor to the same shapes of others in tensorflow?\n\n1 Padding sequences in tensorflow with tf.pad\n\n34 Tensor with unspecified dimension in tensorflow\n\n2 Enlarge a tensor in tensorflow\n\n21 Tensorflow. Converting unknown dimension size of a tensor to int\n\n0 how can I scale a tensor in tensorflow?\n\n3 Tensorflow - Avoid Tensor Size Limit\n\n3 Pad a tensor by a weight with tensorflow in Python\n\n5 Padding a tensor until reaching required size\n\n2 How to pad 1 dimensinal vector in tensorflow? Getting InvalidArgumentError: paddings must be a matrix with 2 columns with tf.pad\n\n1 Pad a variable size tensor to a specific size in a custom layer\n\n1 Pad the last dimension of a tensor with different lengths to a specific length\n\nHot Network Questions\n\nHow did the Dragon modify 6847 video output timing for PAL?\n\nI do not understand the pronunciation of ""et notre petit dernier""\n\nDisable Windows sound when some operation is performed that is not possible\n\nUpgrading a 105 R7000 to 105 di2 R7100\n\nCreating dotted line in OpenLayers with outline and fill color for each dot\n\nFind separating sets\n\nChains of Mephistopheles versus ancestral recall\n\nLanguage is not displaying published item in Sitecore 10.2\n\nIs there anything that prevents Xi from creating a dynasty like the Kim dynasty in North Korea?\n\nMurder due to temporary insanity\n\nWhy would a pilot request that ATC dim the runway lights?\n\nConvenient way to declare 2D (or even higher dimension) arrays with std::array\n\nVisibility of ISS at extreme latitudes\n\nWhy does time-translational symmetry imply that energy (and not something else) is conserved?\n\nMotherboard missing serial number and UUID?\n\nWhy do universities delete professor\'s personal web pages after they leave?\n\nFind where the slope is greatest\n\nWhat are some good options for Black Walnut resistant plants?\n\nWhy do they use bind in Haskell over Kleisli composition?\n\nIs Suica better than PASMO?\n\nWhat are Gibdo Guts useful for?\n\nI cast spark! Or, Design of preindustrial firearms when people can cast spark\n\nCan I shut off power to this panel without pulling the meter?\n\nIs there a grand scheme at work for buying worship? more hot questions\n\nTo subscribe to this RSS feed, copy and paste this URL into your RSS reader.\n\nBy clicking “Accept all cookies”, you agree Stack Exchange can store cookies on your device and disclose information in accordance with our Cookie Policy.\n\nAccept all cookies Necessary cookies only']","The user is trying to understand how to correctly use the tf.pad function to pad a 1-dimensional vector in TensorFlow, specifically how to format the 'paddings' parameter correctly to avoid the InvalidArgumentError they encountered."
+68984841,tf.keras.layers.Dense,Documentation Replicability,How can I understand the kernel of tf.keras.layers.Dense for rank >2?,"<p>How can I understand the kernel of <code>tf.keras.layers.Dense</code> for rank &gt;2?</p>
+<p>The official API doc states that:</p>
+<blockquote>
+<p>Note: If the input to the layer has a rank greater than 2, then Dense
+computes the dot product between the inputs and the kernel along the
+last axis of the inputs and axis 0 of the kernel (using tf.tensordot).
+For example, if input has dimensions (batch_size, d0, d1), then we
+create a kernel with shape (d1, units), and the kernel operates along
+axis 2 of the input, on every sub-tensor of shape (1, 1, d1) (there
+are batch_size * d0 such sub-tensors). The output in this case will
+have shape (batch_size, d0, units).</p>
+</blockquote>
+<p>My understanding is that for a rank larger than 2 (for example rank 3) only <strong>one</strong> kernel is created and thus the same kernel is applied on all slices of the second dimension, like above.
+That would consequently mean that the outputs for different indices of the second dimension are <strong>not independent</strong> of each other (especially during training).</p>
+<p>Is my understanding correct? And if yes, is there a simple way to use a stack of kernels instead or do I have to implement the tensor multiplication?</p>
+","<p>Yes, your understanding is correct.</p>
+<p>To achieve what you want, you need to define a custom keras layer. Let's suppose the input to the layer is of shape (batch_size, d0, i0). Most part of the layer will be similar to the original <code>Dense</code> layer (link: <a href=""https://github.com/tensorflow/tensorflow/blob/22ffec3a9c44133cba2182d60678d49bb372f020/tensorflow/python/keras/layers/core.py#L1077"" rel=""nofollow noreferrer"">github</a>), except that</p>
+<ol>
+<li>In the <code>build</code> function, the shape of <code>self.kernel</code> is (d0, i0, units) instead. You can get the value of <code>d0</code> as well as <code>i0</code> from <code>input_shape</code>.</li>
+<li>In the <code>call</code> function, to do the specified tensor multiplication between <code>inputs</code> and <code>self.kernel</code>, use <code>tf.einsum</code> with this equation: <code>tf.einsum('abc,bcg-&gt;abg', inputs, self.kernel)</code></li>
+</ol>
+","# Customized Content
+
+Yes, your understanding is correct regarding the behavior of `tf.keras.layers.Dense` for inputs with a rank greater than 2. The `Dense` layer indeed uses a single kernel to operate across the last axis of the input tensor, applying the same kernel to each slice along the second-to-last dimension. This means that the outputs for different indices of the second dimension are not independent of each other, as they all share the same kernel during the operation.
+
+To use a stack of kernels instead, thereby allowing for independent operations across the second dimension of the input tensor, you would indeed need to implement a custom layer. This custom layer would involve creating a kernel with a shape that accommodates the additional dimension(s) and performing the tensor multiplication accordingly.
+
+Here's a simplified example of how you might implement such a custom layer in TensorFlow:
+
+```python
+import tensorflow as tf
+
+class CustomDenseLayer(tf.keras.layers.Layer):
+    def __init__(self, units, activation=None, **kwargs):
+        super(CustomDenseLayer, self).__init__(**kwargs)
+        self.units = units
+        self.activation = tf.keras.activations.get(activation)
+
+    def build(self, input_shape):
+        self.kernel = self.add_weight(
+            shape=(input_shape[1], input_shape[2], self.units),
+            initializer='glorot_uniform',
+            name='kernel')
+        self.bias = self.add_weight(
+            shape=(input_shape[1], self.units),
+            initializer='zeros',
+            name='bias')
+
+    def call(self, inputs):
+        # Perform tensor multiplication using tf.einsum
+        # This allows for different operations across the second dimension
+        outputs = tf.einsum('bij,jik->bik', inputs, self.kernel)
+        outputs += self.bias
+        return self.activation(outputs)
+
+# Example usage
+model = tf.keras.Sequential([
+    CustomDenseLayer(32, activation='relu', input_shape=(10, 20)),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+
+model.compile(optimizer='adam', loss='categorical_crossentropy')
+print(model.summary())
+```
+
+This custom layer (`CustomDenseLayer`) takes inputs of shape `(batch_size, d0, d1)` and applies a unique operation across the `d0` dimension using a stack of kernels, one for each slice along `d0`. The output shape from this layer will be `(batch_size, d0, units)`, where each slice along `d0` has been independently processed.
+
+## Additional Resources
+
+#### Stack Overflow Q&A
+- [How can I understand the kernel of tf.keras.layers.Dense for rank >2?](https://stackoverflow.com/questions/68984841/how-can-i-understand-the-kernel-of-tf-keras-layers-dense-for-rank-2)
+
+#### Related Web URLs
+- [TensorFlow Issue #25780: Wrong semantic of Dense layer for tf.python.keras.Dense when input has rank > 2](https://github.com/tensorflow/tensorflow/issues/25780)
+- [Keras API Reference: Dense layer](https://keras.io/api/layers/core_layers/dense/)
+- [A Complete Understanding of Dense Layers in Neural Networks](https://analyticsindiamag.com/a-complete-understanding-of-dense-layers-in-neural-networks/)
+
+#### Related Courses
+- [Custom Models, Layers, and Loss Functions with TensorFlow on Coursera](https://www.coursera.org/learn/custom-models-layers-loss-functions-with-tensorflow)
+- [Introduction to Deep Learning with Keras on Coursera](https://www.coursera.org/learn/introduction-to-deep-learning-with-keras)
+- [Complete TensorFlow 2 and Keras Deep Learning Bootcamp on Udemy](https://www.udemy.com/course/complete-tensorflow-2-and-keras-deep-learning-bootcamp/)
+- [Deep Learning Fundamentals with Keras on edX](https://www.edx.org/learn/deep-learning/ibm-deep-learning-fundamentals-with-keras)","[""Stack Overflow Public questions & answers\n\nStack Overflow for Teams Where developers & technologists share private knowledge with coworkers\n\nTalent Build your employer brand\n\nAdvertising Reach developers & technologists worldwide\n\nCalling all who code. Take the 2023 Developer Survey.\n\nCollectives™ on Stack Overflow\n\nFind centralized, trusted content and collaborate around the technologies you use most. Learn more about Collectives\n\nConnect and share knowledge within a single location that is structured and easy to search. Learn more about Teams\n\nHow can I understand the kernel of tf.keras.layers.Dense for rank >2?\n\nAsked 1 year, 8 months ago\n\nModified 1 year, 8 months ago\n\nHow can I understand the kernel of tf.keras.layers.Dense for rank >2?\n\nThe official API doc states that:\n\nNote: If the input to the layer has a rank greater than 2, then Dense computes the dot product between the inputs and the kernel along the last axis of the inputs and axis 0 of the kernel (using tf.tensordot). For example, if input has dimensions (batch_size, d0, d1), then we create a kernel with shape (d1, units), and the kernel operates along axis 2 of the input, on every sub-tensor of shape (1, 1, d1) (there are batch_size * d0 such sub-tensors). The output in this case will have shape (batch_size, d0, units).\n\nMy understanding is that for a rank larger than 2 (for example rank 3) only one kernel is created and thus the same kernel is applied on all slices of the second dimension, like above. That would consequently mean that the outputs for different indices of the second dimension are not independent of each other (especially during training).\n\nIs my understanding correct? And if yes, is there a simple way to use a stack of kernels instead or do I have to implement the tensor multiplication?\n\nImprove this question\n\nedited Sep 2, 2021 at 1:16\n\n10.9k2020 gold badges4242 silver badges7070 bronze badges\n\nasked Aug 30, 2021 at 13:16\n\nSorted by: Reset to default\n\nHighest score (default)\n\nTrending (recent votes count more)\n\nDate modified (newest first)\n\nDate created (oldest first)\n\nYes, your understanding is correct.\n\nTo achieve what you want, you need to define a custom keras layer. Let's suppose the input to the layer is of shape (batch_size, d0, i0). Most part of the layer will be similar to the original Dense layer (link: github), except that\n\nIn the build function, the shape of self.kernel is (d0, i0, units) instead. You can get the value of d0 as well as i0 from input_shape.\n\nIn the call function, to do the specified tensor multiplication between inputs and self.kernel, use tf.einsum with this equation: tf.einsum('abc,bcg->abg', inputs, self.kernel)\n\nanswered Aug 31, 2021 at 15:15\n\nLaplace RickyLaplace Ricky\n\n1,52088 silver badges66 bronze badges\n\nNot the answer you're looking for? Browse other questions tagged\n\nkeras or ask your own question.\n\nStories from our survey: Salary in the time of pandemic\n\nGreat code isn’t enough. Developers need to brag about it (Ep. 571)\nSearch or jump to...\n\nSearch code, repositories, users, issues, pull requests...\n\nYou signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session.\n\ntensorflow / tensorflow Public\n\nWrong semantic of Dense layer for tf.python.keras.Dense when input has rank > 2. #25780\n\nfredo994 opened this issue\n\nFeb 15, 2019 · 6 comments\n\nWrong semantic of Dense layer for tf.python.keras.Dense when input has rank > 2. #25780\n\nfredo994 opened this issue\n\nFeb 15, 2019 · 6 comments\n\nKeras related issues stale\n\nThis label marks the issue/pr stale - to be closed automatically if no activity stat:awaiting response\n\nStatus - Awaiting response from author type:bug\n\nOS Platform and Distribution: MacOs High Sierra\n\nTensorFlow installed from: installed from pip\n\nTensorFlow version: v1.12.0-0-ga6d8ffae09 1.12.0\n\nProblem I think that tf.python.keras.Dense layer is not implemented correctly. The documentation states:\n\nNote: if the input to the layer has a rank greater than 2, then it is flattened prior to the initial dot product with kernel.\n\nMy interpretation of this claim is: if we have input tensor with shape (None, 10, 10) then dense layer with 20 hidden units should produce output with a shape (None, 20) and the kernel should have a shape of (10 * 10, 20), and input tensor should be flattened to shape (None, 100) before product with kernel.\n\nBut, implementation is different.\n\nKernel is initialized to shape (10, 20) (for the example above)\n\nself.kernel = self.add_weight( # method Dense#build 'kernel', shape=[input_shape[-1].value, self.units], initializer=self.kernel_initializer, regularizer=self.kernel_regularizer, constraint=self.kernel_constraint, dtype=self.dtype, trainable=True)\n\nThe output is computed as tensordot with summation over innermost dimensions\n\n# Broadcasting is required for the inputs. outputs = standard_ops.tensordot(inputs, self.kernel, [[rank - 1], [0]]) # method Dense#call\n\nThis means that for x.shape == (None, 10, 10) and units == 20 the output shape will be (None, 10, 20), and that kernel is broadcasted for all other dimensions (this means weights are shared).\n\nCode to reproduce the issue\n\nimport tensorflow as tf tf.enable_eager_execution() x = tf.random.normal((10, 10, 10)) y = tf.layers.dense(x, 20) print(y.shape) # Produces (10, 10, 20) not (10, 20) as expected.\n\nDiscussion Three possible things are happening here:\n\nDocumentation is wrong and implementation is correct, and a dense layer is meant to accept only rank 2-dimensional input (batchSize, a dimension of input vector) and if we pass it higher rank it treats it as a stack of input vectors. The solution is to change the documentation (specifically the note part), it should state something like numpy's documentation for matmul:""]","The user is seeking to confirm their understanding of how the tf.keras.layers.Dense layer applies a single kernel across slices of the second dimension for inputs with rank greater than 2, and they are inquiring about the possibility of using a stack of kernels for such inputs instead of the default behavior."
+55560676,tf.while_loop,Documentation Replicability,How to use tf.while_loop with eager execution?,"<p>In the documentation, the body of a tf.while_loop needs to be a python callable.</p>
+
+<pre><code>i = tf.constant(0)
+b = lambda i: tf.add(i,1)
+c = lambda i: tf.less(i,10)
+tf.while_loop(c,b, [i])
+</code></pre>
+
+<p>works but</p>
+
+<pre><code>def b(i):
+    tf.add(i,1)
+
+i = tf.constant(0)
+c = lambda i: tf.less(i,10)
+tf.while_loop(c,b, [i])
+</code></pre>
+
+<p>throws a ValueError: Attempt to convert a value (None) with an unsupported type() to a Tensor</p>
+
+<p>In 2.0, eager execution is default, I wonder what's the problem?!</p>
+","<p>You forgot to add return statement to your function:</p>
+
+<pre class=""lang-py prettyprint-override""><code>import tensorflow as tf
+
+def b(i):
+    return tf.add(i, 1)
+
+i = tf.constant(0)
+c = lambda i: tf.less(i, 10)
+tf.while_loop(c, b, [i]) # &lt;tf.Tensor: id=51, shape=(), dtype=int32, numpy=10&gt;
+</code></pre>
+
+<p>Note that in your first example function <code>b</code> does return incremented value:</p>
+
+<pre class=""lang-py prettyprint-override""><code>i = tf.constant(0)
+b = lambda i: tf.add(i,1)
+c = lambda i: tf.less(i,10)
+tf.while_loop(c,b, [i])
+print(b(1).numpy()) # 2
+</code></pre>
+",,,"The user is trying to understand why their code using tf.while_loop with a defined function as the body throws a ValueError when eager execution is enabled in TensorFlow 2.0, despite the function being a Python callable."

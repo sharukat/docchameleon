@@ -10,8 +10,8 @@ from setfit import SetFitModel
 # ==========================================================================================================================
 
 def question_classifier(question_body: str):
-    print("Binary Classification In-Progess.....")
+    # print("Binary Classification In-Progess.....")
     model = SetFitModel.from_pretrained("sharukat/so_mpnet-base_question_classifier")
     prediction = model(question_body)
-    print("Completed Successfully\n")
+    # print("Completed Successfully\n")
     return prediction

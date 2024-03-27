@@ -34,7 +34,7 @@ def read_markdown_file(filename):
       content = file.read()
       return content
   except FileNotFoundError:
-    print(f"Error: File '{filename_with_ext}' not found.")
+    # print(f"Error: File '{filename_with_ext}' not found.")
     return None
 
 

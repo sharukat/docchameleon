@@ -1,7 +1,7 @@
 {
     "Documentation Replication on Other Examples": [
       "Issues related to replicating the documentation examples on other different examples.", 
-      "Provide examples replicating the documentation on other examples along with explanation with respect to the question asked by the user."
+      "Your task is to generate complete executable code example with an explanation replicating the corresponding example in the documentation to address the user's quesetion body by only using the knowledge provided as 'context'."
       ],
     "Documentation Ambiguity": [
       "Issues related to not understanding the content properly.", 
