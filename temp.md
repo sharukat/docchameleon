@@ -1,62 +1,30 @@
 # Customized Content
 
-Yes, your understanding is correct regarding the behavior of `tf.keras.layers.Dense` for inputs with a rank greater than 2. The `Dense` layer indeed uses a single kernel to operate across the last axis of the input tensor, applying the same kernel to each slice along the second-to-last dimension. This means that the outputs for different indices of the second dimension are not independent of each other, as they all share the same kernel during the operation.
 
-To use a stack of kernels instead, thereby allowing for independent operations across the second dimension of the input tensor, you would indeed need to implement a custom layer. This custom layer would involve creating a kernel with a shape that accommodates the additional dimension(s) and performing the tensor multiplication accordingly.
+To address your question on migrating from TensorFlow 1 to TensorFlow 2, specifically regarding the use of `tf.compat.v1.placeholder` and its equivalent in TensorFlow 2, it's important to understand the differences in how shapes are handled between the two versions. In TensorFlow 1, `tf.compat.v1.placeholder` allows you to define a placeholder for a tensor that will always be fed, including specifying its shape. In TensorFlow 2, `tf.keras.Input` is used for a similar purpose but with a slightly different approach to shapes.
 
-Here's a simplified example of how you might implement such a custom layer in TensorFlow:
+When you specify an empty list `[]` as the shape in `tf.compat.v1.placeholder`, it means you're defining a scalar (a single value). However, in TensorFlow 2, when using `tf.keras.Input` with `shape=[]`, it actually expects a 1D tensor with zero elements, which is different from a scalar. To define a scalar input in TensorFlow 2, you should use `shape=()` instead of `shape=[]`. This subtle difference in specifying the shape is likely the reason why you're observing different shapes between `x1` and `x2`.
 
-```python
-import tensorflow as tf
+Here's how you can correctly migrate your code to TensorFlow 2 to have the same shape as in TensorFlow 1:
 
-class CustomDenseLayer(tf.keras.layers.Layer):
-    def __init__(self, units, activation=None, **kwargs):
-        super(CustomDenseLayer, self).__init__(**kwargs)
-        self.units = units
-        self.activation = tf.keras.activations.get(activation)
 
-    def build(self, input_shape):
-        self.kernel = self.add_weight(
-            shape=(input_shape[1], input_shape[2], self.units),
-            initializer='glorot_uniform',
-            name='kernel')
-        self.bias = self.add_weight(
-            shape=(input_shape[1], self.units),
-            initializer='zeros',
-            name='bias')
 
-    def call(self, inputs):
-        # Perform tensor multiplication using tf.einsum
-        # This allows for different operations across the second dimension
-        outputs = tf.einsum('bij,jik->bik', inputs, self.kernel)
-        outputs += self.bias
-        return self.activation(outputs)
-
-# Example usage
-model = tf.keras.Sequential([
-    CustomDenseLayer(32, activation='relu', input_shape=(10, 20)),
-    tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(10, activation='softmax')
-])
-
-model.compile(optimizer='adam', loss='categorical_crossentropy')
-print(model.summary())
 ```
+import tensorflow as tf
+import numpy as np 
+# TensorFlow 1 code
+# x1 = tf.compat.v1.placeholder(tf.float32, [], name="x1")
 
-This custom layer (`CustomDenseLayer`) takes inputs of shape `(batch_size, d0, d1)` and applies a unique operation across the `d0` dimension using a stack of kernels, one for each slice along `d0`. The output shape from this layer will be `(batch_size, d0, units)`, where each slice along `d0` has been independently processed.
+# Equivalent TensorFlow 2 code
+x2 = tf.keras.Input(shape=(), dtype=tf.float32, name="x2")
 
+# To demonstrate the shape equivalence
+with tf.compat.v1.Session() as sess:
+    x1 = tf.compat.v1.placeholder(tf.float32, [], name="x1")
+    print("Shape of x1 (TF1):", sess.run(tf.shape(x1), feed_dict={x1: np.array(5.0)}))
+
+print("Shape of x2 (TF2):", x2.shape)
+
+# Note: In TensorFlow 2, `x2.shape` directly gives the shape without needing to run a session.
+```
 ## Additional Resources
-
-#### Stack Overflow Q&A
-- [How can I understand the kernel of tf.keras.layers.Dense for rank >2?](https://stackoverflow.com/questions/68984841/how-can-i-understand-the-kernel-of-tf-keras-layers-dense-for-rank-2)
-
-#### Related Web URLs
-- [TensorFlow Issue #25780: Wrong semantic of Dense layer for tf.python.keras.Dense when input has rank > 2](https://github.com/tensorflow/tensorflow/issues/25780)
-- [Keras API Reference: Dense layer](https://keras.io/api/layers/core_layers/dense/)
-- [A Complete Understanding of Dense Layers in Neural Networks](https://analyticsindiamag.com/a-complete-understanding-of-dense-layers-in-neural-networks/)
-
-#### Related Courses
-- [Custom Models, Layers, and Loss Functions with TensorFlow on Coursera](https://www.coursera.org/learn/custom-models-layers-loss-functions-with-tensorflow)
-- [Introduction to Deep Learning with Keras on Coursera](https://www.coursera.org/learn/introduction-to-deep-learning-with-keras)
-- [Complete TensorFlow 2 and Keras Deep Learning Bootcamp on Udemy](https://www.udemy.com/course/complete-tensorflow-2-and-keras-deep-learning-bootcamp/)
-- [Deep Learning Fundamentals with Keras on edX](https://www.edx.org/learn/deep-learning/ibm-deep-learning-fundamentals-with-keras)

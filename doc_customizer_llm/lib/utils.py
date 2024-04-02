@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 import glob
 import json
 import requests
-import markdown
 import ast
 import numpy as np
 import pandas as pd

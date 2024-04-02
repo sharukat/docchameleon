@@ -12,4 +12,4 @@ query = """
     resolving this discrepancy to achieve the same tensor shape in TensorFlow 2 as they had in TensorFlow 1.
     """
 
-res = course_urls_retriever(query)
+model_response, context, urls = relevant_context_retriever(query)
