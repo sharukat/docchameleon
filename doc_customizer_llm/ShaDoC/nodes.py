@@ -1,12 +1,13 @@
 import os
 import sys
 import modal
-from lib.config import COLOR, DOCUMENTATION_PATH
+from lib.config import COLOR
 from operator import itemgetter
 
 from lib.common import GraphState, image, stub
-import sandbox
+import graders
 import retrieval
+import sandbox
 import tasks
 import intent
 import search
@@ -16,26 +17,43 @@ from templates.template_1 import return_template
 from templates.output_template import output_template
 
 with image.imports():
+    from langchain.schema import Document
     from langchain.output_parsers.openai_tools import PydanticToolsParser
     from langchain.prompts import PromptTemplate
     from langchain_core.pydantic_v1 import BaseModel, Field
     from langchain_core.utils.function_calling import convert_to_openai_tool
     from langchain_openai import ChatOpenAI
+    from langchain_community.chat_models import ChatCohere
+    from langchain_community.retrievers import CohereRagRetriever
 
 
 class Nodes:
     def __init__(self, debug: bool = False):
+        self.title = None
+        self.question = None
+        self.api_name = None
+        self.issue_type = None
+        self.iter = None
+        self.context_iter = None
         self.intent: str = None
+        self.so_answers = None
+        self.course_urls = None
+
         self.context = None
         self.definition = None
         self.task = None
-        self.course_urls = None
         self.urls: list = None
-        self.so_answers = None
         self.documentation = None
         self.debug = debug
         self.model ="gpt-4-0125-preview"
         self.node_map = {
+            "identify_intent": self.identify_intent,
+            "extract_so": self.extract_so,
+            "retrieve_courses": self.retrieve_courses,
+            "context_retrieval": self.context_retrieval,
+            "check_context_relevancy": self.check_context_relevancy,
+            "check_hallucination": self.check_hallucination,
+            "check_answer_relevancy": self.check_answer_relevancy,
             "check_issue_type": self.check_issue_type,
             "generate": self.generate,
             "generate_without_examples":self.generate_without_examples,
@@ -53,30 +71,221 @@ class Nodes:
             "Documentation Ambiguity",
             "Documentation Completeness"]
     
-    def check_issue_type(self, state: GraphState) -> GraphState:
-        ## State
+
+
+    # ========================================================================================================================
+    def identify_intent(self, state: GraphState) -> GraphState:
         state_dict = state["keys"]
-        title = state_dict["title"]
-        question = state_dict["question"]
-        api_name = state_dict["api_name"]
-        issue_type = state_dict["issue_type"]
-        iter = state_dict["iterations"]
+        self.title = state_dict["title"]
+        self.question = state_dict["question"]
+        self.api_name = state_dict["api_name"]
+        self.issue_type = state_dict["issue_type"]
+        iterations = state_dict["iterations"]
+        context_iter = state_dict["context_iter"]
+
+        self.intention = intent.question_intent_identifier(self.title, self.question)
+
+        return {
+            "keys": {
+                "intent": self.intention,
+                "iterations": iterations,
+                "context_iter": context_iter,
+            }
+        }
+    
+
+    # ========================================================================================================================
+    def extract_so(self, state: GraphState) -> GraphState:
+        state_dict = state["keys"]
+        iterations = state_dict["iterations"]
+        context_iter = state_dict["context_iter"]
+
+        self.so_answers = stackoverflow.retrieval(self.title, self.question)
+
+        return {
+            "keys": {
+                "so_answers": self.so_answers,
+                "iterations": iterations,
+                "context_iter": context_iter,
+            }
+        }
+
+
+    # ========================================================================================================================
+    def retrieve_courses(self, state: GraphState) -> GraphState:
+        state_dict = state["keys"]
+        iterations = state_dict["iterations"]
+        context_iter = state_dict["context_iter"]
+
+        search_results = search.course_urls_retriever(self.intention)
+        course_urls = search_results['urls']
+        if not course_urls:
+            self.course_urls = utils.remove_broken_urls(course_urls)
+
+        return {
+            "keys": {
+                "course_urls": self.course_urls,
+                "iterations": iterations,
+                "context_iter": context_iter,
+            }
+        }
+    
+
+    # ========================================================================================================================
+    def context_retrieval(self, state: GraphState) -> GraphState:
+        """
+        Retrieve relevant context from web using Cohere RAG Retriever
+        Args:
+            state (dict): The current graph state
+        Returns:
+            state (dict): New key added to state, generation, that contains LLM generation
+        """
+
+        state_dict = state["keys"]
+        iterations = state_dict["iterations"]
+        context_iter = state_dict["context_iter"]
+
+        print(f"{COLOR['BLUE']}🚀: EXECUTING RETRIEVER: Cohere RAG Retriever{COLOR['ENDC']}")
+
+        # RAG generation
+        rag = CohereRagRetriever(llm=ChatCohere(model="command-r"), connectors=[{"id": "web-search"}])
+        documents = rag.get_relevant_documents(self.intention)
+        generation = documents.pop()
+        generation = generation.page_content
+        print(f"{COLOR['GREEN']}✅: EXECUTION COMPLETED{COLOR['ENDC']}\n")
+
+        context_iter += 1
+        return {
+            "keys": {
+                "documents": documents, 
+                "generation": generation,
+                "iterations": iterations,
+                "context_iter": context_iter,
+            }
+        }
+    
+
+    # ========================================================================================================================
+    def check_context_relevancy(self, state: GraphState) -> GraphState:
+        """
+        Determines whether the retrieved documents are relevant to the question.
+        Args:
+            state (dict): The current graph state
+        Returns:
+            state (dict): Updates documents key with only filtered relevant documents
+        """
+        print(f"{COLOR['BLUE']}🚀: EXECUTING GRADER: Context vs Question Checker.{COLOR['ENDC']}")
+
+        state_dict = state["keys"]
+        documents = state_dict["documents"]
+        generation = state_dict["generation"]
+        iterations = state_dict["iterations"]
+        context_iter = state_dict["context_iter"]
+
+        # Score each doc
+        filtered_docs = []
+        for d in documents:
+            rg = graders.retrieval_grader()
+            score = rg.invoke({"question": self.question, "document": d.page_content})
+            grade = score.binary_score
+            if grade == "yes":
+                print(f"\t{COLOR['GREEN']}--- ➡️ GRADE: DOCUMENT RELEVANT ---{COLOR['ENDC']}")
+                filtered_docs.append(d)
+            else:
+                print(f"\t{COLOR['RED']}--- ➡️ GRADE: DOCUMENT NOT RELEVANT ---{COLOR['ENDC']}")
+                continue
+        print(f"{COLOR['GREEN']}✅: EXECUTION COMPLETED{COLOR['ENDC']}\n")
+        
+        return {
+            "keys": {
+                "documents": filtered_docs, 
+                "generation": generation,
+                "iterations": iterations,
+                "context_iter": context_iter,
+            }
+        }
+
+
+
+    # ========================================================================================================================
+    def check_hallucination(self, state: GraphState) -> GraphState:
+        print(f"{COLOR['BLUE']}🚀: EXECUTING GRADER: Hallucination Checker.{COLOR['ENDC']}")
+        state_dict = state["keys"]
+        documents = state_dict["documents"]
+        generation = state_dict["generation"]
+        iterations = state_dict["iterations"]
+        context_iter = state_dict["context_iter"]
+
+        documents = "\n".join([d.page_content for d in documents])
+        documents = Document(page_content=documents)
+
+        hg = graders.hallucination_grader()
+        score = hg.invoke({"documents": documents, "generation": generation})
+        grade = score.binary_score
+
+        print(f"{COLOR['GREEN']}✅: EXECUTION COMPLETED{COLOR['ENDC']}\n")
+        
+        return {
+            "keys": {
+                "documents": documents, 
+                "generation": generation,
+                "hallucinations": grade,
+                "iterations": iterations,
+                "context_iter": context_iter,
+            }
+        }
+    
+
+
+    # ========================================================================================================================
+    def check_answer_relevancy(self, state: GraphState) -> GraphState:
+        print(f"{COLOR['BLUE']}🚀: EXECUTING GRADER: Generation vs Question Checker.{COLOR['ENDC']}")
+        state_dict = state["keys"]
+        documents = state_dict["documents"]
+        generation = state_dict["generation"]
+        hallucinations = state_dict["hallucinations"]
+        iterations = state_dict["iterations"]
+        context_iter = state_dict["context_iter"]
+
+        ag = graders.answer_grader()
+        score = ag.invoke({"question": self.question,"generation": generation})
+        grade = score.binary_score
+        print(f"{COLOR['GREEN']}✅: EXECUTION COMPLETED{COLOR['ENDC']}\n")
+
+        return {
+            "keys": {
+                "documents": documents, 
+                "generation": generation,
+                "hallucinations": hallucinations,
+                "answer_relevancy": grade, 
+                "iterations": iterations,
+                "context_iter": context_iter,
+            }
+        }
+
+
+    # ========================================================================================================================
+    def check_issue_type(self, state: GraphState) -> GraphState:
+        state_dict = state["keys"]
+        context = state_dict["generation"]
+        iterations = state_dict["iterations"]
         flag = False
 
-        if issue_type in self.examples_required:
+        if self.issue_type in self.examples_required:
             flag = True
 
         return {
             "keys": {
-                "title": title,
-                "question": question,
-                "api_name": api_name,
-                "issue_type": issue_type,
+                "context": context,
+                "iterations": iterations,
                 "example_required": flag,
-                "iterations": iter,
+                
             }
         }
 
+
+
+    # ========================================================================================================================
     def generate(self, state: GraphState) -> GraphState:
         """
         Generate a code solution based on LCEL docs and the input question
@@ -91,31 +300,14 @@ class Nodes:
 
         ## State
         state_dict = state["keys"]
-        title = state_dict["title"]
-        question = state_dict["question"]
-        api_name = state_dict["api_name"]
-        issue_type = state_dict["issue_type"]
-        iter = state_dict["iterations"]
+        context = state_dict["context"]
+        iterations = state_dict["iterations"]
 
         try:
-            utils.is_valid_api(api_name)
-            self.documentation = utils.get_documentation(api_name)
-
-            if self.intent is None:
-                results = tasks.prompt_task(issue_type)
-                self.definition = results['definition']
-                self.task = results['task']
-
-                self.intent = intent.question_intent_identifier(title, question)
-
-                search_results = search.course_urls_retriever(self.intent)
-                course_urls = search_results['urls']
-                if not course_urls:
-                    self.course_urls = utils.remove_broken_urls(course_urls)
-
-                model_response, self.context, self.urls = retrieval.relevant_context_retriever(query = self.intent)
-
-                self.so_answers = stackoverflow.retrieval(title, question)
+            self.documentation = utils.get_documentation(self.api_name)
+            results = tasks.prompt_task(self.issue_type)
+            self.definition = results['definition']
+            self.task = results['task']
 
             ## Data model
             class code(BaseModel):
@@ -173,19 +365,19 @@ class Nodes:
                 # Prompt
                 prompt = PromptTemplate(
                     template=template,
-                    input_variables=["context", "api_name", "title","question", "documentation", 
+                    input_variables=["context", "api_name", "title", "question", "documentation", 
                                      "issue_type", "definition", "task", "generation", "error"],
                 )
 
                 # Chain
                 chain = (
                     {
-                        "context": lambda _: self.context,
+                        "context": itemgetter("context"),
                         "documentation": lambda _: self.documentation,
-                        "title": itemgetter("title"),
-                        "question": itemgetter("question"),
-                        "api_name": itemgetter("api_name"),
-                        "issue_type": itemgetter("issue_type"),
+                        "title": lambda _: self.title,
+                        "question": lambda _: self.question,
+                        "api_name": lambda _: self.api_name,
+                        "issue_type": lambda _: self.issue_type,
                         "definition": lambda _: self.definition,
                         "task": lambda _: self.task,
                         "generation": itemgetter("generation"),
@@ -197,11 +389,7 @@ class Nodes:
                 )
 
                 code_solution = chain.invoke(
-                    {   
-                        "title": title,
-                        "question": question,
-                        "api_name": api_name,
-                        "issue_type": issue_type,
+                    {   "context": context,
                         "generation": str(code_solution[0]),
                         "error": error,
                     }
@@ -219,12 +407,12 @@ class Nodes:
                 # Chain
                 chain = (
                     {
-                        "context": lambda _: self.context,
+                        "context": itemgetter("context"),
                         "documentation": lambda _: self.documentation,
-                        "title": itemgetter("title"),
-                        "question": itemgetter("question"),
-                        "api_name": itemgetter("api_name"),
-                        "issue_type": itemgetter("issue_type"),
+                        "title": lambda _: self.title,
+                        "question": lambda _: self.question,
+                        "api_name": lambda _: self.api_name,
+                        "issue_type": lambda _: self.issue_type,
                         "definition": lambda _: self.definition,
                         "task": lambda _: self.task,
                     }
@@ -235,25 +423,17 @@ class Nodes:
 
                 code_solution = chain.invoke(
                     {
-                        "title": title,
-                        "question": question,
-                        "api_name": api_name,
-                        "issue_type": issue_type,
+                        "context": context,
                     }
                 )
                 
 
-            iter = iter + 1
+            iterations += 1
             return {
                 "keys": {
                     "generation": code_solution,
-                    "title": title,
-                    "question": question,
-                    "api_name": api_name,
-                    "issue_type": issue_type,
-                    "urls": self.urls,
-                    "documentation": self.documentation,
-                    "iterations": iter,
+                    "context": context,
+                    "iterations": iterations,
                 }
             }
     
@@ -261,6 +441,8 @@ class Nodes:
             print(e)
 
 
+
+    # ========================================================================================================================
     def generate_without_examples(self, state: GraphState) -> GraphState:
         """
         Generate a description based on context and the input question
@@ -274,31 +456,16 @@ class Nodes:
 
         ## State
         state_dict = state["keys"]
-        title = state_dict["title"]
-        question = state_dict["question"]
-        api_name = state_dict["api_name"]
-        issue_type = state_dict["issue_type"]
-        iter = state_dict["iterations"]
+        context = state_dict["context"]
+        iterations = state_dict["iterations"]
 
         try:
-            utils.is_valid_api(api_name)
-            self.documentation = utils.get_documentation(api_name)
+            utils.is_valid_api(self.api_name)
+            self.documentation = utils.get_documentation(self.api_name)
 
-            if self.intent is None:
-                results = tasks.prompt_task(issue_type)
-                self.definition = results['definition']
-                self.task = results['task']
-
-                self.intent = intent.question_intent_identifier(title, question)
-
-                search_results = search.course_urls_retriever(self.intent)
-                course_urls = search_results['urls']
-                if not course_urls:
-                    self.course_urls = utils.remove_broken_urls(course_urls)
-
-                model_response, self.context, self.urls = retrieval.relevant_context_retriever(query = self.intent)
-
-                self.so_answers = stackoverflow.retrieval(title, question)
+            results = tasks.prompt_task(self.issue_type)
+            self.definition = results['definition']
+            self.task = results['task']
 
             ## LLM
             llm = ChatOpenAI(temperature=0, model=self.model, streaming=True)
@@ -318,12 +485,12 @@ class Nodes:
             # Chain
             chain = (
                 {
-                    "context": lambda _: self.context,
+                    "context": itemgetter("context"),
                     "documentation": lambda _: self.documentation,
-                    "title": itemgetter("title"),
-                    "question": itemgetter("question"),
-                    "api_name": itemgetter("api_name"),
-                    "issue_type": itemgetter("issue_type"),
+                    "title": lambda _: self.title,
+                    "question": lambda _: self.question,
+                    "api_name": lambda _: self.api_name,
+                    "issue_type": lambda _: self.issue_type,
                     "definition": lambda _: self.definition,
                     "task": lambda _: self.task,
                 }
@@ -332,23 +499,15 @@ class Nodes:
 
             solution = chain.invoke(
                 {
-                    "title": title,
-                    "question": question,
-                    "api_name": api_name,
-                    "issue_type": issue_type,
+                    "context": context,
                 }
             )
             
             return {
                 "keys": {
                     "generation": solution,
-                    "title": title,
-                    "question": question,
-                    "api_name": api_name,
-                    "issue_type": issue_type,
-                    "urls": self.urls,
-                    "documentation": self.documentation,
-                    "iterations": iter,
+                    "context": context,
+                    "iterations": iterations,
                 }
             }
     
@@ -357,6 +516,7 @@ class Nodes:
 
 
 
+    # ========================================================================================================================
     def check_code_imports(self, state: GraphState) -> GraphState:
         """
         Check imports
@@ -372,13 +532,10 @@ class Nodes:
         print(f"{COLOR['BLUE']}⏳ CHECKING CODE IMPORTS{COLOR['ENDC']}")
         print(f"{COLOR['BLUE']}{'-'*30}{COLOR['ENDC']}")
         state_dict = state["keys"]
-        title = state_dict["title"]
-        question = state_dict["question"]
-        api_name = state_dict["api_name"]
-        issue_type = state_dict["issue_type"]
+        context = state_dict["context"]
         code_solution = state_dict["generation"]
         imports = code_solution[0].imports
-        iter = state_dict["iterations"]
+        iterations = state_dict["iterations"]
 
         # Attempt to execute the imports
         sb = sandbox.run(imports)
@@ -406,17 +563,15 @@ class Nodes:
         return {
             "keys": {
                 "generation": code_solution,
-                "title": title,
-                "question": question,
-                "api_name": api_name,
-                "issue_type": issue_type,
-                "urls": self.urls,
-                "documentation": self.documentation,
                 "error": error,
-                "iterations": iter,
+                "context": context,
+                "iterations": iterations,
             }
         }
 
+
+
+    # ========================================================================================================================
     def check_code_execution(self, state: GraphState) -> GraphState:
         """
         Check code block execution
@@ -432,16 +587,13 @@ class Nodes:
         print(f"{COLOR['BLUE']}⏳ CHECKING CODE EXECUTION {COLOR['ENDC']}")
         print(f"{COLOR['BLUE']}{'-'*30}{COLOR['ENDC']}")
         state_dict = state["keys"]
-        title = state_dict["title"]
-        question = state_dict["question"]
-        api_name = state_dict["api_name"]
-        issue_type = state_dict["issue_type"]
+        context = state_dict["context"]
         code_solution = state_dict["generation"]
         prefix = code_solution[0].prefix
         imports = code_solution[0].imports
         code = code_solution[0].code
         code_block = imports + "\n" + code
-        iter = state_dict["iterations"]
+        iterations = state_dict["iterations"]
 
         sb = sandbox.run(code_block)
         output, error = sb.stdout.read(), sb.stderr.read()
@@ -467,20 +619,18 @@ class Nodes:
         return {
             "keys": {
                 "generation": code_solution,
-                "title": title,
-                "question": question,
-                "api_name": api_name,
-                "issue_type": issue_type,
-                "urls": self.urls,
-                "documentation": self.documentation,
                 "error": error,
                 "prefix": prefix,
                 "imports": imports,
-                "iterations": iter,
+                "context": context,
+                "iterations": iterations,
                 "code": code,
             }
         }
 
+
+
+    # ========================================================================================================================
     def finish(self, state: GraphState) -> dict:
         """
         Finish the graph
@@ -488,45 +638,62 @@ class Nodes:
         Returns:
             dict: Final result
         """
+        examples_required = [
+            "Documentation Replication on Other Examples", 
+            "Documentation Replicability", ]
+        
+        state_dict = state["keys"]
+        if self.issue_type in examples_required:
+            code_solution = state_dict["generation"][0]
+            prefix = code_solution.prefix
+            imports = code_solution.imports
+            code = code_solution.code
+
+            output = output_template(self.api_name, prefix, imports, code)
+            final = self.documentation + output
+
+        else:
+            solution = state_dict["generation"][0]
+            final = self.documentation + solution
 
         print(f"\n{COLOR['YELLOW']}🏁 FINISHING {COLOR['ENDC']}")
 
-        response = extract_response(state)
+        # response = extract_response(state)
 
-        return {"keys": {"response": response}}
+        return {"keys": {"response": final}}
 
 
-def extract_response(state: GraphState) -> str:
-    """
-    Extract the response from the graph state
+# def extract_response(state: GraphState) -> str:
+#     """
+#     Extract the response from the graph state
 
-    Args:
-        state (dict): The current graph state
+#     Args:
+#         state (dict): The current graph state
 
-    Returns:
-        str: The response
-    """
-    examples_required = [
-            "Documentation Replication on Other Examples", 
-            "Documentation Replicability", ]
+#     Returns:
+#         str: The response
+#     """
+#     examples_required = [
+#             "Documentation Replication on Other Examples", 
+#             "Documentation Replicability", ]
 
-    state_dict = state["keys"]
-    issue_type = state_dict["issue_type"]
-    if issue_type in examples_required:
-        api_name = state_dict["api_name"]
-        urls = state_dict["urls"]
-        documentation = state_dict["documentation"]
-        code_solution = state_dict["generation"][0]
-        prefix = code_solution.prefix
-        imports = code_solution.imports
-        code = code_solution.code
+#     state_dict = state["keys"]
+#     issue_type = state_dict["issue_type"]
+#     if issue_type in examples_required:
+#         api_name = state_dict["api_name"]
+#         # urls = state_dict["urls"]
+#         documentation = state_dict["documentation"]
+#         code_solution = state_dict["generation"][0]
+#         prefix = code_solution.prefix
+#         imports = code_solution.imports
+#         code = code_solution.code
 
-        output = output_template(api_name, prefix, imports, code, urls)
-        final = documentation + output
+#         output = output_template(api_name, prefix, imports, code)
+#         final = documentation + output
 
-    else:
-        documentation = state_dict["documentation"]
-        solution = state_dict["generation"][0]
-        final = documentation + solution
+#     else:
+#         documentation = state_dict["documentation"]
+#         solution = state_dict["generation"][0]
+#         final = documentation + solution
 
-    return final
+#     return final

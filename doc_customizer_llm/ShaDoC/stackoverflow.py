@@ -14,6 +14,7 @@ from langchain.retrievers import ContextualCompressionRetriever
 from langchain_community.document_loaders import DataFrameLoader
 from langchain.retrievers.document_compressors import CohereRerank
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.embeddings import CohereEmbeddings
 
 # Load custom modules
 from lib.api import stackexchange

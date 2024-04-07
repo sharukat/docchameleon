@@ -5,6 +5,13 @@ from lib.common import GraphState
 from lib.config import COLOR
 
 EXPECTED_NODES = [
+    "identify_intent",
+    "extract_so",
+    "retrieve_courses",
+    "context_retrieval",
+    "check_context_relevancy",
+    "check_hallucination",
+    "check_answer_relevancy",
     "check_issue_type",
     "generate",
     "generate_without_examples",
@@ -20,7 +27,35 @@ def enrich(graph):
     for node_name in set(EXPECTED_NODES):
         assert node_name in graph.nodes, f"Node {node_name} not found in graph"
 
-    # graph.add_edge("check_issue_type")
+    graph.add_edge("identify_intent", "extract_so")
+    graph.add_edge("extract_so", "retrieve_courses")
+    graph.add_edge("retrieve_courses", "context_retrieval")
+    graph.add_edge("context_retrieval", "check_context_relevancy")
+    graph.add_conditional_edges(
+        "check_context_relevancy",
+        EDGE_MAP["decide_context_relevancy"],
+        {
+            "check_hallucination":"check_hallucination",
+            "context_retrieval":"context_retrieval",
+        }
+    )
+    graph.add_conditional_edges(
+        "check_hallucination",
+        EDGE_MAP["decide_hallucination"],
+        {
+            "check_answer_relevancy":"check_answer_relevancy",
+            "context_retrieval":"context_retrieval",
+        }
+    )
+    graph.add_conditional_edges(
+        "check_answer_relevancy",
+        EDGE_MAP["decide_answer_relevancy"],
+        {
+            "context_retrieval":"context_retrieval",
+            "check_issue_type":"check_issue_type",
+        }
+    )
+    # End of first iterative graph
     graph.add_conditional_edges(
         "check_issue_type",
         EDGE_MAP["decide_example_requirement"],
@@ -29,6 +64,7 @@ def enrich(graph):
             "generate_without_examples":"generate_without_examples",
         },
     )
+
     graph.add_edge("generate", "check_code_imports")
     graph.add_edge("generate_without_examples", "finish")
     graph.add_conditional_edges(
@@ -48,6 +84,47 @@ def enrich(graph):
         },
     )
     return graph
+
+
+
+def decide_context_relevancy(state: GraphState) -> str:
+    state_dict = state["keys"]
+    filtered_documents = state_dict["documents"]
+    if not filtered_documents:
+        print(f"\t{COLOR['RED']}--- ➡️ DECISION: ALL DOCUMENTS ARE NOT RELEVANT TO QUESTION, EXECUTE RAG AGAIN ---{COLOR['ENDC']}\n")
+        return "context_retrieval"
+    else:
+        return "check_hallucination"
+    
+
+def decide_hallucination(state: GraphState) -> str:
+    print(f"{COLOR['BLUE']}❓ DECIDE TO GRADE THE ANSWER FOR HALLUCINATION {COLOR['ENDC']}")
+    print(f"{COLOR['BLUE']}{'-'*60}{COLOR['ENDC']}")
+    state_dict = state["keys"]
+    hallucination = state_dict["hallucinations"]
+    if hallucination == "no":
+        print(f"\t{COLOR['RED']}--- ➡️ DECISION: LLM GENERATION IS NOT GROUNDED ---{COLOR['ENDC']}\n")
+        return "context_retrieval"
+    else:
+        print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: LLM GENERATION IS GROUNDED ---{COLOR['ENDC']}\n")
+        return "check_answer_relevancy"
+    
+
+def decide_answer_relevancy(state: GraphState) -> str:
+    print(f"{COLOR['BLUE']}❓ DECIDE TO PROVIDE THE ANSWER RELEVANCY TO THE QUESTION {COLOR['ENDC']}")
+    print(f"{COLOR['BLUE']}{'-'*60}{COLOR['ENDC']}")
+    state_dict = state["keys"]
+    answer_relevancy = state_dict["answer_relevancy"]
+    context_iter = state_dict["context_iter"]
+
+    if answer_relevancy == "yes" or context_iter >=4:
+        print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: LLM GENERATION RESOLVES THE QUESTION ---{COLOR['ENDC']}\n")
+        return "check_issue_type"
+        
+    else:
+        print(f"\t{COLOR['RED']}--- ➡️ DECISION: LLM GENERATION DOES NOT RESOLVES THE QUESTION. Re-TRY ---{COLOR['ENDC']}\n")
+        return "context_retrieval"
+    
 
 def decide_example_requirement(state: GraphState) -> str:
     print(f"{COLOR['BLUE']}❓ DECIDE TO PROVIDE EXAMPLES WITH DESCRIPTION OR JUST DESCRIPTION {COLOR['ENDC']}")
@@ -115,6 +192,9 @@ def decide_to_finish(state: GraphState) -> str:
 
 
 EDGE_MAP: dict[str, Callable] = {
+    "decide_context_relevancy":decide_context_relevancy,
+    "decide_hallucination":decide_hallucination,
+    "decide_answer_relevancy":decide_answer_relevancy,
     "decide_example_requirement":decide_example_requirement,
     "decide_to_check_code_exec": decide_to_check_code_exec,
     "decide_to_finish": decide_to_finish,

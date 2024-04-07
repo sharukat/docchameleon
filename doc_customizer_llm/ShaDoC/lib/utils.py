@@ -56,6 +56,7 @@ def is_valid_api(text):
   """
   if not text.startswith("tf."):
     raise ValueError(f"{config.COLOR['RED']}❗ EXPECTED API TO START WITH 'tf.', GOT '{text}' INSTEAD.{config.COLOR['ENDC']}\n")
+  print(f"{config.COLOR['GREEN']}✅ {text} API NAME IS VALID.{config.COLOR['ENDC']}\n")
   
 
 # @stub.function(volumes={"/my_vol": modal.Volume.from_name("my-docs-volume", create_if_missing=True)})

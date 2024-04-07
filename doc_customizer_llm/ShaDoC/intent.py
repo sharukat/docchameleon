@@ -2,10 +2,7 @@
 # IMPORT DEPENDENCIES
 # ==========================================================================================================================
 
-import os
-import ast
 from lib.config import COLOR
-from dotenv import load_dotenv
 
 # LANGCHAIN MODULES
 from langchain_openai import ChatOpenAI

@@ -110,8 +110,9 @@ def doc_customization(df, row_index):
 # ==========================================================================================================================
 
 
-# title = "TF1 to TF2 migration"
-# body = """"
+# {
+# "title":"TF1 to TF2 migration",
+# "body":""""
 #     <p>Hello I am new to tensorflow and I am working on a code that I would like to migrate from tensorflow 1 to 2. I have this line of code:</p>
 #     <pre><code>x1 = tf.compat.v1.placeholder(tf.float32, [], name=&quot;x1&quot;)
 #     </code></pre>
@@ -120,8 +121,10 @@ def doc_customization(df, row_index):
 #     </code></pre>
 #     <p>To check the shape I use <code>tf.shape(x1)</code> or <code>tf.shape(x2)</code>, but the shapes are not the same. Could anyone explain to me how to have, in TF2, the same shape as in TF1 ?
 #     Thanks and regards</p>
-# """
-# api_name = "tf.compat.v1.placeholder"
+# """,
+# "api_name":"tf.compat.v1.placeholder",
+# "issue_type":"Documentation Replication on Other Examples",
+# }
 
 # customization = doc_customization(title, body, api_name)
 # create_markdown_file(customization, "customized.md")

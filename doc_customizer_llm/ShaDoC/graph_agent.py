@@ -1,7 +1,6 @@
-import edges
 import nodes
-from lib.common import stub, GraphState
-import lib.utils as utils
+import edges
+from lib.common import GraphState
 from langgraph.graph import StateGraph
 
 
@@ -17,7 +16,8 @@ def construct_graph(debug=False):
     graph = edges.enrich(graph)
 
     # set the starting and ending nodes of the graph
-    graph.set_entry_point(key="check_issue_type")
+    graph.set_entry_point(key="identify_intent")
     graph.set_finish_point(key="finish")
-
     return graph
+
+

@@ -1,84 +1,42 @@
 # ==========================================================================================================================
 # IMPORT DEPENDENCIES
 # ==========================================================================================================================
+import pprint
+import retrieval_nodes
+import retrieval_edges
+from lib.common import RagGraphState
+from langgraph.graph import StateGraph
 
-import os
-from lib.config import COLOR
-from dotenv import load_dotenv
-
-# LANGCHAIN MODULES
-from langchain.storage import InMemoryStore
-from langchain_community.vectorstores import Chroma
-from langchain_community.chat_models import ChatCohere
-from langchain.retrievers.document_compressors import CohereRerank
-from langchain.retrievers import ContextualCompressionRetriever
-from langchain_community.retrievers import CohereRagRetriever
-from langchain.retrievers import ParentDocumentRetriever
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_voyageai import VoyageAIEmbeddings
 
 
 # ==========================================================================================================================
 # MAIN CODE
 # ==========================================================================================================================
 
-def relevant_context_retriever(query: str):
-    print(f"{COLOR['BLUE']}🚀: EXECUTING RETRIEVER: Cohere RAG Retriever{COLOR['ENDC']}")
-    urls = []
-    docs = []
-    model_response = []
-    context = []
-    rag = CohereRagRetriever(llm=ChatCohere(model="command-r"), connectors=[{"id": "web-search"}]) 
+def rag_construct_graph():
+    graph = StateGraph(RagGraphState)
 
-    compressor = CohereRerank(model='rerank-english-v2.0', top_n=5)
-    compression_retriever = ContextualCompressionRetriever(
-        base_compressor=compressor, 
-        base_retriever=rag , 
-    )
-    
-    reranked_docs = compression_retriever.get_relevant_documents(query=query)
-    for index, doc in enumerate(reranked_docs):
-        if 'type' in doc.metadata:
-            model_response.append(doc.page_content)
-        else:
-            if doc.metadata['relevance_score'] > 0.6:
-                urls.append(doc.metadata['url'])
-                docs.append(doc)
+    graph_nodes = retrieval_nodes.Nodes()
+    for key, value in graph_nodes.node_map.items():
+        graph.add_node(key, value)
+
+    graph = retrieval_edges.enrich(graph)
+    graph.set_entry_point(key="generate")
+    graph.set_finish_point(key="finish")
+    return graph
 
 
-    embedding_function = VoyageAIEmbeddings(model="voyage-large-2", batch_size=32)
+def relevant_context_retriever(question: str):
+    graph = rag_construct_graph().compile()
+    inputs = {"question": question, "iterations": 0}
+    context = graph.invoke(inputs)
+    # for output in graph.stream(inputs):
+    #     for key, value in output.items():
+    #         pprint.pprint(f"Node '{key}':")
+    # context = value["generation"]
+    return context['generation']
 
-    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=3000, chunk_overlap=50)
-    child_splitter = RecursiveCharacterTextSplitter(chunk_size=400, chunk_overlap=10)
-    vectorstore = Chroma(
-        collection_name="context",
-        embedding_function=embedding_function
-    )
-
-    # The storage layer for the full answer
-    store = InMemoryStore()
-
-    context_retriever = ParentDocumentRetriever(
-        vectorstore=vectorstore,
-        docstore=store,
-        child_splitter=child_splitter,
-        parent_splitter=parent_splitter,
-    )
-
-    context_retriever.add_documents(docs, ids=None)
-    compressor = CohereRerank(model='rerank-english-v2.0', top_n=10)
-    compression_retriever = ContextualCompressionRetriever(
-        base_compressor=compressor, 
-        base_retriever=context_retriever , 
-    )
-
-    relevant_context = compression_retriever.get_relevant_documents(query=query)
-    for index, answer in enumerate(relevant_context):
-        if answer.metadata['relevance_score'] > 0.6:
-            context.append(answer.page_content)
-            urls.append(answer.metadata['url'])
-
-    print(f"\t➡️ Relevant Parent Doc Count: {len(context)}")
-
-    print(f"{COLOR['GREEN']}✅: EXECUTION COMPLETED{COLOR['ENDC']}\n")
-    return model_response, context, list(set(urls))
+# question = "The user is seeking guidance on how to correctly migrate a TensorFlow 1 code snippet to TensorFlow 2, specifically aiming to replicate the exact shape of a tensor created with tf.compat.v1.placeholder in TensorFlow 1 using tf.keras.Input in TensorFlow 2."
+# context = relevant_context_retriever(question)
+# print(context)
+# print(type(context))

@@ -1,5 +1,5 @@
 import os
-from typing import Dict, TypedDict
+from typing import List, Dict, TypedDict
 from lib.config import DOCUMENTATION_PATH
 
 import modal
@@ -11,9 +11,9 @@ image = modal.Image.debian_slim(python_version="3.11").from_registry(
     ).pip_install(
         "protobuf==3.20.*",
         "tiktoken==0.5.2",
-        "langchain==0.1.11",
-        "langgraph==0.0.28",
-        "langchain-community==0.0.25",
+        "langchain==0.1.13",
+        "langgraph==0.0.30",
+        "langchain-community==0.0.29",
         "langchain-openai==0.0.5",
         "langserve[all]==0.0.51",
         "langchain-voyageai==0.1.0",
@@ -21,8 +21,8 @@ image = modal.Image.debian_slim(python_version="3.11").from_registry(
         "chromadb==0.4.24",
         "langchainhub==0.1.15",
         "mdutils==1.6.0",
-        "numpy",
-        "pandas",
+        "numpy==1.26.4",
+        "pandas==2.2.1",
     )
 
 
@@ -54,4 +54,23 @@ class GraphState(TypedDict):
     keys: Dict[str, any]
 
 
+
+
+
 os.environ["LANGCHAIN_PROJECT"] = "codelangchain"
+
+
+class RagGraphState(TypedDict):
+    """|
+    Represents the state of our graph.
+    Attributes:
+        question: question
+        generation: LLM generation
+        documents: list of documents
+    """
+    question : str
+    generation : str
+    documents : List[str]
+    hallucinations: str
+    answer_relevancy: str
+    iterations: int
