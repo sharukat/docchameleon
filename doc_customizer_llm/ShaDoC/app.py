@@ -2,7 +2,7 @@ import ast
 import modal
 import nodes
 from graph_agent import construct_graph
-from fastapi import FastAPI
+from fastapi import FastAPI, responses
 from fastapi.middleware.cors import CORSMiddleware
 from lib.common import stub
 import lib.utils as utils
@@ -44,6 +44,7 @@ def serve():
                 "question": input_dict['question'], 
                 "api_name": input_dict['api_name'],
                 "issue_type": input_dict['issue_type'],
+                "ground_truth": input_dict['ground_truth'],
                 "iterations": 0, "context_iter": 0}}
         except ValueError as e:
             print(e)
@@ -52,10 +53,9 @@ def serve():
         if "keys" in state:
             return state["keys"]["response"]
         elif "generate" in state:
-            return nodes.Nodes.finish(state["generate"])
+            return nodes.extract_response(state["generate"])
         else:
             return str(state)
-        # return nodes.Nodes.finish(state["keys"]["response"])
 
         
     graph = construct_graph().compile()
@@ -66,5 +66,10 @@ def serve():
         chain,
         path="/codelangchain",
     )
+
+    # redirect the root to the interactive playground
+    @web_app.get("/")
+    def redirect():
+        return responses.RedirectResponse(url="/codelangchain/playground")
 
     return web_app

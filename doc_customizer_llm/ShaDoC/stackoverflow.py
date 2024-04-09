@@ -16,6 +16,7 @@ from langchain.retrievers.document_compressors import CohereRerank
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import CohereEmbeddings
 
+
 # Load custom modules
 from lib.api import stackexchange
 
@@ -37,7 +38,7 @@ def retrieval(title, body):
         loader = DataFrameLoader(df, page_content_column="Answer")
         answers = loader.load()
 
-        embedding_function = VoyageAIEmbeddings(model="voyage-large-2", batch_size=32)
+        embedding_function = CohereEmbeddings(model="embed-english-v3.0")
 
         # parent_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
         child_splitter = RecursiveCharacterTextSplitter(chunk_size=400, chunk_overlap=10)

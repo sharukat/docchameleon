@@ -5,18 +5,16 @@ from lib.common import GraphState
 from lib.config import COLOR
 
 EXPECTED_NODES = [
-    "identify_intent",
-    "extract_so",
-    "retrieve_courses",
+    "intent_soanswers_courses",
     "context_retrieval",
     "check_context_relevancy",
-    "check_hallucination",
-    "check_answer_relevancy",
+    "check_hallucination_and_answer_relevancy",
     "check_issue_type",
     "generate",
     "generate_without_examples",
     "check_code_imports",
     "check_code_execution",
+    "ragas_eval",
     "finish",
 ]
 
@@ -27,29 +25,19 @@ def enrich(graph):
     for node_name in set(EXPECTED_NODES):
         assert node_name in graph.nodes, f"Node {node_name} not found in graph"
 
-    graph.add_edge("identify_intent", "extract_so")
-    graph.add_edge("extract_so", "retrieve_courses")
-    graph.add_edge("retrieve_courses", "context_retrieval")
+    graph.add_edge("intent_soanswers_courses", "context_retrieval")
     graph.add_edge("context_retrieval", "check_context_relevancy")
     graph.add_conditional_edges(
         "check_context_relevancy",
         EDGE_MAP["decide_context_relevancy"],
         {
-            "check_hallucination":"check_hallucination",
+            "check_hallucination_and_answer_relevancy":"check_hallucination_and_answer_relevancy",
             "context_retrieval":"context_retrieval",
         }
     )
     graph.add_conditional_edges(
-        "check_hallucination",
-        EDGE_MAP["decide_hallucination"],
-        {
-            "check_answer_relevancy":"check_answer_relevancy",
-            "context_retrieval":"context_retrieval",
-        }
-    )
-    graph.add_conditional_edges(
-        "check_answer_relevancy",
-        EDGE_MAP["decide_answer_relevancy"],
+        "check_hallucination_and_answer_relevancy",
+        EDGE_MAP["decide_context_retrieval"],
         {
             "context_retrieval":"context_retrieval",
             "check_issue_type":"check_issue_type",
@@ -79,10 +67,11 @@ def enrich(graph):
         "check_code_execution",
         EDGE_MAP["decide_to_finish"],
         {
-            "finish": "finish",
+            "ragas_eval": "ragas_eval",
             "generate": "generate",
         },
     )
+    graph.add_edge("ragas_eval", "finish")
     return graph
 
 
@@ -94,36 +83,23 @@ def decide_context_relevancy(state: GraphState) -> str:
         print(f"\t{COLOR['RED']}--- ➡️ DECISION: ALL DOCUMENTS ARE NOT RELEVANT TO QUESTION, EXECUTE RAG AGAIN ---{COLOR['ENDC']}\n")
         return "context_retrieval"
     else:
-        return "check_hallucination"
+        return "check_hallucination_and_answer_relevancy"
     
 
-def decide_hallucination(state: GraphState) -> str:
-    print(f"{COLOR['BLUE']}❓ DECIDE TO GRADE THE ANSWER FOR HALLUCINATION {COLOR['ENDC']}")
+def decide_context_retrieval(state: GraphState) -> str:
+    print(f"{COLOR['BLUE']}❓ DECIDE TO PERFORM CONTEXT RETRIEVAL AGAIN {COLOR['ENDC']}")
     print(f"{COLOR['BLUE']}{'-'*60}{COLOR['ENDC']}")
     state_dict = state["keys"]
-    hallucination = state_dict["hallucinations"]
-    if hallucination == "no":
-        print(f"\t{COLOR['RED']}--- ➡️ DECISION: LLM GENERATION IS NOT GROUNDED ---{COLOR['ENDC']}\n")
-        return "context_retrieval"
-    else:
-        print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: LLM GENERATION IS GROUNDED ---{COLOR['ENDC']}\n")
-        return "check_answer_relevancy"
-    
-
-def decide_answer_relevancy(state: GraphState) -> str:
-    print(f"{COLOR['BLUE']}❓ DECIDE TO PROVIDE THE ANSWER RELEVANCY TO THE QUESTION {COLOR['ENDC']}")
-    print(f"{COLOR['BLUE']}{'-'*60}{COLOR['ENDC']}")
-    state_dict = state["keys"]
-    answer_relevancy = state_dict["answer_relevancy"]
+    grade = state_dict["grade"]
     context_iter = state_dict["context_iter"]
 
-    if answer_relevancy == "yes" or context_iter >=4:
-        print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: LLM GENERATION RESOLVES THE QUESTION ---{COLOR['ENDC']}\n")
+    if grade == "yes" or context_iter >=3:
+        print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: CONTEXT RETRIEVAL SATISFIES ALL CONDITIONS ---{COLOR['ENDC']}\n")
         return "check_issue_type"
-        
     else:
-        print(f"\t{COLOR['RED']}--- ➡️ DECISION: LLM GENERATION DOES NOT RESOLVES THE QUESTION. Re-TRY ---{COLOR['ENDC']}\n")
+        print(f"\t{COLOR['RED']}--- ➡️ DECISION: CONTEXT RETRIEVAL DOES NOT STATISFY ALL CONDITIONS. RE-TRY! ---{COLOR['ENDC']}\n")
         return "context_retrieval"
+    
     
 
 def decide_example_requirement(state: GraphState) -> str:
@@ -183,9 +159,9 @@ def decide_to_finish(state: GraphState) -> str:
     error = state_dict["error"]
     iter = state_dict["iterations"]
 
-    if error == "None" or iter >= 3:
+    if error == "None" or iter >= 1:
         print(f"\t{COLOR['GREEN']}--- ✅ DECISION: FINISH ---{COLOR['ENDC']}\n")
-        return "finish"
+        return "ragas_eval"
     else:
         print(f"\t{COLOR['RED']}--- 🔄 DECISION: RE-TRY SOLUTION ---{COLOR['ENDC']}\n")
         return "generate"
@@ -193,8 +169,7 @@ def decide_to_finish(state: GraphState) -> str:
 
 EDGE_MAP: dict[str, Callable] = {
     "decide_context_relevancy":decide_context_relevancy,
-    "decide_hallucination":decide_hallucination,
-    "decide_answer_relevancy":decide_answer_relevancy,
+    "decide_context_retrieval":decide_context_retrieval,
     "decide_example_requirement":decide_example_requirement,
     "decide_to_check_code_exec": decide_to_check_code_exec,
     "decide_to_finish": decide_to_finish,

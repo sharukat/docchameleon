@@ -1,7 +1,7 @@
 from langchain_community.chat_models import ChatCohere
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.pydantic_v1 import BaseModel, Field
-from langchain.output_parsers import PydanticOutputParser
+from langchain_core.output_parsers import JsonOutputParser
 from langchain.prompts import PromptTemplate
 
 import os
@@ -16,9 +16,7 @@ class GradeDocuments(BaseModel):
 
 def retrieval_grader():
     llm = ChatCohere(model="command-r", temperature=0)
-
-    # Set up a parser + inject instructions into the prompt template.
-    parser = PydanticOutputParser(pydantic_object=GradeDocuments)
+    parser = JsonOutputParser(pydantic_object=GradeDocuments)
 
     template = """
         You are a grader assessing relevance of a retrieved document to a user question. \n
@@ -27,6 +25,7 @@ def retrieval_grader():
 
         Retrieved document: \n\n {document} \n\n User question: {question}\n
 
+        Strictly follow the format instructions given below.
         {format_instructions}
     """
 
@@ -54,5 +53,5 @@ document = """
 
 rg = retrieval_grader()
 score = rg.invoke({"question": question, "document": document})
-grade = score.binary_score
+grade = score['binary_score']
 print(grade)

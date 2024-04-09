@@ -44,6 +44,7 @@ def course_urls_retriever(query: str):
     template = """
         Your task is to identify relevant online courses based on the input {query}. 
         You have access to the search tools.
+        Output in only valid JSON format.
 
         And you should only use the following online course platforms to find relevant courses:
 
@@ -56,10 +57,10 @@ def course_urls_retriever(query: str):
 
         Here is the input query again: \n --- --- --- \n {query}
 
+        Strictly follow the below format instructions to format the output in json format.
         {format_instructions}
 
-        Do not use any other text within the output. Strictly follow the format instructions to format the output.
-        Do not use "```json" word in the output.
+        Do not use any other text within the output. Do not use "```json" word in the output.
     """
 
     prompt = ChatPromptTemplate.from_messages([template])

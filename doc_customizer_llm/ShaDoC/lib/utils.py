@@ -75,3 +75,8 @@ def get_documentation(filename):
     return content
   except FileNotFoundError:
     raise ValueError(f"{config.COLOR['RED']} ❗ DOCUMENTATION NOT FOUND.{config.COLOR['ENDC']}\n")
+
+
+
+def update_cell(df, column: str, row_index: int, value: str):
+  df.loc[row_index, column] = value

@@ -1,10 +1,9 @@
-import os
 import sys
-import modal
+import numpy as np
 from lib.config import COLOR
 from operator import itemgetter
 
-from lib.common import GraphState, image, stub
+from lib.common import GraphState, image
 import graders
 import retrieval
 import sandbox
@@ -16,7 +15,20 @@ import lib.utils as utils
 from templates.template_1 import return_template
 from templates.output_template import output_template
 
+
+from datasets import Dataset
+from ragas import evaluate
+from ragas.metrics import (
+    answer_relevancy,
+    faithfulness,
+    context_recall,
+    context_precision,
+    answer_correctness,
+    answer_similarity
+)
+
 with image.imports():
+    import pandas as pd
     from langchain.schema import Document
     from langchain.output_parsers.openai_tools import PydanticToolsParser
     from langchain.prompts import PromptTemplate
@@ -29,15 +41,16 @@ with image.imports():
 
 class Nodes:
     def __init__(self, debug: bool = False):
-        self.title = None
-        self.question = None
-        self.api_name = None
-        self.issue_type = None
+        self.title: str = None
+        self.question: str = None
+        self.api_name: str = None
+        self.issue_type: str = None
         self.iter = None
         self.context_iter = None
         self.intent: str = None
         self.so_answers = None
         self.course_urls = None
+        self.ground_truth = None
 
         self.context = None
         self.definition = None
@@ -47,18 +60,16 @@ class Nodes:
         self.debug = debug
         self.model ="gpt-4-0125-preview"
         self.node_map = {
-            "identify_intent": self.identify_intent,
-            "extract_so": self.extract_so,
-            "retrieve_courses": self.retrieve_courses,
+            "intent_soanswers_courses": self.intent_soanswers_courses,
             "context_retrieval": self.context_retrieval,
             "check_context_relevancy": self.check_context_relevancy,
-            "check_hallucination": self.check_hallucination,
-            "check_answer_relevancy": self.check_answer_relevancy,
+            "check_hallucination_and_answer_relevancy": self.check_hallucination_and_answer_relevancy,
             "check_issue_type": self.check_issue_type,
             "generate": self.generate,
             "generate_without_examples":self.generate_without_examples,
             "check_code_imports": self.check_code_imports,
             "check_code_execution": self.check_code_execution,
+            "ragas_eval": self.ragas_eval,
             "finish": self.finish,
         }
 
@@ -74,59 +85,33 @@ class Nodes:
 
 
     # ========================================================================================================================
-    def identify_intent(self, state: GraphState) -> GraphState:
+    def intent_soanswers_courses(self, state: GraphState) -> GraphState:
         state_dict = state["keys"]
         self.title = state_dict["title"]
         self.question = state_dict["question"]
         self.api_name = state_dict["api_name"]
         self.issue_type = state_dict["issue_type"]
+        self.ground_truth = state_dict["ground_truth"]
         iterations = state_dict["iterations"]
         context_iter = state_dict["context_iter"]
 
         self.intention = intent.question_intent_identifier(self.title, self.question)
+        # self.so_answers = stackoverflow.retrieval(self.title, self.question)
+        # search_results = search.course_urls_retriever(self.intention)
+        # course_urls = search_results['urls']
+        # if not course_urls:
+        #     self.course_urls = utils.remove_broken_urls(course_urls)
 
         return {
             "keys": {
                 "intent": self.intention,
+                # "so_answers": self.so_answers,
+                # "course_urls": self.course_urls,
                 "iterations": iterations,
                 "context_iter": context_iter,
-            }
-        }
-    
-
-    # ========================================================================================================================
-    def extract_so(self, state: GraphState) -> GraphState:
-        state_dict = state["keys"]
-        iterations = state_dict["iterations"]
-        context_iter = state_dict["context_iter"]
-
-        self.so_answers = stackoverflow.retrieval(self.title, self.question)
-
-        return {
-            "keys": {
-                "so_answers": self.so_answers,
-                "iterations": iterations,
-                "context_iter": context_iter,
-            }
-        }
-
-
-    # ========================================================================================================================
-    def retrieve_courses(self, state: GraphState) -> GraphState:
-        state_dict = state["keys"]
-        iterations = state_dict["iterations"]
-        context_iter = state_dict["context_iter"]
-
-        search_results = search.course_urls_retriever(self.intention)
-        course_urls = search_results['urls']
-        if not course_urls:
-            self.course_urls = utils.remove_broken_urls(course_urls)
-
-        return {
-            "keys": {
-                "course_urls": self.course_urls,
-                "iterations": iterations,
-                "context_iter": context_iter,
+                "issue_type": self.issue_type,
+                "api_name": self.api_name,
+                "documentation": self.documentation,
             }
         }
     
@@ -161,6 +146,9 @@ class Nodes:
                 "generation": generation,
                 "iterations": iterations,
                 "context_iter": context_iter,
+                "issue_type": self.issue_type,
+                "api_name": self.api_name,
+                "documentation": self.documentation,
             }
         }
     
@@ -187,7 +175,7 @@ class Nodes:
         for d in documents:
             rg = graders.retrieval_grader()
             score = rg.invoke({"question": self.question, "document": d.page_content})
-            grade = score.binary_score
+            grade = score['binary_score']
             if grade == "yes":
                 print(f"\t{COLOR['GREEN']}--- ➡️ GRADE: DOCUMENT RELEVANT ---{COLOR['ENDC']}")
                 filtered_docs.append(d)
@@ -202,14 +190,17 @@ class Nodes:
                 "generation": generation,
                 "iterations": iterations,
                 "context_iter": context_iter,
+                "issue_type": self.issue_type,
+                "api_name": self.api_name,
+                "documentation": self.documentation,
             }
         }
 
 
 
     # ========================================================================================================================
-    def check_hallucination(self, state: GraphState) -> GraphState:
-        print(f"{COLOR['BLUE']}🚀: EXECUTING GRADER: Hallucination Checker.{COLOR['ENDC']}")
+    def check_hallucination_and_answer_relevancy(self, state: GraphState) -> GraphState:
+        print(f"{COLOR['BLUE']}🚀: EXECUTING GRADER: Hallucination and Answer Relevancy Checker.{COLOR['ENDC']}")
         state_dict = state["keys"]
         documents = state_dict["documents"]
         generation = state_dict["generation"]
@@ -221,45 +212,33 @@ class Nodes:
 
         hg = graders.hallucination_grader()
         score = hg.invoke({"documents": documents, "generation": generation})
-        grade = score.binary_score
-
+        answer_grounded = score['binary_score']
+        if answer_grounded == "no":
+            print(f"\t{COLOR['RED']}--- ➡️ DECISION: LLM GENERATION IS NOT GROUNDED ---{COLOR['ENDC']}")
+            grade = "no"
+        else:
+            print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: LLM GENERATION IS GROUNDED ---{COLOR['ENDC']}")
+            ag = graders.answer_grader()
+            score = ag.invoke({"question": self.question,"generation": generation})
+            answer_relevancy = score['binary_score']
+            if answer_relevancy == "yes":
+                print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: LLM GENERATION RESOLVES THE QUESTION ---{COLOR['ENDC']}")
+                grade = "yes"
+            else:
+                grade = "no"
+                print(f"\t{COLOR['RED']}--- ➡️ DECISION: LLM GENERATION DOES NOT RESOLVES THE QUESTION. Re-TRY ---{COLOR['ENDC']}")
         print(f"{COLOR['GREEN']}✅: EXECUTION COMPLETED{COLOR['ENDC']}\n")
         
         return {
             "keys": {
                 "documents": documents, 
                 "generation": generation,
-                "hallucinations": grade,
+                "grade": grade,
                 "iterations": iterations,
                 "context_iter": context_iter,
-            }
-        }
-    
-
-
-    # ========================================================================================================================
-    def check_answer_relevancy(self, state: GraphState) -> GraphState:
-        print(f"{COLOR['BLUE']}🚀: EXECUTING GRADER: Generation vs Question Checker.{COLOR['ENDC']}")
-        state_dict = state["keys"]
-        documents = state_dict["documents"]
-        generation = state_dict["generation"]
-        hallucinations = state_dict["hallucinations"]
-        iterations = state_dict["iterations"]
-        context_iter = state_dict["context_iter"]
-
-        ag = graders.answer_grader()
-        score = ag.invoke({"question": self.question,"generation": generation})
-        grade = score.binary_score
-        print(f"{COLOR['GREEN']}✅: EXECUTION COMPLETED{COLOR['ENDC']}\n")
-
-        return {
-            "keys": {
-                "documents": documents, 
-                "generation": generation,
-                "hallucinations": hallucinations,
-                "answer_relevancy": grade, 
-                "iterations": iterations,
-                "context_iter": context_iter,
+                "issue_type": self.issue_type,
+                "api_name": self.api_name,
+                "documentation": self.documentation,
             }
         }
 
@@ -279,7 +258,9 @@ class Nodes:
                 "context": context,
                 "iterations": iterations,
                 "example_required": flag,
-                
+                "issue_type": self.issue_type,
+                "api_name": self.api_name,
+                "documentation": self.documentation,
             }
         }
 
@@ -434,6 +415,9 @@ class Nodes:
                     "generation": code_solution,
                     "context": context,
                     "iterations": iterations,
+                    "issue_type": self.issue_type,
+                    "api_name": self.api_name,
+                    "documentation": self.documentation,
                 }
             }
     
@@ -508,6 +492,9 @@ class Nodes:
                     "generation": solution,
                     "context": context,
                     "iterations": iterations,
+                    "issue_type": self.issue_type,
+                    "api_name": self.api_name,
+                    "documentation": self.documentation,
                 }
             }
     
@@ -566,6 +553,9 @@ class Nodes:
                 "error": error,
                 "context": context,
                 "iterations": iterations,
+                "issue_type": self.issue_type,
+                "api_name": self.api_name,
+                "documentation": self.documentation,
             }
         }
 
@@ -625,6 +615,88 @@ class Nodes:
                 "context": context,
                 "iterations": iterations,
                 "code": code,
+                "issue_type": self.issue_type,
+                "api_name": self.api_name,
+                "documentation": self.documentation,
+            }
+        }
+
+
+    # ========================================================================================================================
+    def ragas_eval(self, state: GraphState) -> GraphState:
+        state_dict = state["keys"]
+        contexts = state_dict["context"]
+        answer = state_dict["generation"][0]
+        code_solution = state_dict["generation"]
+        error = state_dict["error"]
+        prefix = state_dict["prefix"]
+        imports = state_dict["imports"]
+        iterations = state_dict["iterations"]
+        code = state_dict["code"]
+
+        metrics = [
+            answer_relevancy,
+            faithfulness,
+            context_recall,
+            context_precision,
+            answer_correctness,
+            answer_similarity
+        ]
+
+        print(f"{COLOR['GREEN']}--- RAGAS EVALUATION ---{COLOR['ENDC']}")
+
+        dtypes = {
+            "answer": str,
+            "contexts": list,
+            "ground_truth": str,
+        }
+        
+        df = pd.DataFrame(data={}, columns=['question'])
+        for col_name, dtype in dtypes.items():
+            df[col_name] = np.empty(len(df), dtype=dtype)
+
+        utils.update_cell(df, 'question', 0, self.question)
+        utils.update_cell(df, 'answer', 0, str(answer))
+        utils.update_cell(df, 'contexts', 0, [contexts])
+        utils.update_cell(df, 'ground_truth', 0, self.ground_truth)
+
+        response_dataset = Dataset.from_dict({
+            "question" : df['question'],
+            "answer" : df['answer'],
+            "contexts" : df['contexts'],
+            "ground_truth" : df['ground_truth'],
+        })
+
+        results = evaluate(response_dataset, metrics)
+        results_df = results.to_pandas()
+        
+        print(f"{COLOR['BLUE']}RESULTS{COLOR['ENDC']}")
+        print(f"{COLOR['BLUE']}{'-'*10}{COLOR['ENDC']}")
+        print(f"\t{COLOR['BLUE']}➡️ Faithfulness        : {results_df['faithfulness'][0]} {COLOR['ENDC']}")
+        print(f"\t{COLOR['BLUE']}➡️ Context Recall      : {results_df['context_recall'][0]} {COLOR['ENDC']}")
+        print(f"\t{COLOR['BLUE']}➡️ Context Precision   : {results_df['context_precision'][0]} {COLOR['ENDC']}")
+        print(f"\t{COLOR['BLUE']}➡️ Answer Correctness  : {results_df['answer_correctness'][0]} {COLOR['ENDC']}")
+        print(f"\t{COLOR['BLUE']}➡️ Answer Similarity   : {results_df['answer_similarity'][0]} {COLOR['ENDC']}")
+        print(f"\t{COLOR['BLUE']}➡️ Answer Relevancy    : {results_df['answer_relevancy'][0]} {COLOR['ENDC']}")
+
+        return {
+            "keys": {
+                "generation": code_solution,
+                "error": error,
+                "prefix": prefix,
+                "imports": imports,
+                "context": contexts,
+                "iterations": iterations,
+                "code": code,
+                "issue_type": self.issue_type,
+                "api_name": self.api_name,
+                "documentation": self.documentation,
+                "faithfulness": results_df["faithfulness"][0],
+                "context_recall": results_df["context_recall"][0],
+                "context_precision": results_df["context_precision"][0],
+                "answer_correctness": results_df["answer_correctness"][0],
+                "answer_similarity": results_df["answer_similarity"][0],
+                "answer_relevancy": results_df["answer_relevancy"][0],
             }
         }
 
@@ -638,62 +710,46 @@ class Nodes:
         Returns:
             dict: Final result
         """
-        examples_required = [
-            "Documentation Replication on Other Examples", 
-            "Documentation Replicability", ]
         
-        state_dict = state["keys"]
-        if self.issue_type in examples_required:
-            code_solution = state_dict["generation"][0]
-            prefix = code_solution.prefix
-            imports = code_solution.imports
-            code = code_solution.code
-
-            output = output_template(self.api_name, prefix, imports, code)
-            final = self.documentation + output
-
-        else:
-            solution = state_dict["generation"][0]
-            final = self.documentation + solution
-
         print(f"\n{COLOR['YELLOW']}🏁 FINISHING {COLOR['ENDC']}")
 
-        # response = extract_response(state)
+        response = extract_response(state)
 
-        return {"keys": {"response": final}}
+        return {"keys": {"response": response}}
 
 
-# def extract_response(state: GraphState) -> str:
-#     """
-#     Extract the response from the graph state
+def extract_response(state: GraphState) -> str:
+    """
+    Extract the response from the graph state
 
-#     Args:
-#         state (dict): The current graph state
+    Args:
+        state (dict): The current graph state
 
-#     Returns:
-#         str: The response
-#     """
-#     examples_required = [
-#             "Documentation Replication on Other Examples", 
-#             "Documentation Replicability", ]
+    Returns:
+        str: The response
+    """
 
-#     state_dict = state["keys"]
-#     issue_type = state_dict["issue_type"]
-#     if issue_type in examples_required:
-#         api_name = state_dict["api_name"]
-#         # urls = state_dict["urls"]
-#         documentation = state_dict["documentation"]
-#         code_solution = state_dict["generation"][0]
-#         prefix = code_solution.prefix
-#         imports = code_solution.imports
-#         code = code_solution.code
+    examples_required = [
+            "Documentation Replication on Other Examples", 
+            "Documentation Replicability", ]
 
-#         output = output_template(api_name, prefix, imports, code)
-#         final = documentation + output
+    state_dict = state["keys"]
+    issue_type = state_dict["issue_type"]
+    if issue_type in examples_required:
+        api_name = state_dict["api_name"]
+        # urls = state_dict["urls"]
+        documentation = state_dict["documentation"]
+        code_solution = state_dict["generation"][0]
+        prefix = code_solution.prefix
+        imports = code_solution.imports
+        code = code_solution.code
 
-#     else:
-#         documentation = state_dict["documentation"]
-#         solution = state_dict["generation"][0]
-#         final = documentation + solution
+        output = output_template(api_name, prefix, imports, code)
+        final = documentation + output
 
-#     return final
+    else:
+        documentation = state_dict["documentation"]
+        solution = state_dict["generation"][0]
+        final = documentation + str(solution)
+
+    return final
