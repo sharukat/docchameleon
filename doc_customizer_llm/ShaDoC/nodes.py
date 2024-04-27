@@ -1,44 +1,47 @@
 import sys
+import ast
+import json
 import numpy as np
-from lib.config import COLOR
+from datasets import Dataset
 from operator import itemgetter
 
-from lib.common import GraphState, image
-import graders
-import retrieval
-import sandbox
+# Custom Modules
 import tasks
 import intent
 import search
+import sandbox
+import graders
+import retrieval
 import stackoverflow
 import lib.utils as utils
-from templates.template_1 import return_template
-from templates.output_template import output_template
+from lib.config import COLOR
+from lib.common import GraphState, image
+from templates import template_1, template_2, output_template
 
-
-from datasets import Dataset
-from ragas import evaluate
-from ragas.metrics import (
-    answer_relevancy,
-    faithfulness,
-    context_recall,
-    context_precision,
-    answer_correctness,
-    answer_similarity
-)
 
 with image.imports():
     import pandas as pd
+    from ragas import evaluate
+    from ragas.metrics import (
+        answer_relevancy,
+        faithfulness,
+        context_recall,
+        context_precision,
+        answer_correctness,
+        answer_similarity
+    )
+    from setfit import SetFitModel
     from langchain.schema import Document
-    from langchain.output_parsers.openai_tools import PydanticToolsParser
-    from langchain.prompts import PromptTemplate
-    from langchain_core.pydantic_v1 import BaseModel, Field
-    from langchain_core.utils.function_calling import convert_to_openai_tool
     from langchain_openai import ChatOpenAI
+    from langchain.prompts import PromptTemplate
     from langchain_community.chat_models import ChatCohere
+    from langchain_core.pydantic_v1 import BaseModel, Field
     from langchain_community.retrievers import CohereRagRetriever
-
-
+    from langchain.output_parsers.openai_tools import PydanticToolsParser
+    from langchain_core.utils.function_calling import convert_to_openai_tool
+    
+    
+    
 class Nodes:
     def __init__(self, debug: bool = False):
         self.title: str = None
@@ -90,10 +93,21 @@ class Nodes:
         self.title = state_dict["title"]
         self.question = state_dict["question"]
         self.api_name = state_dict["api_name"]
-        self.issue_type = state_dict["issue_type"]
+        # self.issue_type = state_dict["issue_type"]
         self.ground_truth = state_dict["ground_truth"]
         iterations = state_dict["iterations"]
         context_iter = state_dict["context_iter"]
+
+        # Question type classification (multi-class classifier)
+        model = SetFitModel.from_pretrained("sharukat/sbert-issuetypeidentifier")
+        prediction = model(self.question)
+        if prediction == 0:
+            self.issue_type = 'additional_resources'
+        elif prediction == 1:
+            self.issue_type = 'examples_required'
+        else:
+            self.issue_type = 'description_only'
+
 
         self.intention = intent.question_intent_identifier(self.title, self.question)
         # self.so_answers = stackoverflow.retrieval(self.title, self.question)
@@ -318,7 +332,7 @@ class Nodes:
             parser_tool = PydanticToolsParser(tools=[code])
 
             ## Prompt
-            template = return_template(image)
+            template = template_1.return_template(image)
 
             ## Generation
             if "error" in state_dict:
@@ -455,7 +469,7 @@ class Nodes:
             llm = ChatOpenAI(temperature=0, model=self.model, streaming=True)
 
             ## Prompt
-            template = return_template(image)
+            template = template_2.return_template(image)
 
 
             print(f"{COLOR['YELLOW']} {'='*10} 🛠 GENERATE SOLUTION {'='*10} {COLOR['ENDC']}\n")
@@ -710,46 +724,75 @@ class Nodes:
         Returns:
             dict: Final result
         """
-        
-        print(f"\n{COLOR['YELLOW']}🏁 FINISHING {COLOR['ENDC']}")
+        print(f"\n{COLOR['YELLOW']}🏁 FINISHING {COLOR['ENDC']}\n")
+        state_dict = state["keys"]
+        issue_type = state_dict["issue_type"]
 
-        response = extract_response(state)
+        if self.debug:
+            response = extract_eval_response(state)
+        else:
+            response = extract_response(state)
 
         return {"keys": {"response": response}}
 
 
-def extract_response(state: GraphState) -> str:
-    """
-    Extract the response from the graph state
-
-    Args:
-        state (dict): The current graph state
-
-    Returns:
-        str: The response
-    """
-
+# ========================================================================================================================
+def extract_eval_response(state: GraphState) -> str:
     examples_required = [
             "Documentation Replication on Other Examples", 
-            "Documentation Replicability", ]
-
+            "Documentation Replicability", 
+            "Inadequate Examples"]
+    
     state_dict = state["keys"]
     issue_type = state_dict["issue_type"]
     if issue_type in examples_required:
+        code_solution = state_dict["generation"][0]
+        prefix = code_solution.prefix
+        imports = code_solution.imports
+        code = code_solution.code
+        answer = "\n".join([prefix, imports, code])
+    else:
+        answer = str(state_dict["generation"][0])
+
+    ragas = {
+        "context": str(state_dict["context"]),
+        "answer" : answer,
+        "faithfulness": str(state_dict["faithfulness"]),
+        "context_recall": str(state_dict["context_recall"]),
+        "context_precision": str(state_dict["context_precision"]),
+        "answer_correctness": str(state_dict["answer_correctness"]),
+        "answer_similarity": str(state_dict["answer_similarity"]),
+        "answer_relevancy": str(state_dict["answer_relevancy"]),
+    }
+    return json.dumps(ragas)
+
+
+
+def extract_response(state: GraphState) -> str:
+
+
+    state_dict = state["keys"]
+    issue_type = state_dict["issue_type"]
+    documentation = state_dict["documentation"]
+
+    if issue_type == "examples_required":
         api_name = state_dict["api_name"]
         # urls = state_dict["urls"]
-        documentation = state_dict["documentation"]
         code_solution = state_dict["generation"][0]
         prefix = code_solution.prefix
         imports = code_solution.imports
         code = code_solution.code
 
-        output = output_template(api_name, prefix, imports, code)
+        output = output_template.return_template1(api_name, prefix, imports, code)
         final = documentation + output
 
-    else:
+    elif issue_type == "description_only":
         documentation = state_dict["documentation"]
         solution = state_dict["generation"][0]
-        final = documentation + str(solution)
 
+        output = output_template.return_template2(api_name, solution)
+        final = documentation + output
+    
+    else:
+        pass
     return final

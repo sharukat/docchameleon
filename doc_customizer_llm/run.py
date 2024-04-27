@@ -1,5 +1,9 @@
 import requests
+import ast
+import pandas as pd
 import json
+
+
 endpoint = "https://sharukat--code-langchain-serve-dev.modal.run/codelangchain/invoke"
 
 input = {
@@ -63,9 +67,12 @@ data = {
     "kwargs": {},
 }
 
-r = requests.post(
+response = requests.post(
     url=endpoint,
     json=data,
 )
 
-print(r.text)
+response = json.loads(response.text)
+print(f"Output type: {type(response)}")
+df = pd.json_normalize(response)
+print(df)

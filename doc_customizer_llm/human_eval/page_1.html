@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Viewer & Questionnaire</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script type="module" src="https://md-block.verou.me/md-block.js"></script>
+    <link href="prism.css" rel="stylesheet" />
+</head>
+
+<body class="bg-gray-100 p-8">
+    <script src="prism.js"></script>
+    
+    <h1 class="text-3xl font-bold text-center mb-8">TensorFlow tf.data.Data API Documentation</h1>
+    <div class="flex flex-col">
+        <ul class="flex mb-4">
+            <li class="mr-2">
+                <button type="button" class="text-gray-700 font-medium px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 active:bg-gray-200 border-b-2 border-indigo-500">
+                    Official API Documentation
+                </button>
+            </li>
+            <li>
+                <button type="button" class="text-gray-500 font-medium px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Customized API Documentation
+                </button>
+            </li>
+        </ul>
+
+        <div id="tab-content" class="overflow-auto h-screen">
+            <div class="border rounded-md p-4">
+                <md-block src="tf.nn.conv1d.md"></md-block>
+            </div>
+            <div class="border rounded-md p-4 hidden">
+                <md-block>
+                    # Content for Tab 2
+                </md-block>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <h2 class="text-xl font-bold mb-4">Feedback Form</h2>
+        <iframe src="https://docs.google.com/forms/d/YOUR_FORM_ID/edit?embedded=true" width="100%" height="500" frameborder="0" style="border:0; min-height: 500px;" allowfullscreen></iframe>
+    </div>
+
+</body>
+
+<script>
+    const tabs = document.querySelectorAll('ul li button');
+    const tabContent = document.getElementById('tab-content').children;
+
+    // Set the first tab as active by default
+    tabs[0].classList.add('active:bg-gray-200', 'border-b-2', 'border-indigo-500');
+    tabContent[0].classList.remove('hidden');  // Show content for the first tab
+
+    tabs.forEach((tabButton, index) => {
+        tabButton.addEventListener('click', () => {
+            // Reset styles for all tabs
+            tabs.forEach(btn => btn.classList.remove('active:bg-gray-200', 'border-b-2', 'border-indigo-500'));
+
+            // Apply styles to the clicked tab
+            tabButton.classList.add('active:bg-gray-200', 'border-b-2', 'border-indigo-500');
+
+            // Show/Hide content based on clicked tab
+            for (const content of tabContent) {
+                content.classList.add('hidden');
+            }
+            tabContent[index].classList.remove('hidden');
+        });
+    });
+</script>

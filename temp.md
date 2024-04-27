@@ -1,30 +1,65 @@
-# Customized Content
+<table class="responsive fixed orange">
+<colgroup><col width="214px"><col></colgroup>
+<tr><th colspan="2"><h2 class="add-link">Args</h2></th></tr>
 
-
-To address your question on migrating from TensorFlow 1 to TensorFlow 2, specifically regarding the use of `tf.compat.v1.placeholder` and its equivalent in TensorFlow 2, it's important to understand the differences in how shapes are handled between the two versions. In TensorFlow 1, `tf.compat.v1.placeholder` allows you to define a placeholder for a tensor that will always be fed, including specifying its shape. In TensorFlow 2, `tf.keras.Input` is used for a similar purpose but with a slightly different approach to shapes.
-
-When you specify an empty list `[]` as the shape in `tf.compat.v1.placeholder`, it means you're defining a scalar (a single value). However, in TensorFlow 2, when using `tf.keras.Input` with `shape=[]`, it actually expects a 1D tensor with zero elements, which is different from a scalar. To define a scalar input in TensorFlow 2, you should use `shape=()` instead of `shape=[]`. This subtle difference in specifying the shape is likely the reason why you're observing different shapes between `x1` and `x2`.
-
-Here's how you can correctly migrate your code to TensorFlow 2 to have the same shape as in TensorFlow 1:
-
-
-
-```
-import tensorflow as tf
-import numpy as np 
-# TensorFlow 1 code
-# x1 = tf.compat.v1.placeholder(tf.float32, [], name="x1")
-
-# Equivalent TensorFlow 2 code
-x2 = tf.keras.Input(shape=(), dtype=tf.float32, name="x2")
-
-# To demonstrate the shape equivalence
-with tf.compat.v1.Session() as sess:
-    x1 = tf.compat.v1.placeholder(tf.float32, [], name="x1")
-    print("Shape of x1 (TF1):", sess.run(tf.shape(x1), feed_dict={x1: np.array(5.0)}))
-
-print("Shape of x2 (TF2):", x2.shape)
-
-# Note: In TensorFlow 2, `x2.shape` directly gives the shape without needing to run a session.
-```
-## Additional Resources
+<tr>
+<td>
+`input`<a id="input"></a>
+</td>
+<td>
+A Tensor of rank at least 3. Must be of type `float16`, `float32`, or
+`float64`.
+</td>
+</tr><tr>
+<td>
+`filters`<a id="filters"></a>
+</td>
+<td>
+A Tensor of rank at least 3.  Must have the same type as `input`.
+</td>
+</tr><tr>
+<td>
+`stride`<a id="stride"></a>
+</td>
+<td>
+An int or list of `ints` that has length `1` or `3`.  The number of
+entries by which the filter is moved right at each step.
+</td>
+</tr><tr>
+<td>
+`padding`<a id="padding"></a>
+</td>
+<td>
+'SAME' or 'VALID'. See
+[here](https://www.tensorflow.org/api_docs/python/tf/nn#notes_on_padding_2)
+for more information.
+</td>
+</tr><tr>
+<td>
+`data_format`<a id="data_format"></a>
+</td>
+<td>
+An optional `string` from `"NWC", "NCW"`.  Defaults to `"NWC"`,
+the data is stored in the order of
+`batch_shape + [in_width, in_channels]`.  The `"NCW"` format stores data
+as `batch_shape + [in_channels, in_width]`.
+</td>
+</tr><tr>
+<td>
+`dilations`<a id="dilations"></a>
+</td>
+<td>
+An int or list of `ints` that has length `1` or `3` which
+defaults to 1. The dilation factor for each dimension of input. If set to
+k > 1, there will be k-1 skipped cells between each filter element on that
+dimension. Dilations in the batch and depth dimensions must be 1.
+</td>
+</tr><tr>
+<td>
+`name`<a id="name"></a>
+</td>
+<td>
+A name for the operation (optional).
+</td>
+</tr>
+</table>

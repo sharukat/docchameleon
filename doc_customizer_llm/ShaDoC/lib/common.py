@@ -24,6 +24,7 @@ image = modal.Image.debian_slim(python_version="3.11").from_registry(
         "numpy==1.26.4",
         "pandas==2.2.1",
         "ragas==0.1.4",
+        "setfit==1.0.3"
     )
 
 
