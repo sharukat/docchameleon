@@ -40,11 +40,12 @@ def serve():
         try:
             utils.is_valid_api(input_dict['api_name'])
             return {"keys": {
+                "question_id": input_dict['question_id'],
                 "title": input_dict['title'], 
                 "question": input_dict['question'], 
                 "api_name": input_dict['api_name'],
-                # "issue_type": input_dict['issue_type'],
-                # "ground_truth": input_dict['ground_truth'],
+                "issue_type": input_dict['issue_type'],
+                "ground_truth": input_dict['ground_truth'],
                 "iterations": 0, "context_iter": 0}}
         except ValueError as e:
             print(e)

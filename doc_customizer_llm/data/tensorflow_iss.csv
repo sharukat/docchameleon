@@ -1,0 +1,903 @@
+Issue Number,Issue Name,Date Opened,Issue Author,Date Closed,Closed By
+66057,Basic regression: Predict fuel efficiency Probelm</bdi,19-Apr-24,illaoiiiii,Not closed,Not closed
+65399,Documentation for RaggedTensors does not match Input layer documentation</bdi,10-Apr-24,damienwojtowicz,Not closed,Not closed
+65317,[DOCS] Missing complex input for Round op</bdi,09-Apr-24,LucaTamSapienza,Not closed,Not closed
+65160,Model.add_loss is not documented</bdi,05-Apr-24,piyushsrv,Not closed,Not closed
+64817,efficient_serving.ipynb has some bugs</bdi,31-Mar-24,paya-alavi77,Not closed,Not closed
+64810,Generating Images with BigGAN -- demo in docs no longer compatible with tensorflow (hub?)</bdi,30-Mar-24,janeon,Not closed,Not closed
+64250,Could not interpret optimizer identifier: &lt;keras.src.optimizers.adam.Adam object</bdi,22-Mar-24,hilmyas,Not closed,Not closed
+63093,Logic Error in experimental Unity Plugin HelloTFLite.cs Sample Code</bdi,29-Feb-24,Tom-James-Marsden,Not closed,Not closed
+62922,Github link to tf.nest.map_structure is broken in the docs</bdi,08-Feb-24,chmendoza,Not closed,Not closed
+62846,test bug</bdi,25-Jan-24,venkat926,Not closed,Not closed
+62789,Incorrect Reduction Arguments in third_party/xla/xla/experiments/triton_autotuning/matmul_lib.py</bdi,13-Jan-24,K-Wu,Not closed,Not closed
+62784,Tensorflow docs email address is invalid (docs@tensorflow.org)</bdi,11-Jan-24,neon60,Not closed,Not closed
+62761,[bug] button 'view releases' has loading issue</bdi,09-Jan-24,soham2k06,Not closed,Not closed
+62746,tensorflow-macos==2.15.0 still requesting ml-dtypes (~=0.2.0) instead of 0.3.1</bdi,06-Jan-24,mathpluscode,Not closed,Not closed
+62718,Critical typo: squeeze the y_pred tensor even when it’s the same rank and shape as the y_pred tensor should be == instead of !=</bdi,02-Jan-24,rodriguesk,Not closed,Not closed
+62626,"Build from source"" cuDNN documented version is not correct for TF 2.15.0</bdi""",12-Dec-23,mcourteaux,Not closed,Not closed
+62601,"Errors/Warnings in documentation webpage https://www.tensorflow.org/tfx/transform/get_started#define_a_preprocessing_function""</bdi""",08-Dec-23,1ofseven,Not closed,Not closed
+62590,Advisory GHSA-9jjw-hf72-3mxw contains invalid semver</bdi,07-Dec-23,crfrolik,Not closed,Not closed
+62498,GPU installation docs woefully broken</bdi,28-Nov-23,FlorinAndrei,Not closed,Not closed
+62389,tensorflow.org/versions points to latest version for 2.11 onwards</bdi,14-Nov-23,ageron,Not closed,Not closed
+62271,Documentation of <code>tf.nn.depthwise_conv2d</code> fails to mention limitation on strides</bdi,29-Oct-23,burnpanck,Not closed,Not closed
+62032,TF 2.14 minimum nvidia driver version</bdi,02-Oct-23,schrummy14,Not closed,Not closed
+61861,Elu activation implementation </bdi,14-Sep-23,samthakur587,Not closed,Not closed
+61801,Linux tensorflow build from source: bash failed genrule-setup.sh has carriage return</bdi,06-Sep-23,tomeeeS,Not closed,Not closed
+61429,Keras docs source code links point to 404</bdi,31-Jul-23,grofte,Not closed,Not closed
+61407,The issue of updating a formula.</bdi,27-Jul-23,liuanan,Not closed,Not closed
+61375,tf.keras.callbacks.SidecarEvaluatorModelExport doc page looks broken.</bdi,25-Jul-23,DameNianch,Not closed,Not closed
+61257,The legal value range of the alpha parameter in LeakyReLU</bdi,12-Jul-23,PhyllisJi,Not closed,Not closed
+61256,The value range of dropout parameters and recurrent_dropout parameters of GRU/LSTM/SimpleRNN functions</bdi,12-Jul-23,PhyllisJi,Not closed,Not closed
+61254,Documentation Bug about API ActivityRegularization</bdi,12-Jul-23,PhyllisJi,Not closed,Not closed
+61233,site/en/guide/create_op.md example code has memory leak</bdi,10-Jul-23,spardda,Not closed,Not closed
+61090,The relationship between the parameters of Conv2D is unclear</bdi,27-Jun-23,PhyllisJi,Not closed,Not closed
+60921,Some parameters are missing type descriptions</bdi,19-Jun-23,cheyennee,Not closed,Not closed
+60907,Typo in docs transfer_learning.ipynb</bdi,17-Jun-23,kentmchenry,Not closed,Not closed
+60878,Mistype (mixed_bloat16) in the keras.mixed_precision.Policy class</bdi,15-Jun-23,antnsi,Not closed,Not closed
+60839,Documentation Bug：the description of padding</bdi,12-Jun-23,PhyllisJi,Not closed,Not closed
+60836,Image Segmenter | tflite-suuport | AttributeError: type object 'SegmentationOptions' has no attribute 'OutputType'</bdi,12-Jun-23,VIS-WA,Not closed,Not closed
+60750,pip installation LD_LIBRARY_PATH order</bdi,01-Jun-23,jackyko1991,Not closed,Not closed
+60531,"when argument batch_size is bool, tf.data.experimental.dense_to_ragged_batch works</bdi",08-May-23,cheyennee,Not closed,Not closed
+60521,error message is inconsistent with documentation in tf.nn.leaky_relu</bdi,06-May-23,cheyennee,Not closed,Not closed
+60504,Android Download page URL not available</bdi,05-May-23,TE-N-ElvenWang,Not closed,Not closed
+60457,error message of tf.eye is inconsistent with doc</bdi,01-May-23,cheyennee,Not closed,Not closed
+60449,error message of tf.constant_initializer is not accuracy</bdi,30-Apr-23,cheyennee,Not closed,Not closed
+60419,tf.raw_ops.GatherV2 api doc page does not properly describe the argument 'batch_dims' </bdi,26-Apr-23,meghendra,Not closed,Not closed
+60285,linked page is not valid!</bdi,10-Apr-23,jntdst,Not closed,Not closed
+60229,"Problem on installation document, wrong $LD_LIBRARY_PATH</bdi",04-Apr-23,KiWeng,Not closed,Not closed
+60183,Please update/fix the tutorial of how to automatically add cuda/dnn path into environment when activate conda environment</bdi,31-Mar-23,TomMeowMeow,Not closed,Not closed
+60137,Issue in TF Docs and it's tools with dataclasses module in Python 3.6 and earlier</bdi,28-Mar-23,eslam69,Not closed,Not closed
+60114,LSTMBlockCell validation error</bdi,25-Mar-23,zsoltszakaly,Not closed,Not closed
+60093,tf.raw_ops.Round doesn't have a gradient</bdi,23-Mar-23,trickiwoo,Not closed,Not closed
+60080,Tensorflow version is 2.11.1 in v2.12.0 tag</bdi,23-Mar-23,npanpaliya,Not closed,Not closed
+59959,Tensorflow lite for microcontrollers documentation has broken links to .cc files</bdi,11-Mar-23,acridland,Not closed,Not closed
+59900,Outdated example</bdi,05-Mar-23,TheHellTower,Not closed,Not closed
+59701,Video CNN Tutorial</bdi,15-Feb-23,chewman19,Not closed,Not closed
+59577,"tf.keras.callbacks.ModelCheckpoint: initial_value_threshold not working, definition with a mistake</bdi",06-Feb-23,agoeroeg,Not closed,Not closed
+59245,Problem with loading example dataset</bdi,12-Jan-23,rexys777,Not closed,Not closed
+59181,[Documentation] <code>raw_ops.RealDiv</code>: Input Tensors cannot be of integer dtype</bdi,09-Jan-23,hmahmood24,Not closed,Not closed
+59156,[Documentation] raw_ops.Conv3D: strides cannot be a list of ints that has length &gt;= 5</bdi,07-Jan-23,hmahmood24,Not closed,Not closed
+58971,XLA Collapse Documentation: Example Incorrect</bdi,21-Dec-22,chrisby,Not closed,Not closed
+58933,Bad download link for Windows GPU only binaries zip file</bdi,18-Dec-22,krsummersBA,Not closed,Not closed
+58901,C API installation instructions don't work for MacOS</bdi,15-Dec-22,SJaffa,Not closed,Not closed
+58699,Question about tf.image.convert_image_dtype parameter type?</bdi,27-Nov-22,triumph-wangyuyang,Not closed,Not closed
+58695,The information thrown by the tf.clip_by_norm operator in different TensorFlow versions does not match the description in the documentation.</bdi,26-Nov-22,triumph-wangyuyang,Not closed,Not closed
+58693,tf.math.add runs successfully Documentation Unsupported type: uint16</bdi,26-Nov-22,triumph-wangyuyang,Not closed,Not closed
+58621,Invalid argument in example</bdi,20-Nov-22,svobora,Not closed,Not closed
+58556,Ubuntu 20.04 based Tensorflow images don't include Python 3.9 as indicated in the dockerhub docs</bdi,14-Nov-22,TaylorZowtuk,Not closed,Not closed
+58404,typo in https://www.tensorflow.org/datasets/catalog/big_patent </bdi,01-Nov-22,21564669,Not closed,Not closed
+58397,https://www.tensorflow.org/api_docs/python/tf/keras/losses/BinaryFocalCrossentropy contains some information of https://www.tensorflow.org/api_docs/python/tf/keras/losses/BinaryCrossentropy</bdi,01-Nov-22,21564669,Not closed,Not closed
+58383,"Misspelling of the word argument""</bdi""",31-Oct-22,Germantas-IILTD,Not closed,Not closed
+58341,Versioning scheme of CVE patches</bdi,27-Oct-22,slashleo,Not closed,Not closed
+58019,tf.raw_ops.TruncateDiv documentation is not consistent</bdi,07-Oct-22,KareemMAX,Not closed,Not closed
+57978,Undocumented explicit padding exceptions in tf.nn.max_pool and tf.nn.max_pool2d</bdi,05-Oct-22,Ingkarat,Not closed,Not closed
+57965,tf.nn.gelu raises an exception when 'features'.dtype is not a floating point tensor</bdi,04-Oct-22,Ingkarat,Not closed,Not closed
+57964,tf.nn.ctc_loss documentation does not mention that 'blank_index' must be provided when 'labels' is a SparseTensor</bdi,04-Oct-22,Ingkarat,Not closed,Not closed
+57926,Markdown Failure for TF Dialect Documentation</bdi,30-Sep-22,Jerry-Ge,Not closed,Not closed
+57922,Don't show correct formula </bdi,30-Sep-22,jntdst,Not closed,Not closed
+57921,Template code does not work</bdi,30-Sep-22,jntdst,Not closed,Not closed
+57587,"Unncessary semicolons in tutorials terminate statements, possible documentation improvement</bdi",01-Sep-22,brechtse,Not closed,Not closed
+57536,Indentation bug in TensorFlow main expert tutorial</bdi,30-Aug-22,doughywilson,Not closed,Not closed
+57525,tf.clip_by_norm documentation wrong</bdi,30-Aug-22,cheyennee,Not closed,Not closed
+57465,docs are incorrect for tf.raw_ops.Atan</bdi,26-Aug-22,mattbarrett98,Not closed,Not closed
+57208,TF Lite API Reference on Internet Page does not match Code for interpreter_options.h</bdi,18-Aug-22,PfeifferJosef-96,Not closed,Not closed
+57196,Is the estimate of how big TFLite is on ARM incorrect for iOS?</bdi,17-Aug-22,drubinstein,Not closed,Not closed
+57192,Integer dtype not supported for tensorflow.math.tan</bdi,17-Aug-22,RickSanchezStoic,Not closed,Not closed
+57165,tf.keras.layers.Dense documentation wrong</bdi,16-Aug-22,cheyennee,Not closed,Not closed
+57159,The type of parameter 'prefix' in tf.keras.backend.get_uid documentation wrong</bdi,15-Aug-22,cheyennee,Not closed,Not closed
+57153,The type of parameter 'device_type' in tf.config.list_logical_devices wrong</bdi,15-Aug-22,cheyennee,Not closed,Not closed
+57150,update documentation of tf.abs</bdi,15-Aug-22,cheyennee,Not closed,Not closed
+57072,Docker Hub ubuntu version documentation error</bdi,09-Aug-22,zplizzi,Not closed,Not closed
+57039,"Please update the Simplified Chinese documents, or at least set an indicator to tell readers the documents are out of date</bdi",08-Aug-22,code4lala,Not closed,Not closed
+56945,Broken link to model mitigation guide for variable_scope (python)</bdi,29-Jul-22,afdreher,Not closed,Not closed
+56884,"message convert_variables_to_constants is deprecated""</bdi""",25-Jul-22,njzjz,Not closed,Not closed
+56618,A small typo in <code>graph_properties.cc</code></bdi,29-Jun-22,AmosChenYQ,Not closed,Not closed
+56553,"CSV generated by the code in the Human Pose Classification with MoveNet and TensorFlow Lite"" example inconsistent</bdi""",23-Jun-22,rjfc,Not closed,Not closed
+56462,ktonthat - tech writer testing this template</bdi,14-Jun-22,ktonthat,Not closed,Not closed
+56333,<code>tf.image.resize_with_pad</code> raises <code>InvalidArgumentError</code> but the behavior is not documented</bdi,02-Jun-22,kyamagu,Not closed,Not closed
+56330,Unix wheel URLs are incorrect in TF2.9</bdi,02-Jun-22,chunduriv,Not closed,Not closed
+56292,Error in Ragged Tensor Documentation</bdi,28-May-22,aflah02,Not closed,Not closed
+56272,TensorArray documentation is misleading</bdi,26-May-22,Rocketknight1,Not closed,Not closed
+56226,Cholesky decomposition half precision either does not work or wrong documentation.</bdi,23-May-22,andsmi97,Not closed,Not closed
+56215,Document Dataset.repeat(0)</bdi,23-May-22,jamesbraza,Not closed,Not closed
+56112,No module named model.recommendation_model_launcher_keras</bdi,15-May-22,muja555,Not closed,Not closed
+56099,Fonts do not load properly under Firefox</bdi,13-May-22,zurgeg,Not closed,Not closed
+56078,Unit test //tensorflow/tools/docs:tf_doctest is broken by protobuf exception</bdi,12-May-22,elfringham,Not closed,Not closed
+55723,Missing <code>f</code> prefix on f-strings</bdi,23-Apr-22,code-review-doctor,Not closed,Not closed
+55510,TypeError: __call__() missing 1 required positional argument: 'step'</bdi,06-Apr-22,JiaqingFu,Not closed,Not closed
+55372,Wrong definition of arg fixed_length in api_docs/python/tf/raw_ops/DecodePaddedRaw</bdi,25-Mar-22,shijy16,Not closed,Not closed
+55290,"tf.nn.ctc_loss documentation misleads about GPU support, leading to 50x performance difference</bdi",18-Mar-22,psobot,Not closed,Not closed
+55276,"Event file summary metric type changed, breaking the example in summary_iterator.py</bdi",17-Mar-22,timatim,Not closed,Not closed
+55035,The documentation of tf.sparse.softmax has inexecutable example code</bdi,05-Mar-22,ArrowIntoTheSky,Not closed,Not closed
+54991,TensorFlow API Versions Hyperlink for 2.7 points to 2.8</bdi,04-Mar-22,KilnOfTheSecondFlame,Not closed,Not closed
+54660,Please remove invalid hyperlinks.</bdi,27-Feb-22,praksharma,Not closed,Not closed
+53828,Descriptions of <code>tf.RaggedTensor</code>'s methods '__xx__' are unclear</bdi,20-Jan-22,ArrowIntoTheSky,Not closed,Not closed
+53783,<code>tf.scatter_nd</code> document refers to deprecated apis</bdi,15-Jan-22,ArrowIntoTheSky,Not closed,Not closed
+53506,Specify what is ag__ in the output of tf.autograph.to_code</bdi,21-Dec-21,ricvo,Not closed,Not closed
+53499,Doc Improvement</bdi,21-Dec-21,kaimo455,Not closed,Not closed
+53453,Description error of 'non_max_suppression_with_scores'</bdi,16-Dec-21,ChaojifeixiaDazhuang,Not closed,Not closed
+53157,Outdated documentation for <code>DataFormatVecPermute</code></bdi,22-Nov-21,Nyrio,Not closed,Not closed
+53112,"Misleading behavior on matrix and vector division, which is in contradiction with the documentation in nn.softmax</bdi",18-Nov-21,T-Almeida,Not closed,Not closed
+53107,Details about tf.keras.layers.Conv2DTranspose params 'padding' and 'output_padding'</bdi,18-Nov-21,Gandalf401,Not closed,Not closed
+52640,Typo in the model.compile code examples: tf.keras.optimizers not tf.keras.optimizer</bdi,24-Oct-21,rand42studios,Not closed,Not closed
+52623,missing Link to nightly version of BinaryCrossentropy</bdi,22-Oct-21,jvishnuvardhan,Not closed,Not closed
+52520,Document whether the GPU execution of concrete functions are asynchronous</bdi,15-Oct-21,tfeher,Not closed,Not closed
+52348,Documentation problem for gradient clipping parameter</bdi,12-Oct-21,isaacgerg,Not closed,Not closed
+52336,Unspecified data type in image_dataset_from_directory</bdi,11-Oct-21,AngCamp,Not closed,Not closed
+52321,Tutorial link is missing</bdi,11-Oct-21,MaoXianXin,Not closed,Not closed
+52253,Incorrect Links under API Reference </bdi,05-Oct-21,robotjellyzone,Not closed,Not closed
+51726,Several links to the github code are broken in https://www.tensorflow.org/</bdi,28-Aug-21,NEGU93,Not closed,Not closed
+51437,AUC in the Classification on imbalanced data tutorial </bdi,11-Aug-21,yoheimiyamoto,Not closed,Not closed
+51097,Parameter description generating weirdly in <code>tf.keras.metrics.AUC</code></bdi,02-Aug-21,eigenvivek,Not closed,Not closed
+51038,"Autograph set_verbosity doc example shows using integer values for env vars, but only strings can be used</bdi",29-Jul-21,Avelina9X,Not closed,Not closed
+50973,Documentation: old installation requirements</bdi,27-Jul-21,ternite,Not closed,Not closed
+50958,Code not visible in dark theme in the Tensorflow documentation</bdi,26-Jul-21,Mohitkumar6122,Not closed,Not closed
+50737,tfa.activations.snake - wrong function in docs</bdi,12-Jul-21,SianoP,Not closed,Not closed
+50536,Grammatical Mistakes in the documentation of tf.keras.Model.load_weights</bdi,30-Jun-21,worldpeaceaspirer,Not closed,Not closed
+50510,The Phi definition of GELU is incorrect</bdi,29-Jun-21,RATATATO,Not closed,Not closed
+50473,[API docs] <code>tf.keras.Sequential.predict_classes</code> is deprecated</bdi,26-Jun-21,8bitmp3,Not closed,Not closed
+50452,api_docs tensor incoherent sentence</bdi,25-Jun-21,Jahnvi13,Not closed,Not closed
+50258,URL of tf.raw_ops.SparseReduceSum comprises Irrelevant/Garbage Values</bdi,14-Jun-21,worldpeaceaspirer,Not closed,Not closed
+49933,DepthwiseConv2D documentation: a different filter per channel vs the same filter per channel</bdi,31-May-21,vinhill,Not closed,Not closed
+49900,No consideration of Activation Functions in the implementation of Initializers</bdi,30-May-21,worldpeaceaspirer,Not closed,Not closed
+49894,List of Initializers are specified twice in the Classes Section of documentation</bdi,29-May-21,worldpeaceaspirer,Not closed,Not closed
+49890,Documentation for Model.trainable_weights is missing</bdi,29-May-21,worldpeaceaspirer,Not closed,Not closed
+49829,image_dataset_from_directory returns dtype 'uint8' Dataset if interpolation='nearest'</bdi,27-May-21,buoi,Not closed,Not closed
+49738,No description about forcing zero output for mask in Bidirectional</bdi,26-May-21,cosmoquester,Not closed,Not closed
+49602,Update variable name within Anomaly Detection example</bdi,25-May-21,cl3m3nt,Not closed,Not closed
+49473,Incorrect requirements.txt in Magic Wand Example</bdi,21-May-21,laurenmurphyx64,Not closed,Not closed
+49379,Distinction between categorical_crossentropy and sparse_categorical_crossentropy is not clear in the documentation</bdi,20-May-21,worldpeaceaspirer,Not closed,Not closed
+49295,tensorflow 2.5.0 cuda and cudnn version</bdi,19-May-21,DachuanZhao,Not closed,Not closed
+49252,SparseCategoricalAccuracy y_true and y_pred shape</bdi,18-May-21,ziruizhuang,Not closed,Not closed
+49237,MultiHeadAttention padding mask example</bdi,17-May-21,dbouchabou,Not closed,Not closed
+49101,<code>tf.keras.preprocessing.image.smart_resize</code> stable docs does not render properly</bdi,11-May-21,mattxwang,Not closed,Not closed
+48796,"Example of tf.scatter_nd contains Session, which is obselete</bdi",28-Apr-21,worldpeaceaspirer,Not closed,Not closed
+48731,dow</bdi,24-Apr-21,adarsh-dhakad,Not closed,Not closed
+48473,Documentation for tf.tensor_scatter_nd_add mentions non existing method</bdi,12-Apr-21,scarlehoff,Not closed,Not closed
+48458,Broken link at tf.keras.callbacks.TensorBoard in docs page</bdi,10-Apr-21,alphaX86,Not closed,Not closed
+48298,Sample or example?</bdi,04-Apr-21,gqqnbig,Not closed,Not closed
+48234,Broken syntax highlighting on docs that render python notebooks.</bdi,01-Apr-21,dansuh17,Not closed,Not closed
+48174,https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/TensorBoard contains broken links</bdi,30-Mar-21,atn832,Not closed,Not closed
+48137,Output size same as input size only if strides = 1</bdi,28-Mar-21,hannnwang,Not closed,Not closed
+48105,Incorrect ZeroPadding before MaxPool2D in keras' resnet</bdi,26-Mar-21,dlopr,Not closed,Not closed
+47991,"Python 3.6.12-debug is not supported, but documentation says it is</bdi",22-Mar-21,Volker-Weissmann,Not closed,Not closed
+47985,Invalid format in tf.math.log doc page</bdi,22-Mar-21,jeongukjae,Not closed,Not closed
+47854,training_a_model.md problem</bdi,17-Mar-21,goldkwang,Not closed,Not closed
+47780,Inconsistency in tf.keras.models.Model.fit() doc</bdi,13-Mar-21,francescoalongi,Not closed,Not closed
+47759,Cuda version should be 11 instead of 10 in Install CUDA with apt(docs)</bdi,12-Mar-21,Arghya999,Not closed,Not closed
+47662,Update aliasing in tf.linalg.band_part docs</bdi,09-Mar-21,jeongukjae,Not closed,Not closed
+47642,Typo issue in tf.keras.losses docs</bdi,08-Mar-21,jeongukjae,Not closed,Not closed
+47619,mobilenet_v3.preprocess_input does nothing!</bdi,07-Mar-21,jameshfisher,Not closed,Not closed
+47608,BatchNorm: Documentation: Problem in Inference Equation (and also training)</bdi,06-Mar-21,MehdiMaboudi,Not closed,Not closed
+47565,TensorBoard Embedding Projector Metadata filepath format not clear</bdi,04-Mar-21,suiluj,Not closed,Not closed
+47537,tf.keras.backend.in_train_phase / tf.keras.backend.in_test_phase not documented</bdi,03-Mar-21,isaacgerg,Not closed,Not closed
+47529,Estimator#export_saved_model section links to irrelevant guide or guide missing relevant section</bdi,03-Mar-21,C-Compton,Not closed,Not closed
+47405,Login loop caused by unmet packages in gpu Ubuntu16.04 installation guide</bdi,25-Feb-21,GrigoriiTarasov,Not closed,Not closed
+47286,The Example Code in tf.feature_column.numeric_column is not Executable/Complete/Self-Sufficient</bdi,20-Feb-21,worldpeaceaspirer,Not closed,Not closed
+47062,tensorflow/cc/saved_model/README.md is broken</bdi,10-Feb-21,atn832,Not closed,Not closed
+46998,Documentation mistake in tf.keras.layers.MaxPool2D python section</bdi,08-Feb-21,chinya07,Not closed,Not closed
+46848,LinearRegression Example in ForwardAccumulator docstring has an error</bdi,02-Feb-21,nickhalmagyi,Not closed,Not closed
+46819,problematic args description table of aixs in tf.nn.softmax</bdi,01-Feb-21,Yonma,Not closed,Not closed
+46757,tf.linalg.triangular_solve adjoint option description is wrong</bdi,28-Jan-21,vicaws,Not closed,Not closed
+46604,The Example Code in tf.feature_column.categorical_column_with_identity is not Executable/Complete/Self-Sufficient</bdi,22-Jan-21,worldpeaceaspirer,Not closed,Not closed
+46568,typos</bdi,21-Jan-21,framsc,Not closed,Not closed
+46522,BatchNormalization inference equation in doc is incorrect</bdi,19-Jan-21,brian36,Not closed,Not closed
+46492,"documentation missing, tf.keras.Model.fit shuffle argument is being ignored when passing a tf.data.dataset</bdi",17-Jan-21,juanma9613,Not closed,Not closed
+46211,Many errors in the Example of tf.feature_column.categorical_column_with_vocabulary_file</bdi,06-Jan-21,rakeshmothukuru1,Not closed,Not closed
+46203,Many errors in the Example of tf.feature_column.categorical_column_with_identity</bdi,06-Jan-21,rakeshmothukuru1,Not closed,Not closed
+46201,Many errors in the Example of tf.feature_column.categorical_column_with_hash_bucket</bdi,06-Jan-21,rakeshmothukuru1,Not closed,Not closed
+46197,Error in example because of Incomplete API names for tf.keras.experimental.SequenceFeatures</bdi,06-Jan-21,rakeshmothukuru1,Not closed,Not closed
+46128,"This throws ERROR: features = tf.io.parse_example(..., features=make_parse_example_spec(columns))</bdi",04-Jan-21,summa-code,Not closed,Not closed
+45874,"TPU guide doesn't work, but used to - <code>Op type not registered 'DecodeImage' in binary</code></bdi",19-Dec-20,SamuelMarks,Not closed,Not closed
+45860,TF2.4 doc missing keras.backend methods</bdi,18-Dec-20,wuhy08,Not closed,Not closed
+45854,MultiHeadAttention masking mechanism</bdi,18-Dec-20,claverru,Not closed,Not closed
+45778,[Doc bug] tf.sparse.concat doesn't have argument <code>expand_nonconcat_dim</code></bdi,17-Dec-20,DNXie,Not closed,Not closed
+45777,[Documentation bug] Format issue in document of <code>tf.raw_ops.For</code></bdi,17-Dec-20,DNXie,Not closed,Not closed
+45731,ambiguity risk of crop_size</bdi,16-Dec-20,qazsweet,Not closed,Not closed
+45243,tf.keras.applications.mobilenet_v3.preprocess_input documentation not according source code </bdi,28-Nov-20,SalvaPedraza,Not closed,Not closed
+45239,tf.image.extract_patches argument description</bdi,28-Nov-20,Crispy13,Not closed,Not closed
+45203,tf.linalg.diag_part does not use matrix_diag_part_v2</bdi,26-Nov-20,Lescurel,Not closed,Not closed
+45007,Mistakes in the documentation of UniqueWithCountsV2 API</bdi,19-Nov-20,rakeshmothukuru1,Not closed,Not closed
+44987,"Necessity of strategy.run"" and ""distribute_datasets_from_function"" for ParameterServers</bdi""",18-Nov-20,MaxiBoether,Not closed,Not closed
+44910,[Question] Adding More Outputs in tflite Interpreter.get_output_details()</bdi,16-Nov-20,Rocksus,Not closed,Not closed
+44829,Incorrect File Formats mentioned and Raises Section is missing in ImageDataGenerator Documentation</bdi,13-Nov-20,rakeshmothukuru1,Not closed,Not closed
+44765,ImportError: cannot import name 'np_utils' in ImageDataGenerator</bdi,11-Nov-20,rakeshmothukuru1,Not closed,Not closed
+44686,Typo in tf.keras.callbacks.EarlyStopping example</bdi,08-Nov-20,jvishnuvardhan,Not closed,Not closed
+44685,Arguments have an HTML format issue</bdi,08-Nov-20,houseofai,Not closed,Not closed
+44587,Behaviour of ImageDataGenerator with subset='validation'</bdi,04-Nov-20,danipozo,Not closed,Not closed
+44516,keras preprocessing data_utils.py not working for non-'inferred' labels</bdi,02-Nov-20,mabhags,Not closed,Not closed
+44482,tf.logging documentation leads to 404</bdi,31-Oct-20,jpodivin,Not closed,Not closed
+44005,ValueError: The same saveable will be restored with two names: layer_with_weights-1/_table/.ATTRIBUTES/table</bdi,14-Oct-20,DachuanZhao,Not closed,Not closed
+43998,Update BatchNormalization documentation</bdi,14-Oct-20,vermouth1992,Not closed,Not closed
+43760,creating segmentation</bdi,03-Oct-20,charanhu,Not closed,Not closed
+43752,Documentation example for tf.keras.utils.Sequence is incorrect;  'fencepost' error in example code</bdi,03-Oct-20,drmatthewclark,Not closed,Not closed
+43455,"A commit message should be unit64""</bdi""",22-Sep-20,idiomaticrefactoring,Not closed,Not closed
+43224,keras layers API documentation not sorted properly</bdi,14-Sep-20,PaulPauls,Not closed,Not closed
+43029,TensorFlow2 tutorials Actor-Critic method</bdi,07-Sep-20,hyiche,Not closed,Not closed
+42513,Discrepancy between available operation semantics documentation and documentation of <code>tf2xla.python.xla.conv</code></bdi,20-Aug-20,bchetioui,Not closed,Not closed
+42458,CosineSimilarity documentation range incorrect</bdi,18-Aug-20,danielplatt,Not closed,Not closed
+42435,Keras <code>Layer.call</code> args signature inconsistent with actual code</bdi,17-Aug-20,wchargin,Not closed,Not closed
+42420,Error in Validation split percentage - Image Classification tutorial</bdi,17-Aug-20,roca77,Not closed,Not closed
+42242,tf.convert_to_tensor and tf.constant ignoring tf.device</bdi,11-Aug-20,jacksonloper,Not closed,Not closed
+42151,tf.nn.ctc_beam_search_decoder expects output of softmax whereas documentation says it expects logits</bdi,08-Aug-20,lriuui0x0,Not closed,Not closed
+42140,blank_index in tf.nn.ctc_loss and tf.nn.ctc_beam_search_decoder has different default value</bdi,07-Aug-20,lriuui0x0,Not closed,Not closed
+42045,"TF website tutorial Save and load"" fails on Google Colab for entire models</bdi""",04-Aug-20,jasonlilley,Not closed,Not closed
+41712,"Conv1DTranspose Dilation support - Might be a bug, IDK.</bdi",24-Jul-20,EnderWiggin14,Not closed,Not closed
+41656,The first paragraph of the documentation for tf.linalg.inv is cut in half</bdi,23-Jul-20,lovasoa,Not closed,Not closed
+41496,RGB to YUV: Conflicting information between example and description</bdi,17-Jul-20,huangeddie,Not closed,Not closed
+41470,"Model Maker Outputing Single File, no labels.txt</bdi",16-Jul-20,vdaita,Not closed,Not closed
+41420,Docs: incomplete description of callbacks.ModelCheckpoint's save_best_only parameter</bdi,15-Jul-20,bersbersbers,Not closed,Not closed
+41413,Threshold to be set 0 when using binary accuracy with raw prediction values (from_logits=True)</bdi,15-Jul-20,HaraBeron,Not closed,Not closed
+41270,"GPU delegate library is libtensorflowlite_gpu_delegate.so, not libtensorflowlite_gpu_gl.so.</bdi",10-Jul-20,y-ich,Not closed,Not closed
+41115,Doc of rmsprop optimizer seems not consistent with the code</bdi,06-Jul-20,tzm1003306213,Not closed,Not closed
+41005,"tf.where doc on Args x"" seems incorrect</bdi""",01-Jul-20,Chenni,Not closed,Not closed
+40785,the link to stable version of this codelab is broken </bdi,25-Jun-20,navczydev,Not closed,Not closed
+40725,Incorrect documentation for model_from_config </bdi,23-Jun-20,Trel725,Not closed,Not closed
+40709,What exactly does <code>tf.signal.fft</code> compute?</bdi,23-Jun-20,sharvil,Not closed,Not closed
+40708,looping over tf.range in tf.function is slower than looping over range</bdi,23-Jun-20,amitport,Not closed,Not closed
+40692,Conv1DTranspose documentation inconsistent with code and unclear</bdi,22-Jun-20,EnderWiggin14,Not closed,Not closed
+40595,tf.signal.rfft(2d/3d) documentation refers <code>Tcomplex</code> and <code>input</code> as arguments.</bdi,18-Jun-20,DNXie,Not closed,Not closed
+40594,tf.signal.irfft(2d/3d) documentation refers <code>input</code> and <code>Treal</code> as arguments.</bdi,18-Jun-20,DNXie,Not closed,Not closed
+40593,Unclear rank/dimension dependency of <code>weights</code> in  <code>sigmoid_cross_entropy</code> documentation</bdi,18-Jun-20,DNXie,Not closed,Not closed
+40592,<code>tf.nn.swish</code> documentation refers <code>name</code> as an argument</bdi,18-Jun-20,DNXie,Not closed,Not closed
+40415,AbstractRNNCell documentation</bdi,12-Jun-20,AlecBG,Not closed,Not closed
+40104,<code>tf.compat.v1.setdiff1d</code> documentation refers <code>out_idx</code> as an argument</bdi,03-Jun-20,DNXie,Not closed,Not closed
+40103,Unclear type/dimension dependency of <code>filters</code> in  <code>conv1d/3d_transpose</code> documentation</bdi,03-Jun-20,DNXie,Not closed,Not closed
+40052,Format issue in <code>tf.ragged.constant</code> documentation</bdi,01-Jun-20,DNXie,Not closed,Not closed
+40051,<code>tf.hessians</code> documentation refers <code>colocate_gradients_with_ops</code> as an argument</bdi,01-Jun-20,DNXie,Not closed,Not closed
+40050,Unclear shape dependency of <code>value</code> in  <code>tf.keras.backend.moving_average_update</code> documentation</bdi,01-Jun-20,DNXie,Not closed,Not closed
+39981,tf.math.maximum example is written incorrectly.</bdi,29-May-20,abhinavsp0730,Not closed,Not closed
+39962,TFLite Convert Python API Has Bad Code</bdi,28-May-20,ehennis,Not closed,Not closed
+39925,Missing pre-processing for Mobilenet V2 model training</bdi,27-May-20,getsanjeevdubey,Not closed,Not closed
+39788,Formula error display in RMSprop</bdi,22-May-20,MangelFdz,Not closed,Not closed
+39733,Documentation of accepted datatypes for <code>validation_data</code> in keras.Model.fit is incorrect. </bdi,20-May-20,AdamHarries,Not closed,Not closed
+39677,[TF 2.2 API docs] tf.keras.applications.resnet_v2.preprocess_input docs Returns paragraph is misleading</bdi,19-May-20,RaibekTussupbekov,Not closed,Not closed
+39638,saved_model README.md uses deprecated code</bdi,18-May-20,edurenye,Not closed,Not closed
+39615,tf.keras.Model docs missing get_weights method and metrics property</bdi,17-May-20,ThewBear,Not closed,Not closed
+39520,tf.signal.rfft documentation refers to Tcomplex as an argument </bdi,13-May-20,arvoelke,Not closed,Not closed
+39469,"Keras Conv3DTranspose inconsistency between padding, output_shape and output_padding</bdi",12-May-20,bhushan23,Not closed,Not closed
+39454,Documentaton issue: tf.split num_or_size_splits parameter</bdi,12-May-20,bersbersbers,Not closed,Not closed
+39305,control_dependencies with assert_equal</bdi,08-May-20,bhack,Not closed,Not closed
+39160,Issue in google codelabs handwritten digit classifier code.</bdi,04-May-20,PatrickPrakash,Not closed,Not closed
+39047,Docstring is not misleading.</bdi,30-Apr-20,andreiionutdamian,Not closed,Not closed
+38946,Docs:  multi_worker_with_keras.ipynb shows init() instead of __init__()</bdi,27-Apr-20,robertlugg,Not closed,Not closed
+38818,Documentation updates</bdi,22-Apr-20,fbordignon,Not closed,Not closed
+38713,Online documentation missing python docs</bdi,20-Apr-20,phemmer,Not closed,Not closed
+38564,Wrong function in example for tensor_diag</bdi,15-Apr-20,ngc92,Not closed,Not closed
+38546,FTRL maths displayed messy</bdi,14-Apr-20,dirknbr,Not closed,Not closed
+38523,https://www.tensorflow.org/api_docs/python/tf/saved_model/tag_constants is broken</bdi,14-Apr-20,rakeshmothukuru1,Not closed,Not closed
+42798,[ru] Failing notebooks.</bdi,10-Apr-20,MarkDaoust,Not closed,Not closed
+38318,New project inquiries</bdi,07-Apr-20,inoxstasy,Not closed,Not closed
+38229,No examples showing how to generate Arduino files from source for Arduino IDE</bdi,04-Apr-20,nicseve,Not closed,Not closed
+38199,"tf.keras.losses.categorical_hinge mentions [-1, 1] values while it works with one-hot-encoded tensor</bdi",03-Apr-20,FrankwaP,Not closed,Not closed
+38067,Custom Loss: Order of arguments</bdi,31-Mar-20,Arktius,Not closed,Not closed
+37996,Documentation corresponding to Arguments for Pre-Trained Models inside &lt;tf.keras.applications&gt; is missing</bdi,28-Mar-20,rakeshmothukuru1,Not closed,Not closed
+42796,[zh-cn] Notebooks failing</bdi,27-Mar-20,MarkDaoust,Not closed,Not closed
+37971,Broken link for tf.debugging.assert_same_float_dtype</bdi,27-Mar-20,theadityasam,Not closed,Not closed
+37896,tf.keras.losses.cosine_similarity() is not a negative quantity</bdi,25-Mar-20,aikho,Not closed,Not closed
+37859,tf.keras.losses.SparseCategoricalCrossentropy  Documentation Issue</bdi,24-Mar-20,UesugiErii,Not closed,Not closed
+42794,[zh-cn] Remove references to tf-nightly-2.0-preview package</bdi,23-Mar-20,lamberta,Not closed,Not closed
+42793,[ja] Remove references to tf-nightly-2.0-preview package</bdi,23-Mar-20,lamberta,Not closed,Not closed
+37830,Replace VarHandleOp in Keras with VariableV2</bdi,23-Mar-20,summelon,Not closed,Not closed
+37792,"Does Keras disable regularization (dropout, noise) layers when evaluating the validation data during Model.fit()?</bdi",22-Mar-20,mcourteaux,Not closed,Not closed
+37708,applications.resnet.ResNet50 means ResNet50 or ResNet34</bdi,19-Mar-20,CNOCycle,Not closed,Not closed
+37669,Scatter nd add has legacy docstrings from scatter nd</bdi,17-Mar-20,zaccharieramzi,Not closed,Not closed
+37610,Generated docs for TF 2.1 and TF 2.2 are missing information present in the source docs</bdi,15-Mar-20,foxik,Not closed,Not closed
+37607,Lots of links are Broken.</bdi,15-Mar-20,abhinavsp0730,Not closed,Not closed
+37591,Example given in tf.image.rgb_to_yub is contadicting with the description.</bdi,14-Mar-20,ashutosh1919,Not closed,Not closed
+37534,loading pre-trained resnet-50 for Object Detection Models on TensorFlow 2.0</bdi,12-Mar-20,Swann14444,Not closed,Not closed
+37480,'third_party/tensorflow/compiler/aot:codegen_test' No such directory found</bdi,10-Mar-20,ayushmankumar7,Not closed,Not closed
+37445,Document purpose for tf.keras.preprocessing module</bdi,09-Mar-20,mjul,Not closed,Not closed
+37416,Precision at top_k does not compute the precision *on average* as stated in the API</bdi,07-Mar-20,LeechMuse,Not closed,Not closed
+37379,"matplotlib.mlab has been removed, update code please</bdi",06-Mar-20,dynamor2019,Not closed,Not closed
+37330,Improve the TFDS Getting Started Documentation </bdi,05-Mar-20,coreyching,Not closed,Not closed
+37293,"TF2.x API Docs:  example codes in <code>tf.Module</code> raise error, and fix it</bdi",04-Mar-20,JiaRu2016,Not closed,Not closed
+37240,How to deserialize from a dict with tf.keras.losses.get</bdi,02-Mar-20,princessofpillows,Not closed,Not closed
+37239,tf.keras.experimental.WideDeepModel example has wrong input for constructor</bdi,02-Mar-20,tobillsung-doc,Not closed,Not closed
+37228,tf.debugging.assert_shapes</bdi,02-Mar-20,ngc92,Not closed,Not closed
+37187,guarantees for the logs argument in keras Callbacks</bdi,29-Feb-20,ngc92,Not closed,Not closed
+37179,"Wrong name"" parameter default for Nadam optimizer</bdi""",29-Feb-20,princessofpillows,Not closed,Not closed
+37168,<code>encode_png</code> function should be exported from <code>tf.io</code> module</bdi,28-Feb-20,vijayphoenix,Not closed,Not closed
+37084,Reintroduced Typo in tf.keras.layers.Attention docs example</bdi,26-Feb-20,ulf1,Not closed,Not closed
+37078,Documentation issue about tf.math.xlog1py (nightly-only APIs)</bdi,26-Feb-20,wookayin,Not closed,Not closed
+37075,Documentation needs to upgrade to Python3</bdi,26-Feb-20,ayushmankumar7,Not closed,Not closed
+37067,Usage Documentation Needed for tf.image.yuv_to_rgb</bdi,25-Feb-20,alexdwu13,Not closed,Not closed
+37066,Model class API / predict / gradient update</bdi,25-Feb-20,johngrabner,Not closed,Not closed
+37047,Request for documents of tf.compat.v1.profiler.Profiler</bdi,25-Feb-20,ProNoobLi,Not closed,Not closed
+37021,There are no documentations related to decode_predictions() and preprocess_input() in any keras.applications</bdi,24-Feb-20,ashutosh1919,Not closed,Not closed
+36987,multi head multi loss model with GradientTape</bdi,23-Feb-20,sezarxray,Not closed,Not closed
+36936,Does passing 'training' flag to tf.keras.Sequential do anything?</bdi,20-Feb-20,milongo,Not closed,Not closed
+36775,First example on the Tensor page results in an error</bdi,15-Feb-20,jraman,Not closed,Not closed
+36757,Add more information about eager/graph context for Keras layer.call()</bdi,14-Feb-20,qlzh727,Not closed,Not closed
+36734,AttributeError: 'BatchGen' object has no attribute 'shape'</bdi,13-Feb-20,etetteh,Not closed,Not closed
+36730,tensorflow-gpu=2.1.0 AttributeError: module 'tensorflow' has no attribute 'placeholder'</bdi,13-Feb-20,PingYufeng,Not closed,Not closed
+36708,First python project for class--- could someone please help me understand?- exif data using python </bdi,12-Feb-20,rcizzle94,Not closed,Not closed
+36695,Function String Keras Attention Layer contains error/typo</bdi,12-Feb-20,tmensink,Not closed,Not closed
+36693,Spelling of placeholder incorrect in line 53... :P</bdi,12-Feb-20,Spider8801,Not closed,Not closed
+36599,NMT with attention</bdi,09-Feb-20,arshren,Not closed,Not closed
+36547,Documentation error for tf.signal.frame </bdi,07-Feb-20,jmsmdy,Not closed,Not closed
+36516,"Misleading documentation for hook parameters in estimators evaluate, predict, train methods</bdi",06-Feb-20,espinafre,Not closed,Not closed
+36452,Broken outbound links from index pages for older TF API</bdi,04-Feb-20,lichili233,Not closed,Not closed
+36449,Unclear documentation for implementing custom TensorFlow Keras optimizers</bdi,03-Feb-20,artemmavrin,Not closed,Not closed
+36442,eager</bdi,03-Feb-20,mizzling,Not closed,Not closed
+36375,AttributeError: 'Callback' object has no attribute 'validation_data'</bdi,31-Jan-20,nbro,Not closed,Not closed
+36347,Official release of tensorflow==1.15.2 does not include GPU support</bdi,30-Jan-20,pavanky,Not closed,Not closed
+36290,Not sufficient documentation on custom tf_lite classification model </bdi,28-Jan-20,jvishnuvardhan,Not closed,Not closed
+36245,Malformatted doc page for SGD optimizer</bdi,27-Jan-20,renatobellotti,Not closed,Not closed
+36237,Layer Names tf.keras.applications vs keras.applications not matching</bdi,27-Jan-20,MiWeiss,Not closed,Not closed
+35989,tf.function stable doc typo issue</bdi,17-Jan-20,shizukanaskytree,Not closed,Not closed
+35979,What's the difference between Keras applications and TF Model Garden?</bdi,17-Jan-20,haimat,Not closed,Not closed
+35760,diag_part documentation outdated</bdi,11-Jan-20,n-gao,Not closed,Not closed
+35745,Add a warning that tfds.load can not be used for own Datasets</bdi,10-Jan-20,PanCakeConnaisseur,Not closed,Not closed
+35717,TensorFlow&lt;1.15 documentation redirects to GitHub</bdi,09-Jan-20,artemmavrin,Not closed,Not closed
+35712,tf.distribute.experimental.TPUStrategy doesn't render Stable correctly</bdi,09-Jan-20,uchua,Not closed,Not closed
+35667,assign() got an unexpected keyword argument 'validate_shape'</bdi,08-Jan-20,bersbersbers,Not closed,Not closed
+35648,Malformed <code>TRAINABLE_ATTRIBUTE_NOTE</code> in batch normalization documentation</bdi,07-Jan-20,joe-antognini,Not closed,Not closed
+35647,"tf.strings.lower and tf.strings.upper have TODO"" docstrings</bdi""",07-Jan-20,pbaranay,Not closed,Not closed
+35628,How many items does tf.gradients return?</bdi,07-Jan-20,sharvil,Not closed,Not closed
+35602,"Census tutorial documentation refers to Python 2, but code uses Python 3</bdi",06-Jan-20,fdb,Not closed,Not closed
+35557,Line break missing in tf.keras.Model.fit() documentation</bdi,03-Jan-20,bersbersbers,Not closed,Not closed
+35452,which is the correct type for debugging.assert_shape?</bdi,27-Dec-19,MokkeMeguru,Not closed,Not closed
+35336,No clear document explains how to use pre-trained model</bdi,22-Dec-19,CNOCycle,Not closed,Not closed
+35329,Error: Cannot convert 'auto' to EagerTensor of dtype float</bdi,21-Dec-19,yourtheron,Not closed,Not closed
+35173,"I do not get the from the file or definition of gen_nn_ops"" in the place ""tensorflow.python.ops""</bdi""",17-Dec-19,chensongkui,Not closed,Not closed
+35136,Typo on doc</bdi,15-Dec-19,guglielmocamporese,Not closed,Not closed
+35085,[DOCS] Using <code>&gt;&gt;&gt;</code> in documentation is incorrectly formatted on website</bdi,13-Dec-19,Squadrick,Not closed,Not closed
+35079,Add usage examples for tf.audio APIs</bdi,13-Dec-19,boronhub,Not closed,Not closed
+35065,Bug in documentation of tf.while_loop.  parallel_iterations doesn't seem to affect performance.</bdi,12-Dec-19,charles19920528,Not closed,Not closed
+35063,No example provided for using tf.nn.ctc_loss</bdi,12-Dec-19,gabolsgabs,Not closed,Not closed
+34975,[TF 2.0 API Docs] <code>tf.keras.callbacks.LearningRateScheduler</code> (Very small update)</bdi,09-Dec-19,shun-lin,Not closed,Not closed
+34965,Keras Callback log entry wrong documented</bdi,09-Dec-19,marcj,Not closed,Not closed
+34927,Bad example in Sparse_Categorical_CrossEntropy</bdi,07-Dec-19,wzzhu,Not closed,Not closed
+34895,SavedModel format for tf.estimator class in Tensorflow 2.0</bdi,06-Dec-19,jnsgrnborg,Not closed,Not closed
+34890,tf.keras.models.Sequential does not support run_eagarly</bdi,06-Dec-19,Squadrick,Not closed,Not closed
+34858,SparseCategoricalCrossEntropy example contains a mistake in terms of input</bdi,05-Dec-19,Antymon,Not closed,Not closed
+34849,TF 2.0 - WARNING - dense_features is casting an input tensor from dtype float64 to the layer's dtype of float32</bdi,05-Dec-19,00krishna,Not closed,Not closed
+34823,Profiler API and Service are not available</bdi,04-Dec-19,AlexisBRENON,Not closed,Not closed
+34809,Typo in tf.keras.layers.Attention docs example</bdi,03-Dec-19,rabitt,Not closed,Not closed
+34776,StackedRNNCells has an invalid example</bdi,03-Dec-19,r-barnes,Not closed,Not closed
+34758,Docker Install instructions page is broken now that v2.0 is the latest image</bdi,02-Dec-19,PeteBlackerThe3rd,Not closed,Not closed
+34721,Missing information: embedding_lookup automatically returns 0 for an out-of-vocab index</bdi,30-Nov-19,hoangcuong2011,Not closed,Not closed
+34712,Please fix the example section of tf.constant_initialize</bdi,29-Nov-19,vinayapathak,Not closed,Not closed
+34694,API Documentation - Incorrect formatting for tanh activation function</bdi,28-Nov-19,benchislett,Not closed,Not closed
+34650,TFRecordsWriter default write mode?</bdi,27-Nov-19,qbeer,Not closed,Not closed
+34600,Rewrite SECURITY.md with technical writing</bdi,26-Nov-19,bk202,Not closed,Not closed
+34586,Documentation Error on nn.ctc_loss</bdi,25-Nov-19,leonardoaraujosantos,Not closed,Not closed
+34577,tf.losses.cosine_similarity is a negative quantity between -1 and 0 </bdi,25-Nov-19,h2soong,Not closed,Not closed
+34539,RNN document is not clear</bdi,23-Nov-19,zwenju,Not closed,Not closed
+34512,Learning VM</bdi,22-Nov-19,mouse36872,Not closed,Not closed
+34475,WHere is staging package in tf2?</bdi,21-Nov-19,YunchuZhang,Not closed,Not closed
+34455,tf.ragged.stack breaks with rank-1 regular tensors</bdi,20-Nov-19,RunOrVeith,Not closed,Not closed
+34355,"Error Massage: tensorflow.python.framework.errors_impl.UnknownError:  Failed to get convolution algorithm. This is probably because cuDNN failed to initialize, so try looking to see if a warning log message was printed above.</bdi",17-Nov-19,acseckin,Not closed,Not closed
+34340,Image preprocessing for transfer learning confusing</bdi,16-Nov-19,jsgonsette,Not closed,Not closed
+34305,Behaviour of the loss function with sample_weights (keras)</bdi,15-Nov-19,Emilien-P,Not closed,Not closed
+34283,copy paste error for value_embeddings = token_embedding(query_input)</bdi,14-Nov-19,le-horizon,Not closed,Not closed
+34207,Error in the document of tf.keras.layers.Dense</bdi,12-Nov-19,changy12,Not closed,Not closed
+34194,tf.size() has no documentation</bdi,12-Nov-19,danijar,Not closed,Not closed
+34165,tf.keras.backend.sqrt(tf.constant(-1.0)) is 0 which is misleading and tf.sqrt(tf.constant(-1.0)) is 'nan' which is the way it should be.</bdi,11-Nov-19,gaddekumar,Not closed,Not closed
+34099,Warning when using fit_generator</bdi,08-Nov-19,ThinerDAS,Not closed,Not closed
+34071,[Bug] Wrong device placement for tf.constant with int32</bdi,07-Nov-19,VoVAllen,Not closed,Not closed
+34005,Documentation unclear tf.batch_to_space</bdi,05-Nov-19,nikochiko,Not closed,Not closed
+33989,module 'tensorflow' has no attribute 'AdamOptimizer'</bdi,04-Nov-19,jly36963,Not closed,Not closed
+33974,assert_shapes broken code in documentation</bdi,04-Nov-19,bodin-e,Not closed,Not closed
+33923,Insert Windows command line in the tutorials</bdi,01-Nov-19,raffaem,Not closed,Not closed
+33922,tf.compat purpose may be misstated</bdi,01-Nov-19,raffaem,Not closed,Not closed
+33915,Have a default value for monitor on Early Stopping callback?</bdi,01-Nov-19,ktfth,Not closed,Not closed
+33906,Update sample session for build from source instruction docs</bdi,01-Nov-19,nikochiko,Not closed,Not closed
+33856,Outdated doc for tf.keras.Model.save</bdi,30-Oct-19,durandg12,Not closed,Not closed
+33839,tensorflow.linalg.norm document missing</bdi,30-Oct-19,fsx950223,Not closed,Not closed
+33820,normalization in cosine similarity</bdi,29-Oct-19,ngc92,Not closed,Not closed
+33807,TensorFlow pre-built package not available for download</bdi,29-Oct-19,rajeev-mirelz,Not closed,Not closed
+33794,[TF 2.0 API Docs] tf.keras.layers.simpleRNN</bdi,28-Oct-19,brorro,Not closed,Not closed
+33704,relu6</bdi,25-Oct-19,sashiomarda,Not closed,Not closed
+33548,Getting error following steps in 'Building Standard TensorFlow ModelServer'</bdi,20-Oct-19,PeterMourfield,Not closed,Not closed
+33528,Broken Link</bdi,19-Oct-19,soroush,Not closed,Not closed
+33526,Error while trying to use tf.broadcast_weights </bdi,19-Oct-19,MeghnaNatraj,Not closed,Not closed
+33502,please fix docs  converter = tf.lite.TFLiteConverter.from_keras_model(model) doesn't work</bdi,18-Oct-19,ZackPashkin,Not closed,Not closed
+33454,[1.15]Discrepancy between documentation &amp; behaviour in tf.keras.Model.Save</bdi,17-Oct-19,fchouteau,Not closed,Not closed
+33356,'tensorflow.python.keras.api._v1.keras.losses' has no attribute 'Reduction'</bdi,14-Oct-19,subhankar-ghosh,Not closed,Not closed
+33354,fix documentation for tf.batch_to_space</bdi,14-Oct-19,vishalsubbiah,Not closed,Not closed
+33345,keras optimizer <code>apply_gradients</code> arg <code>grads_and_vars</code> has wrong type in documentation</bdi,14-Oct-19,koenhelwegen,Not closed,Not closed
+33340,Significant prediction slowdown after model.compile()</bdi,14-Oct-19,offchan42,Not closed,Not closed
+33326,[TF 2.0 API Docs] tf.GradientTape</bdi,14-Oct-19,prabindh,Not closed,Not closed
+33297,Surprising random seed behavior when using @tf.function</bdi,13-Oct-19,ageron,Not closed,Not closed
+33242,CTC Beam Search Decoder in TensorFlow android</bdi,11-Oct-19,ranjeetchouhan,Not closed,Not closed
+33198,"Tensorflow 2.0, feature_column and input_layer</bdi",10-Oct-19,aszalucha,Not closed,Not closed
+33134,[TF 2.0 API Docs] tf.nn.softmax</bdi,08-Oct-19,prabindh,Not closed,Not closed
+32990,Basic tutorial from Tensorflow 2.0 no longer runs on small machine</bdi,02-Oct-19,dawsonlp,Not closed,Not closed
+32938,Documentation for streaming training data from disk.</bdi,01-Oct-19,invencode,Not closed,Not closed
+32924,Malformed documentation for tf.strings.split</bdi,30-Sep-19,sharvil,Not closed,Not closed
+32923,No documentation for tf.strings.reduce_join</bdi,30-Sep-19,sharvil,Not closed,Not closed
+32915,Wrong links in API document and search results</bdi,30-Sep-19,canasta,Not closed,Not closed
+32890,[TF 2.0 API Docs] tf.nn.batch_normalization</bdi,28-Sep-19,prabindh,Not closed,Not closed
+32800,"Autograph capabilities and limitations"" link in AutoGraph doc is outdated</bdi""",25-Sep-19,yunabe,Not closed,Not closed
+32704,nn</bdi,21-Sep-19,Ryan-cv,Not closed,Not closed
+32684,Arguments formatting error in 1.15 keras.model.save docs + incorrect model format info/docstring mismatch?</bdi,20-Sep-19,jubjamie,Not closed,Not closed
+32664,Broken link in https://www.tensorflow.org/guide/eager#top_of_page</bdi,19-Sep-19,rodrigob,Not closed,Not closed
+32619,Missing output shape for inverse stft</bdi,18-Sep-19,risajef,Not closed,Not closed
+32598,pix2pix tutorial is broken with tf2 rc</bdi,17-Sep-19,AoifeHughes,Not closed,Not closed
+32528,"EstimatorSpec documentation removed from 1.14, 1.15</bdi",14-Sep-19,sharvil,Not closed,Not closed
+32353,Issue with basic_classification tutorial</bdi,09-Sep-19,nfgallimore,Not closed,Not closed
+32136,g3doc</bdi,01-Sep-19,JunhuaYe,Not closed,Not closed
+32129,[TF.2.0 API Docs] tf.ones_like</bdi,31-Aug-19,xqiangx1991,Not closed,Not closed
+32004,Python/C++ API interpreter example for hybrid models</bdi,27-Aug-19,DocDriven,Not closed,Not closed
+32001,The title is the shared_embeddings module，but the document introduces shared_embedding_columns module</bdi,27-Aug-19,yecphaha,Not closed,Not closed
+31903,Fix Tensorflow Lite Documentation</bdi,22-Aug-19,choochtech,Not closed,Not closed
+31882,no attribute python</bdi,22-Aug-19,shenzhencheng,Not closed,Not closed
+31881,no attribute python</bdi,22-Aug-19,shenzhencheng,Not closed,Not closed
+31783,"how to check model restore ok, tf.train.Saver.restore()</bdi",20-Aug-19,zkailinzhang,Not closed,Not closed
+31752,Getting 404 in XLA JIT page</bdi,19-Aug-19,take-cheeze,Not closed,Not closed
+31705,The arguments and returns of tf.keras.layers.GRUCell.call() make no sense at all</bdi,16-Aug-19,princessofpillows,Not closed,Not closed
+31698,Docs could mention that Dataset sharding is deterministic</bdi,16-Aug-19,anubh-v,Not closed,Not closed
+31543,Interrelations of collections and scope counts are not clear from documentation</bdi,12-Aug-19,Uiuran,Not closed,Not closed
+31440,Better documentation for Dataset.from_tensors/from_tensor_slices</bdi,08-Aug-19,karwa,Not closed,Not closed
+31436,[TF 2.0 API Docs] tf.keras.backend.relu</bdi,08-Aug-19,mwinel,Not closed,Not closed
+31415,tools.graph_transforms.TransformGraph has no docs or example of usage</bdi,07-Aug-19,Uiuran,Not closed,Not closed
+31369,TensorflowLite Runtime Installation Doesn't provide Interpreter Package</bdi,06-Aug-19,vibhatha,Not closed,Not closed
+31324,Passing a Variable as learning_rate to Adam optimizer does not work as expected</bdi,04-Aug-19,bjornsing,Not closed,Not closed
+31279,[TF 2.0 API Docs] tf.tuple</bdi,02-Aug-19,johnkegz,Not closed,Not closed
+31278,[TF.2.0 API Docs] tf.train.list_variables</bdi,02-Aug-19,KabohaJeanMark,Not closed,Not closed
+31277,[TF 2.0 API Docs] tf.keras.backend.random_uniform</bdi,02-Aug-19,mwinel,Not closed,Not closed
+31276,[TF 2.0 API Docs] tf.nn.log_softmax</bdi,02-Aug-19,MuhanguziDavid,Not closed,Not closed
+31275,[TF 2.0 API Docs] tf.io.extract_jpeg</bdi,02-Aug-19,dannylwe,Not closed,Not closed
+31241,Error when changing transformer hyperparameters</bdi,01-Aug-19,dawsoneliasen,Not closed,Not closed
+31237,Incomplete description of LSTM.__call__() params</bdi,01-Aug-19,habernal,Not closed,Not closed
+31202,Documentation is missing explanation of how to write custom loss functions for the keras api</bdi,31-Jul-19,esslushy,Not closed,Not closed
+31004,tf.tensordot documentation describes non-existent <code>a_axes</code> and <code>b_axes</code> parameters</bdi,24-Jul-19,bashi-bazouk,Not closed,Not closed
+30994,[TF 2.0 API Docs] tf.math.sqrt</bdi,24-Jul-19,stmugisha,Not closed,Not closed
+30988,Relations/differences between Container and Scopes in Context Manager are not Clear</bdi,24-Jul-19,Uiuran,Not closed,Not closed
+30874,"base64 strings contains   ""</bdi""",19-Jul-19,gison93,Not closed,Not closed
+30846,mismatch in the description of BatchDot and TensorFlow's implementation. </bdi,18-Jul-19,zachmayer,Not closed,Not closed
+30815,Feedback on Tensorflow 2.0 beta - documentation issues?</bdi,17-Jul-19,emrul,Not closed,Not closed
+30798,slim</bdi,17-Jul-19,liudefu,Not closed,Not closed
+30742,AttributeError: module 'tensorflow' has no attribute 'get_default_graph'</bdi,16-Jul-19,60pahn,Not closed,Not closed
+30682,TFLite speech example failing to train with -output_representation='spec'or'mfcc' examples/lite/examples/speech_commands/ml</bdi,13-Jul-19,KauthamMurugan,Not closed,Not closed
+30634,[Documentation][TF 1.14] Missing documentation for <code>batch_dims</code> in <code>tf.gather</code></bdi,12-Jul-19,MartinusR,Not closed,Not closed
+30616,"[Documentation] In TF 1.13.1, tf.keras.experimental.export does not exist despite being documented</bdi",11-Jul-19,zmjjmz,Not closed,Not closed
+30610,[r1.13.1] ImportError for  tf.keras.applications.imagenet_utils.preprocess_input</bdi,11-Jul-19,swghosh,Not closed,Not closed
+30566,Missing Graph Editor Documentation</bdi,10-Jul-19,buck-ross,Not closed,Not closed
+30492,Custom OP Documentation: <code>-D_GLIBCXX_USE_CXX11_ABI=0</code> not required anymore?</bdi,08-Jul-19,PhilJd,Not closed,Not closed
+30445,[TF 2.0 API Docs] tf.image.image_gradients</bdi,06-Jul-19,imransalam,Not closed,Not closed
+30437,"Remove global_step"" in usage example of CosineDecay and other related classes</bdi""",05-Jul-19,vsuryamurthy,Not closed,Not closed
+30436,tf.data.Dataset.list_files return is deterministic order when shuffle=False?</bdi,05-Jul-19,zhjunqin,Not closed,Not closed
+30419,类型问题</bdi,05-Jul-19,OkShen,Not closed,Not closed
+30408,Poor documentation of tf.saved_model.Builder</bdi,04-Jul-19,twatzl,Not closed,Not closed
+30319,TensorFlow does not work without tcmalloc in some cases (boosted trees).</bdi,02-Jul-19,daisylab,Not closed,Not closed
+30316,The docs are unscrollable with JavaScript disabled</bdi,02-Jul-19,KOLANICH,Not closed,Not closed
+30283,[TF 2.0] Minor changes to the 'Load images with tf.data' tutorial + fix image links</bdi,01-Jul-19,8bitmp3,Not closed,Not closed
+30206,API link for r1.13 directs to r1.12 instead</bdi,27-Jun-19,micw523,Not closed,Not closed
+30097,[TF 2.0 API Docs] tf.image.extract_glimpse</bdi,24-Jun-19,imransalam,Not closed,Not closed
+30092,AttributeError: module 'tensorflow._api.v2.train' has no attribute 'FtrlOptimizer'</bdi,24-Jun-19,keurcien,Not closed,Not closed
+30085,Default values not listed for hyperparameters in tfp ExponentiatedQuadratic class</bdi,24-Jun-19,alinaselega,Not closed,Not closed
+30071,Classifying Handwritten Digits with TF.Learn - Machine Learning(jupyter notebook on docker)</bdi,24-Jun-19,shadabs22,Not closed,Not closed
+30061,Method mentioned in documentation is missing: tf.keras.preprocessing.text.tokenizer_from_json</bdi,23-Jun-19,alexwal,Not closed,Not closed
+30004,a writing error in tf.contrib.data.map_and_batch</bdi,20-Jun-19,xixiaoyao,Not closed,Not closed
+30002,[TF 2.0 API Docs] <code>tf.keras.callbacks.LearningRateScheduler</code></bdi,20-Jun-19,8bitmp3,Not closed,Not closed
+29958,[TF 2.0 API Docs] <code>tf.keras.callbacks</code> (sub)classes</bdi,19-Jun-19,8bitmp3,Not closed,Not closed
+29955,Create a low-level python tutorial for tf 2</bdi,19-Jun-19,KOLANICH,Not closed,Not closed
+29950,[TF 2.0/1.14 API Docs] <code>tf.keras.callbacks</code> - broken links to source</bdi,19-Jun-19,8bitmp3,Not closed,Not closed
+29898,Need example of mixed precision in eager execution mode</bdi,17-Jun-19,edwardyehuang,Not closed,Not closed
+29897,[TF 2.0 API Docs] tf.sets.difference</bdi,17-Jun-19,Rodriq,Not closed,Not closed
+29890,[TF 2.0 API Docs] tf.keras.backend.count_params</bdi,17-Jun-19,lkmandy,Not closed,Not closed
+29860,[TF 2.0 API Docs] tf.keras.layers.GRU</bdi,17-Jun-19,math-alpha,Not closed,Not closed
+29859,[TF 2.0 API Docs] tf.errors.DeadlineExceededError</bdi,17-Jun-19,lkmandy,Not closed,Not closed
+29858,[TF 2.0 API Docs] tf.dynamic_stitch</bdi,17-Jun-19,lkmandy,Not closed,Not closed
+29855,[TF 2.0 API Docs] https://www.tensorflow.org/versions/r2.0/api_docs/python/tf/keras/layers/MaxPool1D</bdi,17-Jun-19,allenbangai,Not closed,Not closed
+29853,[TF 2.0 API Docs] tf.div_no_nan</bdi,17-Jun-19,Wil2129,Not closed,Not closed
+29852,[TF 2.0 API Docs] Documentation describes non existing symbol</bdi,17-Jun-19,xurror,Not closed,Not closed
+29851,[TF 2.0 API Docs] tf.data.experimental.unbatch</bdi,17-Jun-19,lkmandy,Not closed,Not closed
+29850,[TF 2.0 API Docs] tf.data.experimental.rejection_resample</bdi,17-Jun-19,lkmandy,Not closed,Not closed
+29849,[TF 2.0 API Docs] tf.debugging.assert_type</bdi,17-Jun-19,Wil2129,Not closed,Not closed
+29848,[TF 2.0 API Docs] tf.data.experimental.prefetch_to_device</bdi,17-Jun-19,Wil2129,Not closed,Not closed
+29847,[TF 2.0 API Docs] tf.errors.ResourceExhaustedError</bdi,16-Jun-19,Wil2129,Not closed,Not closed
+29846,[TF 2.0 API Docs] tf.errors.ResourceExhaustedError</bdi,16-Jun-19,Wil2129,Not closed,Not closed
+29844,tf.image.decode_and_crop_jpeg parameter crop_window changed</bdi,16-Jun-19,alon1samuel,Not closed,Not closed
+29835,GPU Support - Shared Object Exclusion </bdi,16-Jun-19,ghost,Not closed,Not closed
+29822,[TF 2.0 API Docs] tf.estimator.SessionRunHook</bdi,15-Jun-19,percyashu,Not closed,Not closed
+29821,[TF 2.0 API Docs] tf.estimator.StepCounterHook</bdi,15-Jun-19,percyashu,Not closed,Not closed
+29804,Inconsistency between names in the conv 1d operations and no support for 'causal' padding</bdi,14-Jun-19,Uiuran,Not closed,Not closed
+29801,Keras Callbacks documentation for on_train_batch_end vs the actual code of ModelCheckpoint</bdi,14-Jun-19,durandg12,Not closed,Not closed
+29755,tf.Print was not rendered correctly in the website</bdi,13-Jun-19,jvishnuvardhan,Not closed,Not closed
+29714,Polynomial Decay Document Page question</bdi,12-Jun-19,pranavsubramani,Not closed,Not closed
+29688,[TF API Docs] UX - <code>tf.io.FixedLenFeature</code> and <code>tf.FixedLenFeature </code></bdi,12-Jun-19,8bitmp3,Not closed,Not closed
+29685,[TF 2.0 API Docs] tf.keras.constraints.MinMaxNorm</bdi,12-Jun-19,kabahima,Not closed,Not closed
+29683,[TF 2.0 API Docs]  tf.keras.metrics.BinaryAccuracy</bdi,12-Jun-19,kabahima,Not closed,Not closed
+29677,tf.layers.dense deprecation update hint</bdi,12-Jun-19,BreakBB,Not closed,Not closed
+29668,The documentation has a cat instead of a bridge</bdi,11-Jun-19,gowthamkpr,Not closed,Not closed
+29654,[TF 2.0 API Docs] tf.lite.OpHint.OpHintArgumentTracker</bdi,11-Jun-19,kisinad,Not closed,Not closed
+29653,[TF 2.0 API Docs] tf.lite.OpHint</bdi,11-Jun-19,kisinad,Not closed,Not closed
+29652,[TF 2.0 API Docs] tf.data.experimental.Counter</bdi,11-Jun-19,TrevorRashid,Not closed,Not closed
+29651,[TF 2.0 API Docs] tf.io.write_file</bdi,11-Jun-19,muwongeemmanuel,Not closed,Not closed
+29650,[TF 2.0 API Docs] tf.data.experimental</bdi,11-Jun-19,kabahima,Not closed,Not closed
+29649,[TF 2.0 API Docs] tf.io.FixedLenSequenceFeature</bdi,11-Jun-19,Emanuz,Not closed,Not closed
+29648,[TF 2.0 API Docs]  tf.io.read_file</bdi,11-Jun-19,edison12a,Not closed,Not closed
+29647,[TF 2.0 API Docs] tf.io.write_file</bdi,11-Jun-19,muwongeemmanuel,Not closed,Not closed
+29646,[TF 2.0 API Docs] tf.io.FixedLenFeature</bdi,11-Jun-19,Emanuz,Not closed,Not closed
+29581,Inconsistency in Input Pipeline code block for test_dataset</bdi,09-Jun-19,NathanDotTo,Not closed,Not closed
+29566,The <code>Load CSV with tf.data</code> tutorial creates confusion about categorical data</bdi,08-Jun-19,00krishna,Not closed,Not closed
+29511,[TF 2.0 API Docs] tf.io.decode_image</bdi,06-Jun-19,imransalam,Not closed,Not closed
+29507,[TF 2.0 API Docs] tf.image.crop_and_resize</bdi,06-Jun-19,imransalam,Not closed,Not closed
+29469,Tensorflow Lite model accuracy page not found</bdi,06-Jun-19,VieDica,Not closed,Not closed
+29445,Feature Columns stock example fails on GPU</bdi,05-Jun-19,johnkabler,Not closed,Not closed
+29441,[TF 2.0 API Docs]tf.data.experimental.shuffle_and_repeat</bdi,05-Jun-19,pronapro,Not closed,Not closed
+29408,[TF 2.0 API Docs] tf.keras.backend.maximum</bdi,04-Jun-19,KengoWada,Not closed,Not closed
+29407,[TF 2.0 API Docs] tf.data.experimental.scan</bdi,04-Jun-19,pronapro,Not closed,Not closed
+29406,[TF 2.0 API Docs] tf.data.experimental.make_saveable_from_iterator</bdi,04-Jun-19,Rwothoromo,Not closed,Not closed
+29402,[TF 2.0 API Docs] tf.io.decode_base64</bdi,04-Jun-19,Emanuz,Not closed,Not closed
+29401,[TF 2.0 API Docs] tf.io.decode_json_example</bdi,04-Jun-19,edison12a,Not closed,Not closed
+29400,https://www.tensorflow.org/versions/api_docs/python/tf link does not exist</bdi,04-Jun-19,anestisdotpy,Not closed,Not closed
+29386,[TF 2.0 API Docs] tf.image.convert_image_dtype</bdi,04-Jun-19,imransalam,Not closed,Not closed
+29384,Missing documentation for executing TF 1.0 frozen and saved models</bdi,04-Jun-19,msektrier,Not closed,Not closed
+29358,[Doc] Broken reference link in basic text classification tutorial</bdi,03-Jun-19,ivenk,Not closed,Not closed
+29339,[TF 2.0 API Docs] tf.data.Dataset.map() example has web render issues.</bdi,02-Jun-19,netskink,Not closed,Not closed
+29338,[TF 2.0 API Docs] tf.data.Dataset and tf.data.experimental.CsvDataset list_files</bdi,02-Jun-19,netskink,Not closed,Not closed
+29337,[TF 2.0 API Docs] tf.data.Dataset</bdi,02-Jun-19,netskink,Not closed,Not closed
+29334,[TF 2.0 API Docs] tf.image.central_crop</bdi,02-Jun-19,imransalam,Not closed,Not closed
+29332,[TF 2.0 API Docs] tf.image.adjust_saturation</bdi,02-Jun-19,imransalam,Not closed,Not closed
+29330,[TF 2.0 API Docs] tf.image.adjust_jpeg_quality</bdi,02-Jun-19,imransalam,Not closed,Not closed
+29327,[TF 2.0 API Docs] tf.image.adjust_hue</bdi,02-Jun-19,imransalam,Not closed,Not closed
+29325,[TF 2.0 API Docs] tf.image.adjust_gamma</bdi,02-Jun-19,imransalam,Not closed,Not closed
+29324,[TF 2.0 API Docs] tf.data </bdi,02-Jun-19,netskink,Not closed,Not closed
+29321,[TF 2.0 API Docs] tf.image.adjust_contrast</bdi,02-Jun-19,imransalam,Not closed,Not closed
+29319,[TF 2.0 API Docs] tf.image.adjust_brightness</bdi,02-Jun-19,imransalam,Not closed,Not closed
+29317,[TF 2.0 API Docs] tf.identity_n</bdi,02-Jun-19,imransalam,Not closed,Not closed
+29315,[TF 2.0 API Docs] tf.identity</bdi,02-Jun-19,imransalam,Not closed,Not closed
+29312,android build</bdi,02-Jun-19,lihongcang,Not closed,Not closed
+29309,[TF 2.0 API Docs] tf.RegisterGradient</bdi,02-Jun-19,Myeongjoon,Not closed,Not closed
+29307,[TF 2.0 API Docs] tf.estimator.VocabInfo</bdi,02-Jun-19,eashtianjr,Not closed,Not closed
+29297,[TF 2.0 API Docs] tf.keras.layers.maximum</bdi,01-Jun-19,sam3ay,Not closed,Not closed
+29296,[TF 2.0 API Docs] tf.data.experimental.Reducer</bdi,01-Jun-19,skalagarla,Not closed,Not closed
+29294,Issue With Usage Example in tf.estimator.BaselineEstimator</bdi,01-Jun-19,MariaNazari,Not closed,Not closed
+29293,Issue With Usage Example in tf.estimator.DNNEstimator</bdi,01-Jun-19,MariaNazari,Not closed,Not closed
+29292,[TF 2.0 API Docs] tf.data.experimental.OptionalStructure</bdi,01-Jun-19,skalagarla,Not closed,Not closed
+29290,Link not working</bdi,01-Jun-19,ak-org,Not closed,Not closed
+29289,[TF 2.0 API Docs] tf.data.experimental.Optional</bdi,01-Jun-19,skalagarla,Not closed,Not closed
+29288,Issue With Usage Example in tf.estimator.BaselineEstimator</bdi,01-Jun-19,MariaNazari,Not closed,Not closed
+29285,[TF 2.0 API Docs] tf.divide</bdi,01-Jun-19,skalagarla,Not closed,Not closed
+29283,[TF 2.0 API Docs] tf.nn.convolution</bdi,01-Jun-19,MagsMagnoli,Not closed,Not closed
+29281,[TF 2.0 API Docs] tf.control_dependencies</bdi,01-Jun-19,ghchinoy,Not closed,Not closed
+29280,tf.data.Options</bdi,01-Jun-19,hendercine,Not closed,Not closed
+29279,[TF 2.0 API Docs] tf.histogram_fixed_width_bins</bdi,01-Jun-19,imransalam,Not closed,Not closed
+29277,[TF 2.0 API Docs] tf.nn.dropout</bdi,01-Jun-19,MagsMagnoli,Not closed,Not closed
+29276,[TF 2.0 API Docs] tf.histogram_fixed_width</bdi,01-Jun-19,imransalam,Not closed,Not closed
+29275,[TF_2.0_API_docs] tf.custom_gradient</bdi,01-Jun-19,hendercine,Not closed,Not closed
+29274,[TF 2.0 API Docs] tf.VariableSynchronization</bdi,01-Jun-19,skalagarla,Not closed,Not closed
+29273,[TF 2.0 API Docs] tf.keras.metrics</bdi,01-Jun-19,HenrySiau,Not closed,Not closed
+29271,[TF 2.0 API Docs] tf.hessians</bdi,01-Jun-19,imransalam,Not closed,Not closed
+29270,tf.autograph.experimental.Feature</bdi,01-Jun-19,hendercine,Not closed,Not closed
+29269,[TF 2.0 API Docs] tf.nn.l2_loss</bdi,01-Jun-19,MagsMagnoli,Not closed,Not closed
+29267,[TF 2.0 API Docs] tf.guarantee_const</bdi,01-Jun-19,imransalam,Not closed,Not closed
+29264,[TF 2.0 API Docs] tf.clip_by_norm</bdi,01-Jun-19,noahhkim,Not closed,Not closed
+29262,[TF 2.0 API Docs] tf.group</bdi,01-Jun-19,imransalam,Not closed,Not closed
+29261,[TF 2.0 API Docs] tf.VariableAggregation</bdi,01-Jun-19,noahhkim,Not closed,Not closed
+29260,[TF 2.0 API Docs] tf.greater_equal</bdi,01-Jun-19,imransalam,Not closed,Not closed
+29257,[TF 2.0 API Docs] tf.greater</bdi,01-Jun-19,imransalam,Not closed,Not closed
+29256,change 'py_func' to 'py_function' in https://www.tensorflow.org/beta/guide/data#applying_arbitrary_python_logic</bdi,01-Jun-19,NickleDave,Not closed,Not closed
+29254,[TF 2.0 API Docs] tf.autograph.to_code</bdi,01-Jun-19,ghchinoy,Not closed,Not closed
+29250,[TF 2.0 API Docs] tf.autograph.set_verbosity</bdi,01-Jun-19,ghchinoy,Not closed,Not closed
+29247,[TF 2.0 API Docs] tf.keras.layers.LSTM</bdi,01-Jun-19,YongJieYongJie,Not closed,Not closed
+29245,[TF 2.0 API Docs] tf.image.transpose</bdi,01-Jun-19,Aqsa-K,Not closed,Not closed
+29244,[TF 2.0 API Docs] tf.io.extract_jpeg_shape</bdi,01-Jun-19,Aqsa-K,Not closed,Not closed
+29243,[TF 2.0 API Docs] tf.image.rot90</bdi,01-Jun-19,Aqsa-K,Not closed,Not closed
+29242,[TF 2.0 API Docs] tf.math.maximum / tf.maximum</bdi,01-Jun-19,whatevergeek,Not closed,Not closed
+29241,[TF 1.14 API Docs] tf.train.experimental.enable_mixed_precision_graph_rewrite</bdi,01-Jun-19,tlkh,Not closed,Not closed
+29237,[TF 2.0 API Docs] tf.complex</bdi,01-Jun-19,merturl,Not closed,Not closed
+29230,Wrong color documented in explanation TensorFlow Lite Android</bdi,31-May-19,darrencapner,Not closed,Not closed
+29212,[TF 2.0 API Docs] tf.queue.FIFOQueue</bdi,31-May-19,HardPlant,Not closed,Not closed
+29210,[TF 2.0 API Docs] tf.dtypes.cast</bdi,31-May-19,kooock,Not closed,Not closed
+29209,[TF 2.0 API Docs] tf.keras.layers.Conv2D</bdi,31-May-19,curieuxjy,Not closed,Not closed
+29160,"[TF 2.0 API Docs] Some Defied in"" links are broken</bdi""",30-May-19,vvsotnikov,Not closed,Not closed
+29092,There have no tensorflow/contrib/tpu/ops module in b211c7a commit</bdi,28-May-19,trialzuki,Not closed,Not closed
+29088,TF 2.0 Beta: custom metric example from documentation is wrong</bdi,28-May-19,thisismygitrepo,Not closed,Not closed
+29064,"What does GradientTape.gradient(target, ...) when target is a list of tensors and not a single tensor ?</bdi",27-May-19,durandg12,Not closed,Not closed
+29056,TFLite GPU delegate model inconsistencies: Mobilenet v1 1.0</bdi,27-May-19,hoonkai,Not closed,Not closed
+28944,Link for migrating from deprecated DNNLinearCombinedRegressor is broken</bdi,22-May-19,teddyward,Not closed,Not closed
+28939,TypeError in RNNs tutorial</bdi,22-May-19,ckeshava,Not closed,Not closed
+28843,TF2.0 DocSprint Prep - Error with Dataset Example</bdi,19-May-19,netskink,Not closed,Not closed
+28823,"[TF 2.0 alpha] Tutorial Using TFRecords and tf.Example"" can't run on tensorflow2.0 α0 gpu</bdi""",18-May-19,Windaway,Not closed,Not closed
+28762,[tensorflow/docs]Translate variables.md from English to Chinese.</bdi,16-May-19,Mr-Nineteen,Not closed,Not closed
+28706,Keep version fixed when searching API docs</bdi,14-May-19,ianhellstrom,Not closed,Not closed
+28701,Possible wrong comments in minimax_discriminator_loss</bdi,14-May-19,bainjamain,Not closed,Not closed
+28691,Error installing tf-nightly-2.0-preview with pip</bdi,14-May-19,wxdao,Not closed,Not closed
+28680,"[TF 2.0 API Docs] tf  - typo, extra symbols in pip install doc copy code</bdi",13-May-19,ghchinoy,Not closed,Not closed
+28596,Keras code in colab from tensorflow.org is not showing tensorflow version details</bdi,10-May-19,muddham,Not closed,Not closed
+28519,Bug in Keras Guide</bdi,08-May-19,pouannes,Not closed,Not closed
+28445,Load Images</bdi,06-May-19,iqbalhabibie,Not closed,Not closed
+28403,dataset in tf2.0 lack of key properties and methods which already in tf1.13</bdi,05-May-19,gandalflee,Not closed,Not closed
+28331,Broken link in Doc [ api_docs/python/tf/test ]</bdi,02-May-19,ramithuh,Not closed,Not closed
+28314,[TF 2.0 API Docs] tf.image.extract_image_patches</bdi,01-May-19,hendercine,Not closed,Not closed
+28271,make test_micro_speech looping </bdi,29-Apr-19,RobotEdh,Not closed,Not closed
+28266,AttributeError: module 'tensorboard.summary._tf.summary' has no attribute 'summary_scope'</bdi,29-Apr-19,Ormagardskvaedi,Not closed,Not closed
+28248,[TF 2.0] Using tf.py_function which has tf.string type input in dataset.map() generates dtype warning.</bdi,29-Apr-19,KichangKim,Not closed,Not closed
+28238,[TF 2.0 API Docs] tf.audio.encode_wav</bdi,28-Apr-19,missaugustina,Not closed,Not closed
+28237,[TF 2.0 API Docs] tf.audio.decode_wav</bdi,28-Apr-19,missaugustina,Not closed,Not closed
+28236,[TF 2.0 API Docs] tf.audio</bdi,28-Apr-19,missaugustina,Not closed,Not closed
+28232,Warning recommends using unexisting tf.keras.layers.CuDNNLSTM layer</bdi,28-Apr-19,Jsevillamol,Not closed,Not closed
+28169,Link to Images guide broken</bdi,26-Apr-19,SoloSynth1,Not closed,Not closed
+28076,deprecation warning in confusion_matrix.py </bdi,23-Apr-19,mayankmetha,Not closed,Not closed
+28054,misalignment in BahdanauAttention documentation</bdi,22-Apr-19,vishalsubbiah,Not closed,Not closed
+28028,[TF2.0] Custom training loop for keras example should provide information about tf.keras.backend.set_learning_phase()</bdi,22-Apr-19,KichangKim,Not closed,Not closed
+27954,Tensorflow 2.0 has missing features related to checkpointing Dataset</bdi,18-Apr-19,KichangKim,Not closed,Not closed
+27929,tf-2.0: AttributeError: module 'tensorflow' has no attribute 'optimizers'</bdi,17-Apr-19,LGTrader,Not closed,Not closed
+27831,"Add built-in helper functions for _bytes_feature, _float_feature and _int64_feature from Using TFRecords and tf.Example"" page</bdi""",14-Apr-19,terryspitz,Not closed,Not closed
+27709,Link to the definiton tf.image broken</bdi,10-Apr-19,surgan12,Not closed,Not closed
+27657,[TF 2.0 API Docs] tf.keras.activations.selu</bdi,08-Apr-19,8bitmp3,Not closed,Not closed
+27652,[TF 2.0 API Docs] tf.keras.activations.elu</bdi,08-Apr-19,8bitmp3,Not closed,Not closed
+27633,[doc/keras] incorrect comment in <code>__init__</code> of <code>tf.keras.layers.AveragePooling1D</code></bdi,08-Apr-19,csukuangfj,Not closed,Not closed
+27632,[doc/keras] incorrect comment in the example for <code>tf.keras.layers.Add</code></bdi,08-Apr-19,csukuangfj,Not closed,Not closed
+27631,[doc/keras] <code>predict</code> of <code>tf.keras.models.Sequential</code> is rendered incorrectly</bdi,08-Apr-19,csukuangfj,Not closed,Not closed
+27627,[doc/keras] <code>__init__</code> of <code>tf.keras.losses.BinaryCrossentropy</code> is not rendered correctly</bdi,08-Apr-19,csukuangfj,Not closed,Not closed
+27583,"Doc keras/Model for predict"" function the list of argument is not display properly (fullblock instead of list)</bdi""",06-Apr-19,tarrade,Not closed,Not closed
+27499,"optimizer_v2.apply_gradients() - surprising behavior, not explicitly documented</bdi",04-Apr-19,ikamensh,Not closed,Not closed
+27478,tf.print the example doesn't work with TF 2.0</bdi,03-Apr-19,hksonngan,Not closed,Not closed
+27465,[DOC 1.x] save_keras_model requires eager mode</bdi,03-Apr-19,slapersonne,Not closed,Not closed
+27463,[TF 2.0 API Docs] tf.keras.Sequential</bdi,03-Apr-19,8bitmp3,Not closed,Not closed
+27461,[TF 2.0 API Docs] tf.keras.Model</bdi,03-Apr-19,8bitmp3,Not closed,Not closed
+27435,AttributeError: module 'tensorflow' has no attribute 'enable_eager_execution' in Verify installation</bdi,02-Apr-19,timoveldt,Not closed,Not closed
+27390,Reading a tensor from file in python which was saved using C++</bdi,01-Apr-19,dibya-pati,Not closed,Not closed
+27355,Dataset c++ extend documentation is outdated for tf 2.0 &amp; DatasetV2</bdi,01-Apr-19,vrince,Not closed,Not closed
+27351,Broken link https://www.tensorflow.org/api_docs/python/tf/keras/preprocessing</bdi,31-Mar-19,miguelusque,Not closed,Not closed
+27304,FileNotFoundError while running %tensorboard</bdi,29-Mar-19,tritemio,Not closed,Not closed
+27269,[doc] broken link in tf.logging</bdi,29-Mar-19,csukuangfj,Not closed,Not closed
+27247,Feedback limitation in a documentation web page </bdi,28-Mar-19,simsim314,Not closed,Not closed
+27186,Wrong function referenced in doc</bdi,27-Mar-19,virgilttr,Not closed,Not closed
+27181,"[TF 2.0 alpha] Tutorial Using TFRecords and tf.Example"" can't run on GPU</bdi""",27-Mar-19,Khoa-NT,Not closed,Not closed
+27166,[TF 2.0 API Docs] tf.bitcast and tf.bitwise.*</bdi,26-Mar-19,hksonngan,Not closed,Not closed
+27054,tensorflow 2.0 transfer_learning tutorial: tensorflow_datasets error on local jupyter notebook Anaconda Win10</bdi,23-Mar-19,Khoa-NT,Not closed,Not closed
+27030,'tensorflow/core/framework/numeric_types.h' file not found</bdi,22-Mar-19,laiqb,Not closed,Not closed
+27029,Make documentation link to C++ code</bdi,22-Mar-19,ageron,Not closed,Not closed
+27005,[TF 2.0] Documentation still mentions _ref types</bdi,21-Mar-19,sklan,Not closed,Not closed
+26984,"[TF 2.0 API Docs] tf.math modules, new endpoints, gen_math_ops.py</bdi",21-Mar-19,8bitmp3,Not closed,Not closed
+26976,[TF 2.0 API Docs] tf.transpose</bdi,21-Mar-19,8bitmp3,Not closed,Not closed
+26789,[TF2.0] Optimizer for Linear models</bdi,16-Mar-19,siinn,Not closed,Not closed
+26783,tf.Tensor documentation in TF2</bdi,16-Mar-19,galeone,Not closed,Not closed
+26781,Confusing documentation for  to tf.Graph in Tensorflow 2</bdi,16-Mar-19,canyon289,Not closed,Not closed
+26735,[2.0] tf.numpy_function logs deprecation warning</bdi,15-Mar-19,guillaumekln,Not closed,Not closed
+26662,"tf.logging does not exist in tf 2.0, yet is used in example</bdi",13-Mar-19,serv-inc,Not closed,Not closed
+26651,resize_image_with_pad is not available as described in documentation</bdi,13-Mar-19,meyerjo,Not closed,Not closed
+26645,Testing guide page not exist (404)</bdi,13-Mar-19,Jasonnor,Not closed,Not closed
+26611,pix2pix_eager.ipynb error: NotImplementedError: exceptions are not yet supported</bdi,12-Mar-19,Khoa-NT,Not closed,Not closed
+26579,[1.13] Incomplete information in the warning message on using tf.contrib.predictor</bdi,11-Mar-19,suyash,Not closed,Not closed
+26577,"Accuracy Metric automatically selected, fails in certain cases</bdi",11-Mar-19,diego898,Not closed,Not closed
+26546,ModuleNotFoundError: No module named 'tensorflow.compat.v2'</bdi,10-Mar-19,cpoptic,Not closed,Not closed
+26539,[TF 2.0 API Docs] tf.zeros_like</bdi,10-Mar-19,mandroid6,Not closed,Not closed
+26538,[TF 2.0 API Docs] tf.zeros_initializer</bdi,10-Mar-19,mandroid6,Not closed,Not closed
+26537,[TF 2.0 API Docs] tf.zeros</bdi,10-Mar-19,mandroid6,Not closed,Not closed
+26535,[TF 2.0 API Docs] tf.unique</bdi,10-Mar-19,mandroid6,Not closed,Not closed
+26534,[TF 2.0 API Docs] tf.unstack</bdi,10-Mar-19,mandroid6,Not closed,Not closed
+26533,[TF 2.0 API Docs] tf.argsort</bdi,10-Mar-19,mandroid6,Not closed,Not closed
+26532,[TF 2.0 API Docs] tf.math.argmin</bdi,10-Mar-19,mandroid6,Not closed,Not closed
+26530,[TF 2.0 API Docs] tf.math.argmax</bdi,10-Mar-19,mandroid6,Not closed,Not closed
+26492,[TF 2.0 API Docs] tf.math.atan and tf.math.asin</bdi,08-Mar-19,Sudeepam97,Not closed,Not closed
+26464,segment erro:tensorflow/tensorflow/examples/label_image/main.cc</bdi,08-Mar-19,allendred,Not closed,Not closed
+26417,Missing warning or documentation for upcast in sparse_softmax_cross_entropy_with_logits?</bdi,07-Mar-19,anshulsamar,Not closed,Not closed
+26372,[TF 2.0 API Docs] tf.keras.activations.softmax</bdi,05-Mar-19,BlackHoundNate,Not closed,Not closed
+26360,extend_with_weight_decay function doesn't exist? </bdi,05-Mar-19,miktoki,Not closed,Not closed
+26333,GPU Support build instructions suggest old Docker image</bdi,04-Mar-19,LGTrader,Not closed,Not closed
+26306,tf.python no longer available in 1.13.1?</bdi,04-Mar-19,greaber,Not closed,Not closed
+26284,Rename tf.nn.batch_normalization</bdi,02-Mar-19,Smokrow,Not closed,Not closed
+26278,tf.image.crop_and_resize() - weird alignment behavior?</bdi,02-Mar-19,ppwwyyxx,Not closed,Not closed
+26270,[TF 2.0 API Docs] tf.custom_gradient</bdi,01-Mar-19,tsbertalan,Not closed,Not closed
+26211,[TF 2.0 API Docs] tf.keras.activations.relu </bdi,28-Feb-19,BlackHoundNate,Not closed,Not closed
+26197,[TF 2.0 API Docs] tf.keras</bdi,28-Feb-19,margaretmz,Not closed,Not closed
+26146,Tensorflow 1.13 - can't deprecate tf.layers.batch_normalization.  No existing replacement</bdi,26-Feb-19,jtressle,Not closed,Not closed
+26145,Tensorflow 1.13 - can't deprecate tf.layers.conv2d - no existing replacement</bdi,26-Feb-19,jtressle,Not closed,Not closed
+26047,Switching between TF 1.x and TF 2.0 in the API browser loses the context</bdi,24-Feb-19,ageron,Not closed,Not closed
+26012,[TF 2.0] tf.keras.losses duplication?</bdi,22-Feb-19,danaugrs,Not closed,Not closed
+25988,[TF 2.0 API Docs] tf.keras.applications.MobileNetV2</bdi,21-Feb-19,JTunis,Not closed,Not closed
+25973,[TF 2.0 API Docs] tf.keras.losses.poisson</bdi,21-Feb-19,dunxen,Not closed,Not closed
+25959,[TF 2.0 API Docs] tf.image.non_max_suppression</bdi,21-Feb-19,RajeshThallam,Not closed,Not closed
+25846,[TF 2.0 API Docs] tf.math.add</bdi,18-Feb-19,josephhaaga,Not closed,Not closed
+25844,[TF 2.0 API Docs] tf.lite.TFLiteConverter</bdi,18-Feb-19,margaretmz,Not closed,Not closed
+25828,[TF 2.0 API Docs] tf.keras.activations.serialize</bdi,18-Feb-19,rohanmeh,Not closed,Not closed
+25827,[TF 2.0 API Docs] tf.keras.activations.tanh</bdi,18-Feb-19,rohanmeh,Not closed,Not closed
+25826,[TF 2.0 API Docs] tf.compat.path_to_str</bdi,18-Feb-19,rohanmeh,Not closed,Not closed
+25820,[TF 2.0 API Docs] tf.math.add_n</bdi,17-Feb-19,osanseviero,Not closed,Not closed
+25802,[TF 2.0 API Docs] tf.math.acos</bdi,17-Feb-19,dynamicwebpaige,Not closed,Not closed
+25794,[TF 2.0 API Docs] tf.AggregationMethod</bdi,16-Feb-19,dynamicwebpaige,Not closed,Not closed
+25691,Missing mathematical definitions of tf.norm</bdi,12-Feb-19,ziofil,Not closed,Not closed
+25636,1.13.0rc1 requires numpy &gt;=1.16.0 instead of &gt;=1.13.3 stated in setup.py in r1.13 branch???</bdi,09-Feb-19,henrysky,Not closed,Not closed
+25611,Docker images with tags <code>1.13.0rc0</code> and <code>1.13.0rc0-py3</code> contains wrong version of TensorFlow</bdi,08-Feb-19,dmitrievanthony,Not closed,Not closed
+25587,Could you please include small examples with the functions embedded in real code with the documentation?</bdi,07-Feb-19,shyamalschandra,Not closed,Not closed
+25564,tf.keras.initializers.glorot_normal is not consistent with its documentation</bdi,07-Feb-19,SungchulLee,Not closed,Not closed
+25393,"reuse"" argument in tf.layers.Dense documentation should be renamed to ""_reuse""</bdi""",31-Jan-19,HanGuo97,Not closed,Not closed
+25387,TF 2.0 Documents how BatchNormalization update is handle in TF 2.0</bdi,31-Jan-19,jrabary,Not closed,Not closed
+25320,tf.data.Dataset error in documentation</bdi,30-Jan-19,mquillot,Not closed,Not closed
+25306,[Docs] Do not link to symbols within code blocks</bdi,30-Jan-19,RicCu,Not closed,Not closed
+25100,xavier_initializer documentations claims use of normal distribution but truncated normal is actually being used</bdi,22-Jan-19,nowozin,Not closed,Not closed
+24998,TPUEstimatorSpec supports hooks or not?</bdi,17-Jan-19,patzm,Not closed,Not closed
+24987,Running in google colab and got the errror:  'tensorflow.python.framework.ops.EagerTensor' has no len()</bdi,17-Jan-19,Gabriel-Azevedo-Ferreira,Not closed,Not closed
+24818,eigvalsh documentation error</bdi,10-Jan-19,proteneer,Not closed,Not closed
+24795,Recurrent batch normalization : While_loop and control_depenecies bug</bdi,09-Jan-19,AzizCode92,Not closed,Not closed
+24726,PolymorphicFunction.get_concrete_function() creates a different concrete function for each python scalar value</bdi,06-Jan-19,ageron,Not closed,Not closed
+24690,tf.keras.backend.batch_normalization documentation equation does not match implementation</bdi,03-Jan-19,chrisdahlberg,Not closed,Not closed
+24653,tf.log() is missing although it is still used in many code examples</bdi,01-Jan-19,ageron,Not closed,Not closed
+24426,where  'tf.image.resize_bilinear' is defined ?</bdi,18-Dec-18,hufangjian,Not closed,Not closed
+24203,Markdown formatting issue in tf.keras.layers.Layer docs</bdi,06-Dec-18,colinmorris,Not closed,Not closed
+23923,Inconsistant naming in Estimator documentation</bdi,22-Nov-18,jltchiu,Not closed,Not closed
+23891,Can we have working example with assets in the documentation for the simple_save?</bdi,20-Nov-18,jltchiu,Not closed,Not closed
+23876,How to use tf.contrib.periodic_resample</bdi,20-Nov-18,MatthiasKohl,Not closed,Not closed
+23798,Docs Needed</bdi,16-Nov-18,SumNeuron,Not closed,Not closed
+23667,Incorrect cuda9.0 package installation required. Should be cuda-9-0</bdi,12-Nov-18,palisadoes,Not closed,Not closed
+23664,Documents for MirroredStrategy</bdi,11-Nov-18,sfujiwara,Not closed,Not closed
+23443,Python client link is broken</bdi,01-Nov-18,litlig,Not closed,Not closed
+23307,Missing Documentation: Multiple links return 404 in Python API Guide</bdi,27-Oct-18,alexaorrico,Not closed,Not closed
+23261,Newer TF post-install python test does not expose CUDA/cuDNN driver problems</bdi,25-Oct-18,pawarrick,Not closed,Not closed
+23212,Ambiguity with tf.nn.embedding_lookup_sparse</bdi,24-Oct-18,brochier,Not closed,Not closed
+23083,Documentation for learning_rate_power in the FTRL optimizer</bdi,18-Oct-18,zachmayer,Not closed,Not closed
+23017,tf.estimator.train's incompatibility with distributed training on Cloud ML Engine is not well-documented</bdi,16-Oct-18,logicchains,Not closed,Not closed
+22763,AdamWOptimizer and learning rate decay</bdi,05-Oct-18,benleetownsend,Not closed,Not closed
+22673,Toco outdated in docker build</bdi,02-Oct-18,redbeard-the-coder,Not closed,Not closed
+22595,is it tensorflow example bug ?</bdi,28-Sep-18,Q82822,Not closed,Not closed
+22554,Adding custom op instructions lacking the GPU building instructions</bdi,27-Sep-18,panfengli,Not closed,Not closed
+22438,InvalidArgumentError when SparseTensorValue is not ordered by row then col</bdi,21-Sep-18,jilljenn,Not closed,Not closed
+22250,"Documentation: Creating Custom Estimators"" says that it uses same train_input_fn as ""pre-made Estimator implementation""",13-Sep-18,Efaq,Not closed,Not closed
+22249,Inconsistency in supported integer types on GPU</bdi,13-Sep-18,maharjun,Not closed,Not closed
+21907,Update Docker description to state CPU requirements</bdi,27-Aug-18,dpotter-intoto,Not closed,Not closed
+21820,Dataset.padded_batch doc improvement request</bdi,23-Aug-18,harahu,Not closed,Not closed
+21796,"int() argument must be a string, a bytes-like object or a number at InceptionResNetV2</bdi",22-Aug-18,Q82822,Not closed,Not closed
+21333,the grappler module is not accessible?</bdi,02-Aug-18,chrisbyd,Not closed,Not closed
+21070,Documentation request: tf.contrib.data.AUTOTUNE</bdi,23-Jul-18,sibyjackgrove,Not closed,Not closed
+20788,Issue with <code>natural_exp_decay</code> documentation</bdi,13-Jul-18,fredtcaroli,Not closed,Not closed
+20506,Pop from empty context_switches when take outputs of one estimator.predict as inputs of another</bdi,03-Jul-18,miacro,Not closed,Not closed
+20425,"Documentation Suggestion: mention and clarification of <code>tf.contrib.data.prefetch_to_device()</code> in Input Pipeline Performance Guide""</bdi""",29-Jun-18,mtpadilla,Not closed,Not closed
+19696,Save training using Tensorflow C++ with VS2015</bdi,01-Jun-18,Pessanha24,Not closed,Not closed
+19530,transforms_graph error when remove_nodes(op=Identity,24-May-18,HwMohanLiu,Not closed,Not closed
+19298,java/sbt. Cannot register 2 metrics with the same name on cross tests</bdi,15-May-18,ravwojdyla,Not closed,Not closed
+19296,tf.gfile.Open has different semantics from open</bdi,15-May-18,superbobry,Not closed,Not closed
+19043,Code documetnantion. Probably misprint in function parameter description.</bdi,03-May-18,nikitaverbis,Not closed,Not closed
+18660,Bug: tf.keras.estimator.model_to_estimator() API giving error when Keras model contains Lambda layer.</bdi,18-Apr-18,sibyjackgrove,Not closed,Not closed
+18443,"In Matmul, is FP16 x FP16 accumulated to FP16 or FP32?</bdi",12-Apr-18,jiazhe0909,Not closed,Not closed
+18214,Documentation missing for tensorrt in Python API</bdi,03-Apr-18,sibyjackgrove,Not closed,Not closed
+18211,freeze_graph.py generates error messages when run on sample model (census / wide_deep)</bdi,03-Apr-18,kjancke,Not closed,Not closed
+18185,Building Graphs documentation</bdi,02-Apr-18,redwrasse,Not closed,Not closed
+17949,incorrect description of num_sampled parameter in tf.nn.nce_loss() function: num_sampled is number of negative examples per 1 positive example (NOT per batch)</bdi,23-Mar-18,denkuzin,Not closed,Not closed
+17925,MaskedAutoregressiveFlow example (tf.contrib.distributions) raises ValueError</bdi,22-Mar-18,mrosenkranz,Not closed,Not closed
+17839,Beam search terminology</bdi,19-Mar-18,MattShannon,Not closed,Not closed
+17762,UnimplementedError: Broadcast between &lt;Tensor&gt; and &lt;Tensor&gt; is not supported yet.</bdi,16-Mar-18,aforslow,Not closed,Not closed
+17663,tf.matrix_solve_ls: Documentation corrupt?</bdi,13-Mar-18,Hoeze,Not closed,Not closed
+17614,Error command in installation guild</bdi,10-Mar-18,GingoBang,Not closed,Not closed
+17389,Documentation links for version 1.5 silently redirect to 1.6</bdi,02-Mar-18,recol3,Not closed,Not closed
+17362,Missing documentation for tf.train.Saver </bdi,01-Mar-18,dreamflasher,Not closed,Not closed
+17351,Examples and tutorial missing from pip tensorflow package</bdi,01-Mar-18,spiiph,Not closed,Not closed
+16950,"Windows Installation tutorial has wrong cuDNN version requirement, 7 required for latest version.</bdi",12-Feb-18,nikitaverbis,Not closed,Not closed
+16948,tf.QueueBase.dequeue_many returns list instead of tuple</bdi,12-Feb-18,msmsajjadi,Not closed,Not closed
+16791,Tensorflow 1.5.0 Import Error on CUDA 9.0</bdi,06-Feb-18,ziruizhuang,Not closed,Not closed
+16747,No documentation on the order of eigenvalues returned by tf.self_adjoint_eig </bdi,04-Feb-18,thjashin,Not closed,Not closed
+16464,AssignAddVariableOp has no output</bdi,26-Jan-18,is8ac,Not closed,Not closed
+16333,Computing gradients of loop variables return None</bdi,23-Jan-18,mholzel,Not closed,Not closed
+16316,Lack of clarity in tf.while_loop documentation</bdi,23-Jan-18,mholzel,Not closed,Not closed
+15978,No documentation for ConfigProto</bdi,09-Jan-18,nbro,Not closed,Not closed
+15256,Problem about tf.data.Dataset.from_sparse_tensor_slices</bdi,11-Dec-17,XeMinZa,Not closed,Not closed
+14798,Provide a list of supported XLA operations like TensorFlow Lite</bdi,22-Nov-17,carlthome,Not closed,Not closed
+14652,a document bug</bdi,17-Nov-17,nezen,Not closed,Not closed
+14455,Tensorflow cannot be installed with default Windows Python 3.5 stack</bdi,10-Nov-17,cfehr247,Not closed,Not closed
+14357,Following instructions in batch_normalization docs produces an exception</bdi,08-Nov-17,naktinis,Not closed,Not closed
+14230,Build from source documentation is incorrect</bdi,03-Nov-17,montanalow,Not closed,Not closed
+14219,"tf.layers.Network is in the documentation, but not the library</bdi",03-Nov-17,MadWombat,Not closed,Not closed
+14095,matrix_triangular_solve has broken docstring</bdi,30-Oct-17,vdutor,Not closed,Not closed
+13900,tfdbg doesn't work with tensorflow GPU version?</bdi,22-Oct-17,mingyr,Not closed,Not closed
+13885,tf.reduce_mean is not compatible with np.mean</bdi,21-Oct-17,amirj,Not closed,Not closed
+13576,sparse_softmax_cross_entropy_with_logits wrong annotation</bdi,09-Oct-17,zhuantouer,Not closed,Not closed
+13566,tf.estimator Quickstart web doc needs syncing with GitHub</bdi,08-Oct-17,Atlas7,Not closed,Not closed
+13288,Cannot put a Tensor into a StagingArea</bdi,25-Sep-17,EFanZh,Not closed,Not closed
+13281,"Non-working example in documentation, with recommendations for how to fix</bdi",24-Sep-17,ecpoppenheimer,Not closed,Not closed
+13165,Doc nicety: use * to indicate when arguments must be keywords</bdi,19-Sep-17,girving,Not closed,Not closed
+13150,Handling of * in pattern of tf.contrib.data.Dataset.list_files undocumented</bdi,19-Sep-17,GPhilo,Not closed,Not closed
+13104,Fix tf.argmax/argmin documentation</bdi,17-Sep-17,hnsl,Not closed,Not closed
+12821,Wrong error message during compiling</bdi,05-Sep-17,boared,Not closed,Not closed
+12569,missing Documentation of the method AttentionWrapper.zero_state(...)</bdi,24-Aug-17,malsulaimi,Not closed,Not closed
+12393,Anaconda installation example doesn't match the description on web site</bdi,18-Aug-17,pulzar,Not closed,Not closed
+11955,Incorrect tfBinaryURL for installing with Anaconda on Linux</bdi,02-Aug-17,orangeagles,Not closed,Not closed
+11831,No mention of how to use custom RunConfig with Estimator in the Estimator tutorial</bdi,27-Jul-17,yhu9,Not closed,Not closed
+11786,contrib.data.Dataset - doc issue with Dataset.map / tf.py_func in 1.3.0rc0</bdi,26-Jul-17,cheind,Not closed,Not closed
+11784,[docs] Windows Instructions need updating.</bdi,26-Jul-17,jubjamie,Not closed,Not closed
+11708,error in installation instructions</bdi,24-Jul-17,sameermahajan,Not closed,Not closed
+11364,Error on tf.contrib.training.stratified_sample</bdi,07-Jul-17,jrbtaylor,Not closed,Not closed
+11287,Missing definition in Getting Started With TensorFlow guide</bdi,05-Jul-17,roshangiyanani,Not closed,Not closed
+11037,installation failed with Virtualenv ERROR:The executable is not functioning tensorflow</bdi,24-Jun-17,hoysasulee,Not closed,Not closed
+11028,wrong path for retrain.py</bdi,24-Jun-17,jintgeorge,Not closed,Not closed
+10661,tf.train.Scaffold missing global_step attribute</bdi,12-Jun-17,edgimar,Not closed,Not closed
+10646,Clarify Installation Docs for Windows (32-bit)</bdi,12-Jun-17,jubjamie,Not closed,Not closed
+10398,"[Docs] arg_scope"" overrides ""defined in"" paths</bdi""",02-Jun-17,Androbin,Not closed,Not closed
+10376,Lack support of qint32 in tf.nn.tanh</bdi,01-Jun-17,yilinjuang,Not closed,Not closed
+10303,TensorflowDebugger does not dump Stack/Pack/Concat nodes</bdi,30-May-17,blake-varden,Not closed,Not closed
+10192,How to know what commands and types are supported in iOS build?</bdi,25-May-17,Koshub,Not closed,Not closed
+9968,ValueError: Refusing to perform an overparameterized separable convolution</bdi,17-May-17,singlasahil14,Not closed,Not closed
+9827,"tf.abs() isn't documented to handle complex, but it does appear to work as tf.complex_abs() used to.</bdi",11-May-17,ddurham2,Not closed,Not closed
+9786,Not a JPEG issue</bdi,09-May-17,santle,Not closed,Not closed
+9731,"More description for optimizers Adagrad, Adadelta, FTRL...</bdi",06-May-17,junwei-pan,Not closed,Not closed
+9709,Missing image in https://www.tensorflow.org/api_docs/python/tf/gather</bdi,06-May-17,jlebar,Not closed,Not closed
+9624,Is batch_norm_param argument missing in the depthwise convolution 2d layer implementation?</bdi,03-May-17,kwotsin,Not closed,Not closed
+9610,Broken link Mac/GPU/py3 whl file</bdi,03-May-17,kinergy,Not closed,Not closed
+9597,Invalid link in https://www.tensorflow.org/deploy/distributed</bdi,02-May-17,junwei-pan,Not closed,Not closed
+9566,Documentation pages are unnecessarily large</bdi,01-May-17,ppwwyyxx,Not closed,Not closed
+9528,TensorFlow processes and core engine documentations </bdi,29-Apr-17,salemmohammed,Not closed,Not closed
+9515,How do you generate tensorflow docs so you can confirm documentation fixes you make?</bdi,28-Apr-17,dmonopoly,Not closed,Not closed
+9476,iOS: No OpKernel was registered to support Op 'Less' with these attrs.  </bdi,27-Apr-17,hansonboy,Not closed,Not closed
+9467,Link Error for the deprecated/__init__.py</bdi,26-Apr-17,junwei-pan,Not closed,Not closed
+9381,Mac Gpu Link not working?</bdi,22-Apr-17,0xDaksh,Not closed,Not closed
+9314,tf.get_collection documentation: argument description is confusing</bdi,19-Apr-17,dmonopoly,Not closed,Not closed
+9313,"<code>Evaluable</code> docs: name, checkpoint_path, and hooks should be new bullets.</bdi",19-Apr-17,dmonopoly,Not closed,Not closed
+9115,Documentation link issue</bdi,10-Apr-17,dumBGuy08,Not closed,Not closed
+9092,problem with wide_n_deep_tutorial.py on Tensorflow 1.0</bdi,10-Apr-17,CBrauer,Not closed,Not closed
+9089,cpp protobuf instructions out-of-date for MacOS</bdi,09-Apr-17,yaroslavvb,Not closed,Not closed
+9074,Documentation: broken links and image in documentation</bdi,09-Apr-17,ddurham2,Not closed,Not closed
+8969,Broken link in README.md</bdi,05-Apr-17,aiqu,Not closed,Not closed
+8920,problem with exemple in API documentation for tf.contrib.distributions.bijector.ScaleAndShift</bdi,03-Apr-17,chetzacoalt,Not closed,Not closed
+8809,an update for the tf.contrib.learn Quickstart example is needed</bdi,29-Mar-17,unnir,Not closed,Not closed
+8793,python StagingArea documentation missing</bdi,29-Mar-17,sjperkins,Not closed,Not closed
+8755,tf.contrib.seq2seq.sequence_loss documentation incorrect</bdi,27-Mar-17,falcondai,Not closed,Not closed
+8753,TFDBG 'PyFunc' is not found in partition graphs.</bdi,27-Mar-17,hqqxyy,Not closed,Not closed
+8666,<code>dynamic_rnn</code>'s docstring refers to a non-existing <code>rnn</code> function</bdi,23-Mar-17,tgy,Not closed,Not closed
+8556,Tenor flow distributed support for spectrum lsf </bdi,20-Mar-17,jsimpson2,Not closed,Not closed
+8364,Documentation formatting broken</bdi,13-Mar-17,BlackHC,Not closed,Not closed
+8349,/tutorials/using_gpu doc (possibly other) should use print() since Windows needs Python 3.x</bdi,13-Mar-17,danbri,Not closed,Not closed
+8306,tf.contrib.distributions.Multinomial initialization problem</bdi,11-Mar-17,yc14600,Not closed,Not closed
+8207,"Operation Documentation has  within it</bdi""",08-Mar-17,aodhan-domhnaill,Not closed,Not closed
+8064,Missing images in docs</bdi,03-Mar-17,christopherhesse,Not closed,Not closed
+8029,Multiple broken g3doc links</bdi,02-Mar-17,clarkzinzow,Not closed,Not closed
+7938,Add Python Graph Transform examples</bdi,28-Feb-17,cancan101,Not closed,Not closed
+7869,Test issue</bdi,25-Feb-17,aselle,Not closed,Not closed
+7836,Breaking changes to API</bdi,24-Feb-17,sachinruk,Not closed,Not closed
+7757,Broken link to doc in extras.</bdi,22-Feb-17,BaiGang,Not closed,Not closed
+7735,API Documentation with Links to Source Code</bdi,21-Feb-17,jonasrauber,Not closed,Not closed
+7685,"Image problems in Tensorflow documentation at tensorflow.org, Error 404</bdi",20-Feb-17,qinglintian,Not closed,Not closed
+7675,Error message could be improved</bdi,19-Feb-17,rpryzant,Not closed,Not closed
+7443,Add Continuous Integration + Review Requirements to CONTRIBUTING.md</bdi,11-Feb-17,ahundt,Not closed,Not closed
+7404,No attribute 'outer_context' when calculating gradient from imported graph</bdi,10-Feb-17,malmaud,Not closed,Not closed
+7392,docs: Broken link/missing py file in Model Files guide</bdi,09-Feb-17,yufengg,Not closed,Not closed
+7378,Seg fault when using tf session with opencv 3</bdi,09-Feb-17,mkabra,Not closed,Not closed
+7344,Documentation for tf.contrib.layers.stack replaced by documentation for tf.stack</bdi,07-Feb-17,william-r-s,Not closed,Not closed
+7300,"API documentation Core graph data structures""</bdi""",06-Feb-17,PierreAndreNoel,Not closed,Not closed
+7077,TensorBoard ImportError: No module named werkzeug</bdi,25-Jan-17,Mazecreator,Not closed,Not closed
+7058,what's the difference betwee tf.nn.seq2seq and tf.python.ops.seq2seq?</bdi,25-Jan-17,coder3344,Not closed,Not closed
+7049,NotFoundError: /tf_files/retrained_graph.pb</bdi,24-Jan-17,gitgreencoder,Not closed,Not closed
+6812,python documentation for tensorflow.abs out of sync</bdi,12-Jan-17,drewm1980,Not closed,Not closed
+6804,Defun broken: errors_impl.NotFoundError: Op type not registered</bdi,12-Jan-17,albertz,Not closed,Not closed
+6700,tensorflow docs have sigmoid_cross_entropy_with_logits args flipped</bdi,06-Jan-17,ghost,Not closed,Not closed
+6622,Minor doc issue - Param order in nce_loss in word2vec tutorial</bdi,04-Jan-17,BaiGang,Not closed,Not closed
+6495,Docker doesn't support GPU for mac OS (doc clarification request)</bdi,26-Dec-16,eraoul,Not closed,Not closed
+6426,Outdated documentation of Assert op</bdi,20-Dec-16,rizar,Not closed,Not closed
+6232,Format Error on the Website</bdi,10-Dec-16,ZijiaLewisLu,Not closed,Not closed
+6202,Inconsistent API for ones_initializer/zeros_initializer</bdi,09-Dec-16,yaroslavvb,Not closed,Not closed
+6068,RNN Tutorial Code cant find sample data</bdi,04-Dec-16,sshleifer,Not closed,Not closed
+5987,"Request for documentation on recommended flow in slim for train, validation, and test sets</bdi",30-Nov-16,kmalakoff,Not closed,Not closed
+5771,"tf.with_dependencies isn't exposed, but it is used in documentations</bdi",22-Nov-16,bc-lee,Not closed,Not closed
+5769,Misformatted documentation after constant_initializer</bdi,22-Nov-16,WuTheFWasThat,Not closed,Not closed
+5696,API pages could use some search optimization</bdi,18-Nov-16,shirriff,Not closed,Not closed
+5673,Possible typo in docstring of embedding_rnn_seq2seq and embedding_attention_seq2seq?</bdi,17-Nov-16,shuvrobiswas,Not closed,Not closed
+5669,Small typo in documentation</bdi,17-Nov-16,hholst80,Not closed,Not closed
+5667,Documentation shows None default instead of actual op attr default</bdi,17-Nov-16,Antonio95,Not closed,Not closed
+5627,Documentation change for 'Adding a new op ShapeFn'</bdi,15-Nov-16,gibiansky,Not closed,Not closed
+5609,Add documentation on how to use bucketing functions</bdi,15-Nov-16,sonalgupta,Not closed,Not closed
+5539,"Sticky  No OpKernel was registered to support Op 'Conv2D' with these attrs.""</bdi""",11-Nov-16,ssegvic,Not closed,Not closed
+5381,Documentation For The New Version of Histogram on TensorBoard</bdi,03-Nov-16,TaihuaLi,Not closed,Not closed
+5284,"tf.contrib.learn output shapes : shapes (?, 1) and (?,) are incompatible</bdi",30-Oct-16,yihong-chen,Not closed,Not closed
+4923,"Tutorial on contrib (load_csv) no longer works, please suggest solution</bdi",12-Oct-16,chivalry123,Not closed,Not closed
+4849,"Method docs contain unclosed verbatim, which causes exceeding verbatim block in HTML docs</bdi",09-Oct-16,foxik,Not closed,Not closed
+4821,Request for documentation: quantize_training in python</bdi,07-Oct-16,xiaoyunwu,Not closed,Not closed
+4749,Minor instruction issue in functional_ops.py/scan</bdi,04-Oct-16,yhg0112,Not closed,Not closed
+4738,Feature Request: Include function argument defaults in the documentation</bdi,03-Oct-16,markpwoodward,Not closed,Not closed
+4444,Code snippet in the TensorFlow for Poets codelab is confusing</bdi,18-Sep-16,mrry,Not closed,Not closed
+4128,Docs for Inception Model</bdi,31-Aug-16,Hvass-Labs,Not closed,Not closed
+4120,"Document How to adding new customized file system""</bdi""",31-Aug-16,llhe,Not closed,Not closed
+3967,Document checkpoint file format</bdi,22-Aug-16,malmaud,Not closed,Not closed
+3657,"0.10.0rc0: Contrib distributions crash when sampling n"" is scalar</bdi""",05-Aug-16,jlowin,Not closed,Not closed
+3629,"Problems in Implement the gradient in Python"" docs</bdi""",03-Aug-16,harpone,Not closed,Not closed
+3622,Missing doc: tf.contrib.layers.embedding_column</bdi,03-Aug-16,PeterisP,Not closed,Not closed
+2939,Unable to download nightly binaries</bdi,17-Jun-16,ppwwyyxx,Not closed,Not closed
+2573,avg/max_pool3d description has a bug.</bdi,29-May-16,ruihou,Not closed,Not closed
+2554,Virtualenv installation failure</bdi,28-May-16,yayosh,Not closed,Not closed
+2547,"Confusing embedding_lookup docstring, incorrect use of the word partition""</bdi""",28-May-16,kuprel,Not closed,Not closed
+1169,"Broken link in A Tool Developer's Guide..."" for graph_metrics.py</bdi""",18-Feb-16,HamedMP,Not closed,Not closed
+721,Tensorflow API doc image is wrong for tf.scatter_*</bdi,07-Jan-16,fpmchu,Not closed,Not closed
+618,Strongly suggest to improve Tensorflow API document by adding examples</bdi,25-Dec-15,NianzuMa,Not closed,Not closed
+617,Docs for tf.device should point to tf.Graph.device</bdi,25-Dec-15,alquraishi,Not closed,Not closed
+615,please share a total example from training in python and prediction in C++.</bdi,25-Dec-15,leftstone2015,Not closed,Not closed
+362,Some wrong code in get_started document</bdi,26-Nov-15,FangLinHe,Not closed,Not closed
+222,Error in api_docs/images/Gather.png </bdi,14-Nov-15,ry,Not closed,Not closed
+196,Padding type definition is swapped in the documentation.</bdi,13-Nov-15,cesarsalgado,Not closed,Not closed
+186,No documentation for Saver class</bdi,12-Nov-15,cemkod,Not closed,Not closed
+151,Typo in reshape documentation</bdi,11-Nov-15,EigenFace,Not closed,Not closed
+7,API docs does not list RNNs</bdi,09-Nov-15,AvantiShri,Not closed,Not closed

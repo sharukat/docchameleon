@@ -4,7 +4,7 @@ from lib.common import GraphState
 from langgraph.graph import StateGraph
 
 
-def construct_graph(debug=False):
+def construct_graph(debug=True):
     graph = StateGraph(GraphState)
 
     # attach our nodes to the graph

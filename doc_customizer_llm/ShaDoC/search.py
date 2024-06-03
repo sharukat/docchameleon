@@ -13,8 +13,10 @@ from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain.agents import create_openai_tools_agent, load_tools
-from langchain.utilities.tavily_search import TavilySearchAPIWrapper
-from langchain.tools.tavily_search import TavilySearchResults
+# from langchain.utilities.tavily_search import TavilySearchAPIWrapper
+from langchain_community.utilities.tavily_search import TavilySearchAPIWrapper
+# from langchain.tools.tavily_search import TavilySearchResults
+from langchain_community.tools.tavily_search.tool import TavilySearchResults
 from langchain_core.pydantic_v1 import BaseModel, Field, validator
 from langchain_core.output_parsers import JsonOutputParser
 
@@ -29,7 +31,7 @@ class Output(BaseModel):
 
 def course_urls_retriever(query: str):
     print(f"{COLOR['BLUE']}🚀: EXECUTING WEB SEARCH: Tavily Search API + GPT-4-Turbo{COLOR['ENDC']}")
-    agent_llm = ChatOpenAI(temperature=0, model_name="gpt-4-0125-preview")
+    agent_llm = ChatOpenAI(temperature=0, model_name="gpt-4o")
     agent_prompt = hub.pull("hwchase17/openai-tools-agent")
     search = TavilySearchAPIWrapper()
     tavily_tool = TavilySearchResults(api_wrapper=search)

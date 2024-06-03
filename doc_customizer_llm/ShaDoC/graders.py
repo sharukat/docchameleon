@@ -1,6 +1,7 @@
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.pydantic_v1 import BaseModel, Field
-from langchain_community.chat_models import ChatCohere
+# from langchain_community.chat_models import ChatCohere
+from langchain_cohere import ChatCohere
 from langchain_core.output_parsers import JsonOutputParser
 from langchain.prompts import PromptTemplate
 

@@ -6,6 +6,7 @@ from datasets import Dataset
 from operator import itemgetter
 
 # Custom Modules
+import time
 import tasks
 import intent
 import search
@@ -27,16 +28,17 @@ with image.imports():
         faithfulness,
         context_recall,
         context_precision,
-        answer_correctness,
         answer_similarity
     )
     from setfit import SetFitModel
     from langchain.schema import Document
     from langchain_openai import ChatOpenAI
     from langchain.prompts import PromptTemplate
-    from langchain_community.chat_models import ChatCohere
+    # from langchain_community.chat_models import ChatCohere
+    from langchain_cohere import ChatCohere
     from langchain_core.pydantic_v1 import BaseModel, Field
-    from langchain_community.retrievers import CohereRagRetriever
+    # from langchain_community.retrievers import CohereRagRetriever
+    from langchain_cohere import CohereRagRetriever
     from langchain.output_parsers.openai_tools import PydanticToolsParser
     from langchain_core.utils.function_calling import convert_to_openai_tool
     
@@ -45,6 +47,7 @@ with image.imports():
 class Nodes:
     def __init__(self, debug: bool = False):
         self.title: str = None
+        self.question_id = None
         self.question: str = None
         self.api_name: str = None
         self.issue_type: str = None
@@ -61,7 +64,7 @@ class Nodes:
         self.urls: list = None
         self.documentation = None
         self.debug = debug
-        self.model ="gpt-4-0125-preview"
+        self.model ="gpt-4o"
         self.node_map = {
             "intent_soanswers_courses": self.intent_soanswers_courses,
             "context_retrieval": self.context_retrieval,
@@ -91,36 +94,40 @@ class Nodes:
     def intent_soanswers_courses(self, state: GraphState) -> GraphState:
         state_dict = state["keys"]
         self.title = state_dict["title"]
+        self.question_id = state_dict['question_id']
         self.question = state_dict["question"]
         self.api_name = state_dict["api_name"]
-        # self.issue_type = state_dict["issue_type"]
+        self.issue_type = state_dict["issue_type"]
         self.ground_truth = state_dict["ground_truth"]
         iterations = state_dict["iterations"]
         context_iter = state_dict["context_iter"]
 
         # Question type classification (multi-class classifier)
-        model = SetFitModel.from_pretrained("sharukat/sbert-issuetypeidentifier")
-        prediction = model(self.question)
-        if prediction == 0:
-            self.issue_type = 'additional_resources'
-        elif prediction == 1:
-            self.issue_type = 'examples_required'
-        else:
-            self.issue_type = 'description_only'
+        # model = SetFitModel.from_pretrained("sharukat/sbert-issuetypeidentifier")
+        # prediction = model(self.question)
+        # if prediction == 0:
+        #     self.issue_type = 'additional_resources'
+        # elif prediction == 1:
+        #     self.issue_type = 'examples_required'
+        # else:
+        #     self.issue_type = 'description_only'
 
 
         self.intention = intent.question_intent_identifier(self.title, self.question)
-        # self.so_answers = stackoverflow.retrieval(self.title, self.question)
-        # search_results = search.course_urls_retriever(self.intention)
-        # course_urls = search_results['urls']
-        # if not course_urls:
-        #     self.course_urls = utils.remove_broken_urls(course_urls)
+        so_relevant_answers = stackoverflow.retrieval(self.title, self.question)
+        if so_relevant_answers is not None:
+            self.so_answers = so_relevant_answers['urls']
+
+        search_results = search.course_urls_retriever(self.intention)
+        course_urls = search_results['urls']
+        if not course_urls:
+            self.course_urls = utils.remove_broken_urls(course_urls)
 
         return {
             "keys": {
                 "intent": self.intention,
-                # "so_answers": self.so_answers,
-                # "course_urls": self.course_urls,
+                "so_answers": self.so_answers,
+                "course_urls": self.course_urls,
                 "iterations": iterations,
                 "context_iter": context_iter,
                 "issue_type": self.issue_type,
@@ -148,7 +155,8 @@ class Nodes:
 
         # RAG generation
         rag = CohereRagRetriever(llm=ChatCohere(model="command-r"), connectors=[{"id": "web-search"}])
-        documents = rag.get_relevant_documents(self.intention)
+        documents = rag.invoke(self.intention)
+        time.sleep(5)
         generation = documents.pop()
         generation = generation.page_content
         print(f"{COLOR['GREEN']}✅: EXECUTION COMPLETED{COLOR['ENDC']}\n")
@@ -189,6 +197,7 @@ class Nodes:
         for d in documents:
             rg = graders.retrieval_grader()
             score = rg.invoke({"question": self.question, "document": d.page_content})
+            time.sleep(10)
             grade = score['binary_score']
             if grade == "yes":
                 print(f"\t{COLOR['GREEN']}--- ➡️ GRADE: DOCUMENT RELEVANT ---{COLOR['ENDC']}")
@@ -226,6 +235,7 @@ class Nodes:
 
         hg = graders.hallucination_grader()
         score = hg.invoke({"documents": documents, "generation": generation})
+        time.sleep(10)
         answer_grounded = score['binary_score']
         if answer_grounded == "no":
             print(f"\t{COLOR['RED']}--- ➡️ DECISION: LLM GENERATION IS NOT GROUNDED ---{COLOR['ENDC']}")
@@ -264,7 +274,7 @@ class Nodes:
         iterations = state_dict["iterations"]
         flag = False
 
-        if self.issue_type in self.examples_required:
+        if self.issue_type == "examples_required":
             flag = True
 
         return {
@@ -422,7 +432,6 @@ class Nodes:
                     }
                 )
                 
-
             iterations += 1
             return {
                 "keys": {
@@ -458,9 +467,7 @@ class Nodes:
         iterations = state_dict["iterations"]
 
         try:
-            utils.is_valid_api(self.api_name)
             self.documentation = utils.get_documentation(self.api_name)
-
             results = tasks.prompt_task(self.issue_type)
             self.definition = results['definition']
             self.task = results['task']
@@ -468,8 +475,9 @@ class Nodes:
             ## LLM
             llm = ChatOpenAI(temperature=0, model=self.model, streaming=True)
 
+
             ## Prompt
-            template = template_2.return_template(image)
+            template = template_2.return_template()
 
 
             print(f"{COLOR['YELLOW']} {'='*10} 🛠 GENERATE SOLUTION {'='*10} {COLOR['ENDC']}\n")
@@ -493,6 +501,7 @@ class Nodes:
                     "task": lambda _: self.task,
                 }
                 | prompt
+                | llm
             )
 
             solution = chain.invoke(
@@ -500,10 +509,10 @@ class Nodes:
                     "context": context,
                 }
             )
-            
+            # print(solution.content)
             return {
                 "keys": {
-                    "generation": solution,
+                    "generation": solution.content,
                     "context": context,
                     "iterations": iterations,
                     "issue_type": self.issue_type,
@@ -640,20 +649,24 @@ class Nodes:
     def ragas_eval(self, state: GraphState) -> GraphState:
         state_dict = state["keys"]
         contexts = state_dict["context"]
-        answer = state_dict["generation"][0]
-        code_solution = state_dict["generation"]
-        error = state_dict["error"]
-        prefix = state_dict["prefix"]
-        imports = state_dict["imports"]
         iterations = state_dict["iterations"]
-        code = state_dict["code"]
+
+        if self.issue_type == "examples_required":
+            code_solution = state_dict["generation"][0]
+            error = state_dict["error"]
+            prefix = code_solution.prefix
+            imports = code_solution.imports
+            code = code_solution.code
+            answer = "\n".join([prefix, imports, code])
+
+        else:
+            answer = state_dict["generation"]
 
         metrics = [
             answer_relevancy,
             faithfulness,
             context_recall,
             context_precision,
-            answer_correctness,
             answer_similarity
         ]
 
@@ -689,30 +702,58 @@ class Nodes:
         print(f"\t{COLOR['BLUE']}➡️ Faithfulness        : {results_df['faithfulness'][0]} {COLOR['ENDC']}")
         print(f"\t{COLOR['BLUE']}➡️ Context Recall      : {results_df['context_recall'][0]} {COLOR['ENDC']}")
         print(f"\t{COLOR['BLUE']}➡️ Context Precision   : {results_df['context_precision'][0]} {COLOR['ENDC']}")
-        print(f"\t{COLOR['BLUE']}➡️ Answer Correctness  : {results_df['answer_correctness'][0]} {COLOR['ENDC']}")
+        # print(f"\t{COLOR['BLUE']}➡️ Answer Correctness  : {results_df['answer_correctness'][0]} {COLOR['ENDC']}")
         print(f"\t{COLOR['BLUE']}➡️ Answer Similarity   : {results_df['answer_similarity'][0]} {COLOR['ENDC']}")
         print(f"\t{COLOR['BLUE']}➡️ Answer Relevancy    : {results_df['answer_relevancy'][0]} {COLOR['ENDC']}")
 
-        return {
-            "keys": {
-                "generation": code_solution,
-                "error": error,
-                "prefix": prefix,
-                "imports": imports,
-                "context": contexts,
-                "iterations": iterations,
-                "code": code,
-                "issue_type": self.issue_type,
-                "api_name": self.api_name,
-                "documentation": self.documentation,
-                "faithfulness": results_df["faithfulness"][0],
-                "context_recall": results_df["context_recall"][0],
-                "context_precision": results_df["context_precision"][0],
-                "answer_correctness": results_df["answer_correctness"][0],
-                "answer_similarity": results_df["answer_similarity"][0],
-                "answer_relevancy": results_df["answer_relevancy"][0],
+        if self.issue_type == "examples_required":
+            return {
+                "keys": {
+                    "generation": code_solution,
+                    "error": error,
+                    "prefix": prefix,
+                    "imports": imports,
+                    "context": contexts,
+                    "iterations": iterations,
+                    "code": code,
+                    "question_id": self.question_id,
+                    "question": self.question,
+                    "ground_truth": self.ground_truth,
+                    "issue_type": self.issue_type,
+                    "api_name": self.api_name,
+                    "documentation": self.documentation,
+                    "urls": self.so_answers,
+                    "course_urls": self.course_urls,
+                    "faithfulness": results_df["faithfulness"][0],
+                    "context_recall": results_df["context_recall"][0],
+                    "context_precision": results_df["context_precision"][0],
+                    # "answer_correctness": results_df["answer_correctness"][0],
+                    "answer_similarity": results_df["answer_similarity"][0],
+                    "answer_relevancy": results_df["answer_relevancy"][0],
+                }
             }
-        }
+        else:
+                return {
+                "keys": {
+                    "generation": answer,
+                    "context": contexts,
+                    "iterations": iterations,
+                    "question_id": self.question_id,
+                    "question": self.question,
+                    "ground_truth": self.ground_truth,
+                    "issue_type": self.issue_type,
+                    "api_name": self.api_name,
+                    "documentation": self.documentation,
+                    "urls": self.so_answers,
+                    "course_urls": self.course_urls,
+                    "faithfulness": results_df["faithfulness"][0],
+                    "context_recall": results_df["context_recall"][0],
+                    "context_precision": results_df["context_precision"][0],
+                    # "answer_correctness": results_df["answer_correctness"][0],
+                    "answer_similarity": results_df["answer_similarity"][0],
+                    "answer_relevancy": results_df["answer_relevancy"][0],
+                }
+            }
 
 
 
@@ -738,32 +779,46 @@ class Nodes:
 
 # ========================================================================================================================
 def extract_eval_response(state: GraphState) -> str:
-    examples_required = [
-            "Documentation Replication on Other Examples", 
-            "Documentation Replicability", 
-            "Inadequate Examples"]
+    # examples_required = [
+    #         "Documentation Replication on Other Examples", 
+    #         "Documentation Replicability", 
+    #         "Inadequate Examples"]
     
     state_dict = state["keys"]
     issue_type = state_dict["issue_type"]
-    if issue_type in examples_required:
+    documentation = state_dict["documentation"]
+    urls = state_dict["urls"]
+    course_urls = state_dict["course_urls"]
+    api_name = state_dict["api_name"]
+
+    if issue_type == "examples_required":
         code_solution = state_dict["generation"][0]
         prefix = code_solution.prefix
         imports = code_solution.imports
         code = code_solution.code
         answer = "\n".join([prefix, imports, code])
+        output = output_template.return_template1(api_name, prefix, imports, code, urls, course_urls)
+        final = documentation + output
     else:
-        answer = str(state_dict["generation"][0])
+        answer = state_dict["generation"]
+        output = output_template.return_template2(api_name, answer, urls, course_urls)
+        final = documentation + output
 
     ragas = {
+        "question_id": str(state_dict["question_id"]),
+        "question": str(state_dict["question"]),
+        "ground_truth": str(state_dict["ground_truth"]),
         "context": str(state_dict["context"]),
-        "answer" : answer,
+        "final" : str(final),
+        # "so_urls": str(urls),
         "faithfulness": str(state_dict["faithfulness"]),
         "context_recall": str(state_dict["context_recall"]),
         "context_precision": str(state_dict["context_precision"]),
-        "answer_correctness": str(state_dict["answer_correctness"]),
+        # "answer_correctness": str(state_dict["answer_correctness"]),
         "answer_similarity": str(state_dict["answer_similarity"]),
         "answer_relevancy": str(state_dict["answer_relevancy"]),
     }
+    # print(ragas)
     return json.dumps(ragas)
 
 

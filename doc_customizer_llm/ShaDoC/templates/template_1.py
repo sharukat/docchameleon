@@ -33,15 +33,18 @@ def return_template(image):
         specific query or issue the user is asking about related to the TensorFlow "{api_name}" API. The issue type of this question
         is {issue_type}. And the definition of this issue type is {definition}.
 
-        Finaly, carefully read and understand the task provided in {task}. This will give you the overall objective and guidelines for 
-        the customized response you need to generate.
+        Finaly, carefully read and understand the task provided below.
+        \n ------- \n
+        {task}
+        \n ------- \n
+          
+        This will give you the overall objective and guidelines for the customized response you need to generate.
 
         Your response will be shown to the user.
 
         Answer the user question based on the above provided context. \n
         Ensure any code you provide can be executed with all required imports and variables defined. \n
         Structure your answer as a description of the code solution, then a list of the imports, and then finally list the functioning code block. \n
-        Here is the user question again: \n --- --- --- \n {question}
         """
     )
 

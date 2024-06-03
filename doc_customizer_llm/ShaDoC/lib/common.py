@@ -11,20 +11,22 @@ image = modal.Image.debian_slim(python_version="3.11").from_registry(
     ).pip_install(
         "protobuf==3.20.*",
         "tiktoken==0.5.2",
-        "langchain==0.1.13",
+        "langchain==0.1.19",
         "langgraph==0.0.30",
-        "langchain-community==0.0.29",
+        "langchain-community==0.0.38",
         "langchain-openai==0.0.5",
-        "langserve[all]==0.0.51",
+        "langserve[all]==0.2.1",
         "langchain-voyageai==0.1.0",
-        "cohere==4.52",
+        "cohere==5.3",
         "chromadb==0.4.24",
         "langchainhub==0.1.15",
         "mdutils==1.6.0",
         "numpy==1.26.4",
         "pandas==2.2.1",
         "ragas==0.1.4",
-        "setfit==1.0.3"
+        "setfit==1.0.3",
+        "langchain-experimental==0.0.58",
+        "langchain-cohere==0.1.4",
     )
 
 

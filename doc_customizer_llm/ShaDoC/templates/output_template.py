@@ -4,30 +4,57 @@ from lib.common import stub
 import modal
 
 
-def return_template1(api_name, prefix, imports, code, urls):
+def return_template1(api_name, prefix, imports, code, urls, course_urls):
     mdFile = MdUtils(file_name=f"{api_name}-Customized")
     mdFile.new_header(level=1, title='Customized Content')
     mdFile.new_paragraph(str(prefix))
     mdFile.insert_code(f"{imports} \n{code}")
-    mdFile.new_header(level=2, title="Additional Resources")
     if urls:
-        mdFile.new_line('  - ' + mdFile.new_inline_link(link=urls[0]))
+        mdFile.new_header(level=2, title="Relevant Stack Overflow Q&A")
+        for i, url in enumerate(urls):
+            label = f'Link {i}'
+            mdFile.new_line('  - ' + mdFile.new_inline_link(link=url, text=label))
+
+    if course_urls:
+        mdFile.new_header(level=3, title="Related Online Courses")
+        for i, url in enumerate(course_urls):
+            label = f'Link {i}'
+            mdFile.new_line('  - ' + mdFile.new_inline_link(link=url, text=label))
+
+
     output = mdFile.get_md_text()
     return output
 
-def return_template2(api_name, solution, urls):
+def return_template2(api_name, solution, urls, course_urls):
     mdFile = MdUtils(file_name=f"{api_name}-Customized")
     mdFile.new_header(level=1, title='Customized Content')
     mdFile.new_paragraph(str(solution))
-    mdFile.new_header(level=2, title="Additional Resources")
     if urls:
-        mdFile.new_line('  - ' + mdFile.new_inline_link(link=urls[0]))
+        mdFile.new_header(level=2, title="Relevant Stack Overflow Q&A")
+        for i, url in enumerate(urls):
+            label = f'Link {i}'
+            mdFile.new_line('  - ' + mdFile.new_inline_link(link=url, text=label))
+
+    if course_urls:
+        mdFile.new_header(level=3, title="Related Online Courses")
+        for i, url in enumerate(course_urls):
+            label = f'Link {i}'
+            mdFile.new_line('  - ' + mdFile.new_inline_link(link=url, text=label))
+
     output = mdFile.get_md_text()
     return output
 
-def return_template3(api_name, prefix, imports, code):
+def return_template3(api_name, urls, course_urls):
     mdFile = MdUtils(file_name=f"{api_name}-Customized")
     mdFile.new_header(level=2, title="Additional Resources")
-    # mdFile.new_inline_link(link=urls[0])
+    if urls:
+        mdFile.new_header(level=3, title="Relevant Stack Overflow Q&A")
+        for url in urls:
+            mdFile.new_line('  - ' + mdFile.new_inline_link(link=url))
+
+    if course_urls:
+        mdFile.new_header(level=3, title="Related Online Courses")
+        for url in course_urls:
+            mdFile.new_line('  - ' + mdFile.new_inline_link(link=url))
     output = mdFile.get_md_text()
     return output

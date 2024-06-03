@@ -54,7 +54,7 @@ def enrich(graph):
     )
 
     graph.add_edge("generate", "check_code_imports")
-    graph.add_edge("generate_without_examples", "finish")
+    graph.add_edge("generate_without_examples", "ragas_eval")
     graph.add_conditional_edges(
         "check_code_imports",
         EDGE_MAP["decide_to_check_code_exec"],
