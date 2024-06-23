@@ -24,10 +24,8 @@ def return_template():
         {question}
         \n ------- \n
 
-
-        Make sure you understand the
-        specific query or issue the user is asking about related to the TensorFlow "{api_name}" API. The issue type of this question
-        is {issue_type}. And the definition of this issue type is {definition}.
+        Make sure you understand the specific query or issue the user is asking about related to the TensorFlow "{api_name}" API. 
+        The issue type of this question is {issue_type}. And the definition of this issue type is {definition}.
 
         Finaly, carefully read and understand the task provided below.
         \n ------- \n
@@ -36,9 +34,10 @@ def return_template():
         
         This will give you the overall objective and guidelines for the customized response you need to generate. Then perform the provided task.
 
-        Your response will be shown to the user.
+        Your response will be added to the documentation. Maintain a similar tone to the documentation in your response.
+        Add a concise description on what is answered is the response based on the question.
 
-        Answer the user question based on the above provided context. \n
+        Answer the question based on the above provided context. \n
         Structure your answer as a description
         """
     )

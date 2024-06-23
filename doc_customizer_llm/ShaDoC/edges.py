@@ -6,6 +6,7 @@ from lib.config import COLOR
 
 EXPECTED_NODES = [
     "intent_soanswers_courses",
+    "check_additional_resources",
     "context_retrieval",
     "check_context_relevancy",
     "check_hallucination_and_answer_relevancy",
@@ -25,7 +26,16 @@ def enrich(graph):
     for node_name in set(EXPECTED_NODES):
         assert node_name in graph.nodes, f"Node {node_name} not found in graph"
 
-    graph.add_edge("intent_soanswers_courses", "context_retrieval")
+    graph.add_edge("intent_soanswers_courses", "check_additional_resources")
+    graph.add_conditional_edges(
+        "check_additional_resources",
+        EDGE_MAP["decide_context_or_finish"],
+        {
+            "finish":"finish",
+            "context_retrieval":"context_retrieval",
+        }
+    )
+
     graph.add_edge("context_retrieval", "check_context_relevancy")
     graph.add_conditional_edges(
         "check_context_relevancy",
@@ -100,7 +110,14 @@ def decide_context_retrieval(state: GraphState) -> str:
         print(f"\t{COLOR['RED']}--- ➡️ DECISION: CONTEXT RETRIEVAL DOES NOT STATISFY ALL CONDITIONS. RE-TRY! ---{COLOR['ENDC']}\n")
         return "context_retrieval"
     
-    
+def decide_context_or_finish(state: GraphState) -> str:
+    state_dict = state["keys"]
+    flag = state_dict["example_required"]
+    if flag == "3":
+        print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: ADDITIONAL RESOURCES ONLY ---{COLOR['ENDC']}\n")
+        return "finish"
+    else:
+        return "context_retrieval"
 
 def decide_example_requirement(state: GraphState) -> str:
     print(f"{COLOR['BLUE']}❓ DECIDE TO PROVIDE EXAMPLES WITH DESCRIPTION OR JUST DESCRIPTION {COLOR['ENDC']}")
@@ -169,6 +186,7 @@ def decide_to_finish(state: GraphState) -> str:
 
 EDGE_MAP: dict[str, Callable] = {
     "decide_context_relevancy":decide_context_relevancy,
+    "decide_context_or_finish":decide_context_or_finish,
     "decide_context_retrieval":decide_context_retrieval,
     "decide_example_requirement":decide_example_requirement,
     "decide_to_check_code_exec": decide_to_check_code_exec,

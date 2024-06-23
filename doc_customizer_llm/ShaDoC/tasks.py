@@ -39,14 +39,14 @@ def prompt_task(type: str):
 
     llm_tasks = {
         "examples_required": {
-        "definition": "Answer to the question should contain an example that includes an explanation and the code.", 
-        "task": """Your task is to generate complete executable code example with an explanation to address the user's quesetion body 
+        "definition": "Answer of the question should contain an example that includes a code behavior clarification and the code.", 
+        "task": """Your task is to generate complete executable code example with a code behavior clarification explanation to address the quesetion body 
         by only using the knowledge provided as 'context'."""
         },
 
         "description_only": {
         "definition": "Answer to the question should only contain an explanation.", 
-        "task": """Your task is to generate an explanation only to address the user's quesetion body 
+        "task": """Your task is to generate an comprehensive explanation only to address the question body 
         by only using the knowledge provided as 'context'."""
         },
     }

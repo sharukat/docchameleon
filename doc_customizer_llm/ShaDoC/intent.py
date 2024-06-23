@@ -21,6 +21,7 @@ os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")   # Claude LLM API Ke
 # ==========================================================================================================================
 class Output(BaseModel):
     intent: str = Field(description="intent or goal behind the question")
+    keywords: list = Field(description="API names within the question body")
 
 def question_intent_identifier(title, body):
     print(f"{COLOR['BLUE']}🚀: EXECUTING INTENT IDENTIFIER: Identifying intent of the SO question{COLOR['ENDC']}")
@@ -38,7 +39,7 @@ def question_intent_identifier(title, body):
         {body}
 
         After reading the title and body, identify the intent or goal behind the question - what is the user ultimately trying to 
-        accomplish or understand?
+        accomplish or understand and emphasize the cause factor? And identify the API names within the question body.
 
         Do not make any external assumptions beyond the information provided in the title and body. Base the identified intent solely on 
         the given question text.
@@ -57,30 +58,16 @@ def question_intent_identifier(title, body):
     prompt = {"title" : title, "body" : body}
     response = chain.invoke(prompt)
     print(f"{COLOR['GREEN']}✅: EXECUTION COMPLETED{COLOR['ENDC']}\n")
-    return response['intent']
+    return response
 
 
 # Test
-# title = "How to create output_signature for tensorflow.dataset.from_generator"
+# title = "Tensor has shape [?, 0] -- how to reshape to [?,]"
 # question = """
-# <p>I have a generator yielding data and labels <code>yield data, labels</code> where the data is
-# an <code>numpy.ndarray</code> with variable rows and 500 columns of type <code>dtype=float32</code> and the labels are integers of <code>numpy.int64</code>.</p>
-# <p>I'm trying to pass this data into TensorFlow from_generator function to create a TensorFlow dataset: <code>tf.data.Dataset.from_generator</code></p>
-# <p>The <a href="https://www.tensorflow.org/api_docs/python/tf/data/Dataset#from_generator" rel="nofollow noreferrer">docs</a> say that the from_generator function needs a parameter <code>output_signature</code> as an input. But I'm having trouble understanding how to build this output_signature.</p>
-# <p>How can I make the output_signature for the generator I described?</p>
-# <p>Thank you!</p>
-# <p>Edit:
-# I used <code>tf.type_spec_from_value</code> to get this:</p>
-# <pre><code>dataset = tf.data.Dataset.from_generator(
-#    datagen_row,
-#    output_signature=(
-#       tf.TensorSpec(shape=(None, 512), dtype=tf.float32, name=None),
-#       tf.TensorSpec(shape=(), dtype=tf.int64, name=None)
-#    )
-# )
-# </code></pre>
-# <p>But is it correct to use None when the number of rows is varying for the first data type?</p>
+# <p>When <code>src</code> has shape <code>[?]</code>, <code>tf.gather(src, tf.where(src != 0))</code> returns a tensor with shape <code>[?, 0]</code>. I'm not sure how a dimension can have size 0, and I'm especially unsure how to change the tensor back. I didn't find anything in the documentation to explain this, either.</p>
+
+# <p>I tried to <code>tf.transpose(tensor)[0]</code>, but the first dimension of the transposed tensor has size 0 and cannot be accessed! What's wrong?</p>
 # """
 
-# intent = question_intent_identifier(title, question)
-# print(intent)
+# response = question_intent_identifier(title, question)
+# print(response)

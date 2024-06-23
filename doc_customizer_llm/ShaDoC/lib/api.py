@@ -26,6 +26,12 @@ class StackExchange:
         response = json.loads(response.text)
         return response
 
+    def questions_using_qids(self, question_ids) -> dict:
+        url = f"questions/{question_ids}?order=desc&sort=activity&site=stackoverflow&filter=!WWt6kbMxuVVOPrYviQ9795*)-6Ja4KJ8gcC_8(1"
+        response = self.get_response(url=url)
+        return response
+    
+
     def answers_using_qids(self, question_ids) -> dict:
         #URL to retrieve the answers based on the question ids (upto 100 question ids separated by ';')
         answer_url =f"questions/{question_ids}/answers?key={API_KEY}&order=desc&sort=activity&site=stackoverflow&filter=!-KbrbfAqA48jRifMLR7sYu7doHuftBYCT"
@@ -69,8 +75,25 @@ def stackexchange(query: str):
         split_list = list(split(q_ids, 100))
         for x in range(len(split_list)):
             questions_ids = ';'.join(map(str, split_list[x]))
+            # questions = SE.questions_using_qids(questions_ids)
 
-            #URL to retrieve the answers based on the question ids (upto 100 question ids separated by ';')
+            # for  item in questions['items']:
+            #     answers = item['answers']
+            #     for answer in answers:
+            #         if answer['is_accepted'] == True:
+            #             res_dict = {
+            #                 "QuestionId": item['question_id'],
+            #                 "Question": item['body'],
+            #                 "URL": item['link'],
+            #                 "CreationDate": item['creation_date'],
+            #                 "accepted_answer_id": item['accepted_answer_id'],
+            #             }
+            #             results.append(res_dict)
+            #             break
+            #         else:
+            #             pass
+
+            # URL to retrieve the answers based on the question ids (upto 100 question ids separated by ';')
             answers = SE.answers_using_qids(questions_ids)
             for item in answers['items']:
                 if item['is_accepted'] == True:

@@ -48,6 +48,7 @@ langchain-experimental = "^0.0.58"
 langchain-cohere = "^0.1.4"
 tqdm = "^4.66.4"
 pingouin = "^0.5.4"
+markdownify = "^0.12.1"
 
 
 [[tool.poetry.source]]

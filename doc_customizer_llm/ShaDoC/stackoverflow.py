@@ -33,7 +33,7 @@ os.environ["VOYAGE_API_KEY"] = os.getenv("VOYAGE_API_KEY")
 # MAIN CODE
 # ==========================================================================================================================
 
-def retrieval(title, intent):
+def retrieval(title, intent, keywords):
     print(f"{COLOR['BLUE']}🚀: EXECUTING Q&A RETRIEVER: Searching for relevant SO Q&As with accepted answers.{COLOR['ENDC']}")
     res = stackexchange(title)
     answers_pagecontent = set()
@@ -47,7 +47,7 @@ def retrieval(title, intent):
         loader = DataFrameLoader(df, page_content_column="Answer")
         answers = loader.load()
         # embedding_function = CohereEmbeddings(model="embed-english-v3.0")
-        embedding_function = VoyageAIEmbeddings(model="voyage-large-2-instruct" )
+        embedding_function = VoyageAIEmbeddings(model="voyage-large-2-instruct", batch_size=16 )
 
         text_splitter = SemanticChunker(embeddings=embedding_function, breakpoint_threshold_type="percentile")
 
@@ -69,12 +69,15 @@ def retrieval(title, intent):
         #     # parent_splitter=parent_splitter,
         # )
 
-        splits = text_splitter.split_documents(answers)
-        vectorstore = Chroma.from_documents(documents=splits, embedding=embedding_function)
-        full_answer_retriever = vectorstore.as_retriever(search_kwargs={"k": len(splits)})
+        # search_kwargs={"k": len(splits)}
 
-        full_answer_retriever.add_documents(answers, ids=None)
-        compressor = CohereRerank(model='rerank-english-v2.0')
+        splits = text_splitter.split_documents(answers)
+        print(len(splits))
+        vectorstore = Chroma.from_documents(documents=splits, embedding=embedding_function)
+        full_answer_retriever = vectorstore.as_retriever(search_type="mmr")
+
+        # full_answer_retriever.add_documents(answers, ids=None)
+        compressor = CohereRerank(model='rerank-english-v2.0', top_n=3)
         compression_retriever = ContextualCompressionRetriever(
             base_compressor=compressor, 
             base_retriever=full_answer_retriever , 
@@ -82,10 +85,14 @@ def retrieval(title, intent):
 
         reranked_answers = compression_retriever.invoke(input=intent)
         for index, answer in enumerate(reranked_answers):
+           print(answer.metadata['relevance_score'])
            if answer.metadata['relevance_score'] > 0.6:
-              answers_pagecontent.add(answer.page_content)
-              urls.add(answer.metadata['URL'])
-              qids.add(answer.metadata['QuestionId'])
+              answer_content = answer.page_content
+              for keyword in keywords:
+                  if keyword.lower() in answer_content.lower():
+                    answers_pagecontent.add(answer_content)
+                    urls.add(answer.metadata['URL'])
+                    qids.add(answer.metadata['QuestionId'])
 
         print(f"\tNumber of URLs: {len(urls)}")
         print(f"{COLOR['GREEN']}✅: EXECUTION COMPLETED{COLOR['ENDC']}\n")
@@ -105,12 +112,13 @@ def retrieval(title, intent):
 
 
 # Test
-# title = "How to create output_signature for tensorflow.dataset.from_generator"
+# title = "Tensor has shape [?, 0] -- how to reshape to [?,]"
 # intent = """
-# The user is seeking to understand how to correctly create an output_signature for a TensorFlow dataset generated from a generator function, specifically when dealing with variable row sizes in the data.
+# The user is trying to understand why a tensor has a dimension of size 0 after using tf.gather and how to reshape it to a desired shape.
 # """
+# keywords = ['tf.gather', 'tf.where', 'tf.transpose']
 
-# so_answers, ids, urls = retrieval(title, intent)
-# print(f"Relevant Chunks: \n{'='*20}\n{so_answers}\n")
-# print(f"Questions IDs: {ids}\n")
-# print(f"URLs: \n{'='*20}\n{urls}")
+# results = retrieval(title, intent, keywords)
+# # print(f"Relevant Chunks: \n{'='*20}\n{so_answers}\n")
+# # print(f"Questions IDs: {ids}\n")
+# print(f"URLs: \n{'='*20}\n{results['urls']}")

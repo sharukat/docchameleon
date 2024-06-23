@@ -40,9 +40,10 @@ def return_template(image):
           
         This will give you the overall objective and guidelines for the customized response you need to generate.
 
-        Your response will be shown to the user.
+        Your response will be added to the documentation. Maintain a similar tone to the documentation in your response.
+        Add a concise description on what is answered is the response based on the question.
 
-        Answer the user question based on the above provided context. \n
+        Answer the question based on the above provided context. \n
         Ensure any code you provide can be executed with all required imports and variables defined. \n
         Structure your answer as a description of the code solution, then a list of the imports, and then finally list the functioning code block. \n
         """

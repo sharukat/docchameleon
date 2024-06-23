@@ -30,7 +30,7 @@ class Output(BaseModel):
     
 
 def course_urls_retriever(query: str):
-    print(f"{COLOR['BLUE']}🚀: EXECUTING WEB SEARCH: Tavily Search API + GPT-4-Turbo{COLOR['ENDC']}")
+    print(f"{COLOR['BLUE']}🚀: EXECUTING: Background Knowledge Source Identifier{COLOR['ENDC']}")
     agent_llm = ChatOpenAI(temperature=0, model_name="gpt-4o")
     agent_prompt = hub.pull("hwchase17/openai-tools-agent")
     search = TavilySearchAPIWrapper()

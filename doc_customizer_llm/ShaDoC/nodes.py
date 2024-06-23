@@ -26,8 +26,8 @@ with image.imports():
     from ragas.metrics import (
         answer_relevancy,
         faithfulness,
-        context_recall,
         context_precision,
+        context_relevancy,
         answer_similarity
     )
     from setfit import SetFitModel
@@ -67,6 +67,7 @@ class Nodes:
         self.model ="gpt-4o"
         self.node_map = {
             "intent_soanswers_courses": self.intent_soanswers_courses,
+            "check_additional_resources": self.check_additional_resources,
             "context_retrieval": self.context_retrieval,
             "check_context_relevancy": self.check_context_relevancy,
             "check_hallucination_and_answer_relevancy": self.check_hallucination_and_answer_relevancy,
@@ -113,15 +114,18 @@ class Nodes:
         #     self.issue_type = 'description_only'
 
 
-        self.intention = intent.question_intent_identifier(self.title, self.question)
-        so_relevant_answers = stackoverflow.retrieval(self.title, self.question)
+        results = intent.question_intent_identifier(self.title, self.question)
+        self.intention = results['intent']
+        keywords = results['keywords']
+        so_relevant_answers = stackoverflow.retrieval(self.title, self.question, keywords)
         if so_relevant_answers is not None:
             self.so_answers = so_relevant_answers['urls']
 
-        search_results = search.course_urls_retriever(self.intention)
-        course_urls = search_results['urls']
-        if not course_urls:
-            self.course_urls = utils.remove_broken_urls(course_urls)
+        if self.issue_type == 'additional_resources':
+            search_results = search.course_urls_retriever(self.intention)
+            course_urls = search_results['urls']
+            if not course_urls:
+                self.course_urls = utils.remove_broken_urls(course_urls)
 
         return {
             "keys": {
@@ -133,6 +137,28 @@ class Nodes:
                 "issue_type": self.issue_type,
                 "api_name": self.api_name,
                 "documentation": self.documentation,
+            }
+        }
+    
+    def check_additional_resources(self, state: GraphState) -> GraphState:
+        state_dict = state["keys"]
+        iterations = state_dict["iterations"]
+        context_iter = state_dict["context_iter"]
+        intent = state_dict["intent"]
+        flag = False
+
+        if self.issue_type == "additional_resources":
+            flag = True
+
+        return {
+            "keys": {
+                "iterations": iterations,
+                "context_iter": context_iter,
+                "example_required": flag,
+                "issue_type": self.issue_type,
+                "api_name": self.api_name,
+                "documentation": self.documentation,
+                "intent":intent,
             }
         }
     
@@ -242,15 +268,16 @@ class Nodes:
             grade = "no"
         else:
             print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: LLM GENERATION IS GROUNDED ---{COLOR['ENDC']}")
-            ag = graders.answer_grader()
-            score = ag.invoke({"question": self.question,"generation": generation})
-            answer_relevancy = score['binary_score']
-            if answer_relevancy == "yes":
-                print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: LLM GENERATION RESOLVES THE QUESTION ---{COLOR['ENDC']}")
-                grade = "yes"
-            else:
-                grade = "no"
-                print(f"\t{COLOR['RED']}--- ➡️ DECISION: LLM GENERATION DOES NOT RESOLVES THE QUESTION. Re-TRY ---{COLOR['ENDC']}")
+            grade = "yes"
+            # ag = graders.answer_grader()
+            # score = ag.invoke({"question": self.question,"generation": generation})
+            # answer_relevancy = score['binary_score']
+            # if answer_relevancy == "yes":
+            #     print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: LLM GENERATION RESOLVES THE QUESTION ---{COLOR['ENDC']}")
+            #     grade = "yes"
+            # else:
+            #     grade = "no"
+            #     print(f"\t{COLOR['RED']}--- ➡️ DECISION: LLM GENERATION DOES NOT RESOLVES THE QUESTION. Re-TRY ---{COLOR['ENDC']}")
         print(f"{COLOR['GREEN']}✅: EXECUTION COMPLETED{COLOR['ENDC']}\n")
         
         return {
@@ -652,6 +679,7 @@ class Nodes:
         iterations = state_dict["iterations"]
 
         if self.issue_type == "examples_required":
+            solution = state_dict["generation"]
             code_solution = state_dict["generation"][0]
             error = state_dict["error"]
             prefix = code_solution.prefix
@@ -665,8 +693,8 @@ class Nodes:
         metrics = [
             answer_relevancy,
             faithfulness,
-            context_recall,
             context_precision,
+            context_relevancy,
             answer_similarity
         ]
 
@@ -700,8 +728,8 @@ class Nodes:
         print(f"{COLOR['BLUE']}RESULTS{COLOR['ENDC']}")
         print(f"{COLOR['BLUE']}{'-'*10}{COLOR['ENDC']}")
         print(f"\t{COLOR['BLUE']}➡️ Faithfulness        : {results_df['faithfulness'][0]} {COLOR['ENDC']}")
-        print(f"\t{COLOR['BLUE']}➡️ Context Recall      : {results_df['context_recall'][0]} {COLOR['ENDC']}")
-        print(f"\t{COLOR['BLUE']}➡️ Context Precision   : {results_df['context_precision'][0]} {COLOR['ENDC']}")
+        print(f"\t{COLOR['BLUE']}➡️ Context Precision      : {results_df['context_precision'][0]} {COLOR['ENDC']}")
+        print(f"\t{COLOR['BLUE']}➡️ Context Relevancy   : {results_df['context_relevancy'][0]} {COLOR['ENDC']}")
         # print(f"\t{COLOR['BLUE']}➡️ Answer Correctness  : {results_df['answer_correctness'][0]} {COLOR['ENDC']}")
         print(f"\t{COLOR['BLUE']}➡️ Answer Similarity   : {results_df['answer_similarity'][0]} {COLOR['ENDC']}")
         print(f"\t{COLOR['BLUE']}➡️ Answer Relevancy    : {results_df['answer_relevancy'][0]} {COLOR['ENDC']}")
@@ -709,7 +737,7 @@ class Nodes:
         if self.issue_type == "examples_required":
             return {
                 "keys": {
-                    "generation": code_solution,
+                    "generation": solution,
                     "error": error,
                     "prefix": prefix,
                     "imports": imports,
@@ -722,11 +750,12 @@ class Nodes:
                     "issue_type": self.issue_type,
                     "api_name": self.api_name,
                     "documentation": self.documentation,
+                    "intent": self.intention,
                     "urls": self.so_answers,
                     "course_urls": self.course_urls,
                     "faithfulness": results_df["faithfulness"][0],
-                    "context_recall": results_df["context_recall"][0],
                     "context_precision": results_df["context_precision"][0],
+                    "context_relevancy": results_df["context_relevancy"][0],
                     # "answer_correctness": results_df["answer_correctness"][0],
                     "answer_similarity": results_df["answer_similarity"][0],
                     "answer_relevancy": results_df["answer_relevancy"][0],
@@ -744,11 +773,12 @@ class Nodes:
                     "issue_type": self.issue_type,
                     "api_name": self.api_name,
                     "documentation": self.documentation,
+                    "intent": self.intention,
                     "urls": self.so_answers,
                     "course_urls": self.course_urls,
                     "faithfulness": results_df["faithfulness"][0],
-                    "context_recall": results_df["context_recall"][0],
                     "context_precision": results_df["context_precision"][0],
+                    "context_relevancy": results_df["context_relevancy"][0],
                     # "answer_correctness": results_df["answer_correctness"][0],
                     "answer_similarity": results_df["answer_similarity"][0],
                     "answer_relevancy": results_df["answer_relevancy"][0],
@@ -797,26 +827,37 @@ def extract_eval_response(state: GraphState) -> str:
         imports = code_solution.imports
         code = code_solution.code
         answer = "\n".join([prefix, imports, code])
-        output = output_template.return_template1(api_name, prefix, imports, code, urls, course_urls)
+        output = output_template.return_template1(api_name, prefix, imports, code, urls)
         final = documentation + output
-    else:
+        if state_dict["error"] == "None":
+            error = "False"
+        else:
+            error = "True"
+    elif issue_type == "description_only":
         answer = state_dict["generation"]
-        output = output_template.return_template2(api_name, answer, urls, course_urls)
+        output = output_template.return_template2(api_name, answer, urls)
         final = documentation + output
+        error = "False"
+    else:
+        output = output_template.return_template3(api_name, urls, course_urls)
+        final = documentation + output
+        error = "False"
 
     ragas = {
         "question_id": str(state_dict["question_id"]),
         "question": str(state_dict["question"]),
+        "intent": str(state_dict["intent"]),
         "ground_truth": str(state_dict["ground_truth"]),
-        "context": str(state_dict["context"]),
+        "context": str(state_dict["context"]) if issue_type != "additional_resources" else "N/A",
         "final" : str(final),
         # "so_urls": str(urls),
-        "faithfulness": str(state_dict["faithfulness"]),
-        "context_recall": str(state_dict["context_recall"]),
-        "context_precision": str(state_dict["context_precision"]),
+        "faithfulness": str(state_dict["faithfulness"]) if issue_type != "additional_resources" else "N/A",
+        "context_precision": str(state_dict["context_precision"]) if issue_type != "additional_resources" else "N/A",
+        "context_relevancy": str(state_dict["context_relevancy"]) if issue_type != "additional_resources" else "N/A",
         # "answer_correctness": str(state_dict["answer_correctness"]),
-        "answer_similarity": str(state_dict["answer_similarity"]),
-        "answer_relevancy": str(state_dict["answer_relevancy"]),
+        "answer_similarity": str(state_dict["answer_similarity"]) if issue_type != "additional_resources" else "N/A",
+        "answer_relevancy": str(state_dict["answer_relevancy"]) if issue_type != "additional_resources" else "N/A",
+        "execution_error": error,
     }
     # print(ragas)
     return json.dumps(ragas)
