@@ -16,6 +16,14 @@ def split(list_a, chunk_size):
     for i in range(0, len(list_a), chunk_size):
         yield list_a[i:i + chunk_size]
 
+def is_url_accessible(url, timeout=5):
+    try:
+        response = requests.head(url, timeout=timeout)
+        return response.status_code == 200
+    except requests.exceptions.RequestException as e:
+        print(f"Error accessing URL {url}: {e}")
+        return False
+
 
 def check_url(url):
     """Checks if a URL is working by sending a HEAD request and verifying a 200 status code.

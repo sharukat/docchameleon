@@ -53,7 +53,7 @@ def ai_webscraper(web_page: str, response_type: str):
 
         <example>
         ```
-        code block
+        Only text that explains the Java API type.
         ```
         </example>
         """

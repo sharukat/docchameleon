@@ -29,8 +29,9 @@ def question_intent_identifier(title, body):
     parser = JsonOutputParser(pydantic_object=Output)
     format_instructions = parser.get_format_instructions()
 
+# Your task is to identify the intent behind questions about the TensorFlow API documentation.
     template = """
-        Your task is to identify the intent behind questions about the TensorFlow API documentation.
+        Your task is to identify the intent behind questions.
 
         First, read the question title:
         {title}
@@ -62,12 +63,46 @@ def question_intent_identifier(title, body):
 
 
 # Test
-# title = "Tensor has shape [?, 0] -- how to reshape to [?,]"
-# question = """
-# <p>When <code>src</code> has shape <code>[?]</code>, <code>tf.gather(src, tf.where(src != 0))</code> returns a tensor with shape <code>[?, 0]</code>. I'm not sure how a dimension can have size 0, and I'm especially unsure how to change the tensor back. I didn't find anything in the documentation to explain this, either.</p>
+title = "Understanding tf.keras.layers.Dense()"
+question = """
+<p>I am trying to understand why there is a difference between calculating a dense layer operation directly and using the <code>keras</code> implementation.</p>
+<p>Following the documentation (<a href="https://www.tensorflow.org/api_docs/python/tf/keras/layers/Dense" rel="nofollow noreferrer">https://www.tensorflow.org/api_docs/python/tf/keras/layers/Dense</a>) <code>tf.keras.layers.Dense()</code> should implement the operation <code>output = activation(dot(input, kernel) + bias)</code> but <code>result</code> and <code>result1</code> below are not the same.</p>
+<pre class="lang-py prettyprint-override"><code>tf.random.set_seed(1)
 
-# <p>I tried to <code>tf.transpose(tensor)[0]</code>, but the first dimension of the transposed tensor has size 0 and cannot be accessed! What's wrong?</p>
-# """
+bias = tf.Variable(tf.random.uniform(shape=(5,1)), dtype=tf.float32)
+kernel = tf.Variable(tf.random.uniform(shape=(5,10)), dtype=tf.float32)
+x = tf.constant(tf.random.uniform(shape=(10,1), dtype=tf.float32))
 
-# response = question_intent_identifier(title, question)
-# print(response)
+result = tf.nn.relu(tf.linalg.matmul(a=kernel, b=x) + bias)
+tf.print(result)
+
+test = tf.keras.layers.Dense(units = 5, 
+                            activation = 'relu',
+                            use_bias = True, 
+                            kernel_initializer = tf.keras.initializers.Constant(value=kernel), 
+                            bias_initializer = tf.keras.initializers.Constant(value=bias), 
+                            dtype=tf.float32)
+
+result1 = test(tf.transpose(x))
+
+print()
+tf.print(result1)
+
+</code></pre>
+<p>output</p>
+<pre class="lang-py prettyprint-override"><code>
+[[2.87080455]
+ [3.25458574]
+ [3.28776264]
+ [3.14319134]
+ [2.04760242]]
+
+[[2.38769 3.63470697 2.62423944 3.31286287 2.91121125]]
+
+</code></pre>
+<p>Using <code>test.get_weights()</code> I can see that the kernel and bias (<code>b</code>) are getting set to the correct values. I am using TF version 2.12.0.</p>
+
+"""
+
+response = question_intent_identifier(title, question)
+print(response)
