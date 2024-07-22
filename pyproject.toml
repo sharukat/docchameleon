@@ -55,6 +55,8 @@ stanza = "^1.8.2"
 nltk = "^3.8.1"
 imblearn = "^0.0"
 nest-asyncio = "^1.6.0"
+selfcheckgpt = "^0.1.7"
+human-eval = "^1.0.3"
 
 
 [[tool.poetry.source]]

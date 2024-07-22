@@ -9,6 +9,8 @@ image = modal.Image.debian_slim(python_version="3.11").from_registry(
     ).env(
         {"TF_ENABLE_ONEDNN_OPTS": '0', "TF_CPP_MIN_LOG_LEVEL": "2"}
     ).pip_install(
+        "human_eval==1.0.3",
+        "nltk==3.8.1",
         "protobuf==3.20.*",
         "tiktoken==0.5.2",
         "langchain==0.1.19",
@@ -24,7 +26,7 @@ image = modal.Image.debian_slim(python_version="3.11").from_registry(
         "numpy==1.26.4",
         "pandas==2.2.1",
         "ragas==0.1.4",
-        "setfit==1.0.3",
+        # "setfit==1.0.3",
         "langchain-experimental==0.0.58",
         "langchain-cohere==0.1.4",
     )
@@ -39,7 +41,6 @@ stub = modal.Stub(
         modal.Secret.from_name("my-openai-secret"),
         modal.Secret.from_name("my-langsmith-secret"),
         modal.Secret.from_name("my-cohere-secret"),
-        modal.Secret.from_name("my-tavily-secret"),
         modal.Secret.from_name("my-voyage-secret"),
         modal.Secret.from_name("my-stackexchange-secret"),
     ],

@@ -38,14 +38,16 @@ def serve():
     def inp(input: str) -> dict:
         input_dict =  ast.literal_eval(input)
         try:
-            utils.is_valid_api(input_dict['api_name'])
+            # utils.is_valid_api(input_dict['api_name'])
             return {"keys": {
-                "question_id": input_dict['question_id'],
-                "title": input_dict['title'], 
-                "question": input_dict['question'], 
-                "api_name": input_dict['api_name'],
-                "issue_type": input_dict['issue_type'],
-                "ground_truth": input_dict['ground_truth'],
+                # "question_id": input_dict['question_id'],
+                # "title": input_dict['title'], 
+                # "question": input_dict['question'], 
+                # "api_name": input_dict['api_name'],
+                # "issue_type": input_dict['issue_type'],
+                # "ground_truth": input_dict['ground_truth'],
+                "problem": input_dict['problem'],
+                "prompt": input_dict['prompt'], 
                 "iterations": 0, "context_iter": 0}}
         except ValueError as e:
             print(e)

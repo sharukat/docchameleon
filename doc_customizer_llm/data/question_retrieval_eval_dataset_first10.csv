@@ -1,0 +1,1132 @@
+QuestionId,QuestionAPI,IssueType,Title,Question,GroundTruth,objective,title_context,title_relevance_score,body_context,body_relevance_score,objective_context,objective_relevance_score
+51586693,tf.gather,Documentation Replication on Other Examples,"Tensor has shape [?, 0] -- how to reshape to [?,]","<p>When <code>src</code> has shape <code>[?]</code>, <code>tf.gather(src, tf.where(src != 0))</code> returns a tensor with shape <code>[?, 0]</code>. I'm not sure how a dimension can have size 0, and I'm especially unsure how to change the tensor back. I didn't find anything in the documentation to explain this, either.</p>
+
+<p>I tried to <code>tf.transpose(tensor)[0]</code>, but the first dimension of the transposed tensor has size 0 and cannot be accessed! What's wrong?</p>
+","<p>I think you should use <a href=""https://www.tensorflow.org/api_docs/python/tf/not_equal"" rel=""nofollow noreferrer""><code>tf.not_equal</code></a> to perform elementwise comparison on the tensor.</p>
+
+<pre><code>src = tf.constant([0, 1, 1, 0], dtype=tf.int8)
+tf.gather(src, tf.where(tf.not_equal(src, 0))).eval(session=tf.Session())
+
+array([[1],
+       [1]], dtype=int8)
+</code></pre>
+
+<p>You can also shorten this a bit and use <a href=""https://www.tensorflow.org/api_docs/python/tf/boolean_mask"" rel=""nofollow noreferrer""><code>tf.boolean_mask</code></a> instead of <code>tf.where</code> and <code>tf.gather</code>:</p>
+
+<pre><code>tf.boolean_mask(src, tf.not_equal(src, 0)).eval(session=tf.Session())
+array([1, 1], dtype=int8)
+</code></pre>
+
+<p>Note the difference in the shape of the outputs.</p>
+",The user is trying to understand why a tensor has a dimension of size 0 after using tf.gather and how to reshape it back to a usable form.,"You can reshape a tensor using the tf.reshape function in TensorFlow. The function takes in the tensor and a desired output shape, and returns a tensor with the same values as the input tensor but shaped differently. 
+
+For a tensor with a shape of [?, 0], you can reshape it into a tensor with a shape of [?] by specifying the new shape as [-1] when creating the reshape layer.",0.633333333,"A tensor with a dimension of size 0 is a scalar tensor, also known as a rank-0 tensor. Rank-0 tensors are immutable and do not have any ""axes"". A possible solution to your problem could be reshaping the tensor to a new shape using tf.reshape. For instance, if your tensor is rank-2, you could use the following code:
+```python
+import tensorflow as tf
+
+reshaped_tensor = tf.reshape(tensor, (1, -1))
+```
+This would move all the elements of the zero-sized dimension into a single-element first dimension, effectively removing the dimension with size 0.",0.655555556,"Tensors are multi-dimensional arrays with a uniform type, called a dtype. Their shapes contain information about the length of each axis, also known as dimensions.
+
+Using tf.gather_nd allows you to gather the elements of a matrix, rather than just its rows or columns. It extracts specific indices from multiple axes of a tensor. The indices must be provided as an integer tensor with shape [d, K], where d is the number of index dimensions and K is the number of indices to gather.
+
+This operation results in a tensor of shape: indices.shape[:d] + gathered_tensor.shape[d:]. In other words, the first d dimensions of the output tensor come from the first d dimensions of indices, and the remaining dimensions come from the corresponding gathering dimensions in the tensor being gathered from.
+
+If the gathered tensor has a shape of (2, 3, 5), and the provided indices are [[0, 0, 4], [1, 2, 3]], the resulting tensor will have a shape of (2, 2):
+```
+ [ [ [0, 4],
+  [0, 3]]
+
+ [ [0, 3],
+  [0, 3]]
+]
+```
+As for reshaping the tensor back to a usable form, TensorFlow provides the tf.reshape operation. It is a fast and cheap operation as the underlying data does not need to be duplicated. You can reshape a tensor into a new shape as long as the same number of elements is maintained. For instance, if you wanted to reshape a tensor of shape (2, 3, 5) into a usable 3D tensor, you could use the following code:
+```python
+reshaped = tf.reshape(gathered_tensor, (2, 3, -1))
+```
+The -1 argument indicates that the dimension will be calculated based on the total number of elements and the other specified dimensions.",0.608695652
+56286350,tf.keras.metrics.SensitivityAtSpecificity,Documentation Replication on Other Examples,tf.keras.metrics.SpecificityAtSensitivity num_thresholds interpretation,"<p>I'm trying to get my head around <a href=""https://www.tensorflow.org/versions/r2.0/api_docs/python/tf/metrics/SensitivityAtSpecificity"" rel=""nofollow noreferrer"">tf.keras.metrics.SensitivityAtSpecificity</a>. I'm fine with the concept of sensity and specificity in isolation, but I'm unsure how the two are related in this single metric.</p>
+
+<p>More specifically, I'm unsure how to interpret the <code>num_thresholds</code> argument. The example in documentation has <code>num_thresholds=1</code>. Setting <code>num_thresholds</code> greater than 1 with the same input data seems to always return a metric value of 1.0.</p>
+
+<pre class=""lang-py prettyprint-override""><code>def print_metric_value(num_thresholds):
+    # other values based on docs example
+    m = tf.keras.metrics.SensitivityAtSpecificity(
+        0.4, num_thresholds=num_thresholds)
+    m.update_state([0, 0, 1, 1], [0, 0.5, 0.3, 0.9])
+    print('Result with num_thresholds = %d: %.1f' %
+          (num_thresholds, m.result().numpy()))
+
+print_metric_value(1)    # 0.5 - same as docs
+print_metric_value(2)    # 1.0
+print_metric_value(200)  # 1.0
+</code></pre>
+","<p>The <code>num_thresholds</code> refers to the number of thresholds. But you might ask: what is a threshold (in this context)? And the answer is that the threshold, which is in the range [0,1], is actually the value which all the predictions greater than that will be considered as positive (i.e. 1) and all the prediction lower than that will be considered as negative (i.e. 0). </p>
+
+<p>For example, consider the prediction vector as <code>[0, 0.5, 0.3, 0.9]</code> which are actually confidences scores (e.g. probabilities). Now if we apply the threshold value of <code>0.1</code>, we get <code>[0, 1, 1, 1]</code>; or if we apply threshold value of <code>0.6</code> we get <code>[0, 0, 0, 1]</code> (i.e. only the confidence of last prediction is higher than <code>0.6</code>).   </p>
+
+<p>Now suppose you want to monitor the changes to specificity at a fixed sensitivity. What <code>SensitivityAtSpecificity</code> metric does is that, to compute the value of sensitivity, it would first compute the specificity at different thresholds and then chooses the threshold which has the closest specificity to the specificity value you have provided (for example, in your question you have given <code>0.4</code> as the specificity value). Then the sensitivity is computed at that threshold and will be returned as the value of this metric. The same thing applies to <code>SpecificityAtSensitivity</code> metric, just swap ""specificity"" and ""sensitivity"" in this paragraph.</p>
+
+<p>You might also ask: what are the threshold values? The answer is if <code>num_thresholds=1</code> then the only threshold is 0.5. If <code>num_thresholds &gt; 1</code> then, besides 0 and 1 as thresholds, the interval (0,1) will be split into <code>num_thresholds - 1</code> equal sub-intervals and the split points are chosen as additional threshold values. For example:</p>
+
+<pre><code>num_threshold  |  thresholds
+=============================
+1              | [0.5]
+2              | [0, 1]
+3              | [0, 0.5, 1]
+4              | [0, 0.33, 0.66, 1]
+5              | [0, 0.25, 0.5, 0.75, 1]
+...
+</code></pre>
+",The user is trying to understand how the num_thresholds argument affects the tf.keras.metrics.SensitivityAtSpecificity metric and why setting num_thresholds greater than 1 always returns a metric value of 1.0.,"The num_thresholds argument in tf.keras.metrics.SpecificityAtSensitivity refers to the number of thresholds being used. The threshold value is used to determine whether predictions are considered positive or negative - typically, any predictions greater than the threshold are considered positive, and those below are considered negative.
+
+If num_thresholds=1, then the threshold used is 0.5. If num_thresholds is greater than 1, the range 0 to 1 is split into num_thresholds - 1 equal sub-intervals, with their split points used as threshold values. For example, if num_thresholds=3, the thresholds used are 0, 0.5, and 1.",1,"The num_thresholds argument refers to the number of thresholds used to discretize the curve. The threshold value is the point at which predictions are considered positive or negative - for instance, a threshold of 0.5 would consider any prediction above 0.5 as positive and any prediction below as negative.
+
+If num_thresholds = 1, the only threshold used is 0.5. If num_thresholds is greater than 1, the interval (0, 1) is split into num_thresholds - 1 equal sub-intervals, and these split points are used as additional threshold values. For example, if num_thresholds = 5, the thresholds used would be  [0, 0.25, 0.5, 0.75, 1].",1,"The num_thresholds argument in tf.keras.metrics.SensitivityAtSpecificity refers to the number of thresholds to use when computing the metric. The default value is 200. If num_thresholds = 1, the only threshold is 0.5. Setting num_thresholds greater than 1 always returns a metric value of 1.0 because besides 0 and 1 as thresholds, the interval (0, 1) is split into num_thresholds - 1 equal sub-intervals and the split points are chosen as additional threshold values. Therefore, as the num_thresholds increase, the sensitivity at specificity value approaches 1.0.",1
+74005009,tf.data.Dataset,Documentation Replicability,How to create output_signature for tensorflow.dataset.from_generator,"<p>I have a generator yielding data and labels <code>yield data, labels</code> where the data is
+an <code>numpy.ndarray</code> with variable rows and 500 columns of type <code>dtype=float32</code> and the labels are integers of <code>numpy.int64</code>.</p>
+<p>I'm trying to pass this data into TensorFlow from_generator function to create a TensorFlow dataset: <code>tf.data.Dataset.from_generator</code></p>
+<p>The <a href=""https://www.tensorflow.org/api_docs/python/tf/data/Dataset#from_generator"" rel=""nofollow noreferrer"">docs</a> say that the from_generator function needs a parameter <code>output_signature</code> as an input. But I'm having trouble understanding how to build this output_signature.</p>
+<p>How can I make the output_signature for the generator I described?</p>
+<p>Thank you!</p>
+<p>Edit:
+I used <code>tf.type_spec_from_value</code> to get this:</p>
+<pre><code>dataset = tf.data.Dataset.from_generator(
+   datagen_row,
+   output_signature=(
+      tf.TensorSpec(shape=(None, 512), dtype=tf.float32, name=None),
+      tf.TensorSpec(shape=(), dtype=tf.int64, name=None)
+   )
+)
+</code></pre>
+<p>But is it correct to use None when the number of rows is varying for the first data type?</p>
+","<p>if your datagen_row() function yields input_data, label with format 500 and 1
+than your output_signature should be:</p>
+<pre><code>  output_signature=(
+  tf.TensorSpec(shape=(None, 500), dtype=tf.float32, name=None),
+  tf.TensorSpec(shape=(), dtype=tf.int64, name=None))
+</code></pre>
+<p>where the first TensorSpec is for the data format and the second one for the label format.
+But it would be helpful if you post the function + maybe data examples or data shape here. Otherwise it is hard to help.</p>
+","The user is trying to understand how to correctly create the output_signature parameter for the tf.data.Dataset.from_generator function in TensorFlow, specifically for a generator that yields data with variable rows and fixed columns, and labels as integers.","The function tf.data.Dataset.from_generator accepts a parameter called output_signature which can be formed using tf.TensorSpec.
+
+For instance, if your generator function yields inputs and labels, the output_signature can be defined as:
+```
+output_signature = (tf.TensorSpec(shape=(None, 500), dtype=tf.float32, name=None), 
+                   tf.TensorSpec(shape=(), dtype=tf.int64, name=None))
+```
+where the first TensorSpec is for the input data format and the second one is for the label format. 
+
+The shape parameter in TensorSpec can also be set to None when the number of rows is variable.",0.727272727,"The `output_signature` parameter in the `tf.data.Dataset.from_generator` function is used to specify the shape and data type of the generated elements. 
+
+Since your generator function yields two values: `data` and `labels`, the output signature should be a tuple with two elements. The first element of the tuple should correspond to the data part, and the second element to the labels.
+
+It seems you already have the right output signature:
+```
+ (
+ tf.TensorSpec(shape=(None, 512), dtype=tf.float32, name=None),
+ tf.TensorSpec(shape=(), dtype=tf.int64, name=None))
+```
+
+As for your question about using `None` for the shape of the first data type, it is correct to use it when the number of rows is varying. `None` is a special value in TensorFlow that means the dimension of the tensor at that position can be inferred from the input data.",0.846153846,"To correctly create the `output_signature` parameter for the `tf.data.Dataset.from_generator` function in TensorFlow, you should use `TensorSpec` with the appropriate `shape` and `dtype` for each element yielded by your generator.
+
+If your generator yields data with variable rows and fixed columns, you can specify the shape of the data tensor as `(None, fixed_columns)`, where `None` represents the variable number of rows.
+
+For integer labels, you can use `TensorSpec` with an appropriate `shape`, e.g. `()` for scalar labels, and `dtype=tf.int64`.
+
+Here's an example that demonstrates the creation of the `output_signature` parameter for a generator yielding data with variable rows and fixed columns, and integer labels:
+
+```python
+import tensorflow as tf
+
+def gen():
+ # Your generator logic here
+ # ...
+ yield data, labels
+
+output_signature = (
+ tf.TensorSpec(shape=(None, 500), dtype=tf.float32), # For the data with variable rows and fixed columns
+ tf.TensorSpec(shape=(), dtype=tf.int64) # For the integer labels
+)
+
+dataset = tf.data.Dataset.from_generator(gen, output_signature=output_signature)
+```
+
+Make sure to replace `(None, 500)` with the actual number of columns in your data, and adjust the `dtype` accordingly if your data and labels have different types.",0.705882353
+51858970,tf.gradients,Documentation Ambiguity,"tf.gradients() sums over ys, does it?","<p><a href=""https://www.tensorflow.org/versions/r1.6/api_docs/python/tf/gradients"" rel=""noreferrer"">https://www.tensorflow.org/versions/r1.6/api_docs/python/tf/gradients</a></p>
+
+<p>In the documentation for tf.gradients(ys, xs) it states that </p>
+
+<blockquote>
+  <p>Constructs symbolic derivatives of sum of ys w.r.t. x in xs</p>
+</blockquote>
+
+<p>I am confused about the summing part, I have read elsewhere that this sums the derivatives dy/dx across the batch for every x in the batch. However, whenever I use this I fail to see this happening. Take the following simple example:</p>
+
+<pre><code>x_dims = 3
+batch_size = 4
+
+x = tf.placeholder(tf.float32, (None, x_dims))
+
+y = 2*(x**2)
+
+grads = tf.gradients(y,x)
+
+sess = tf.Session()
+
+x_val = np.random.randint(0, 10, (batch_size, x_dims))
+y_val, grads_val = sess.run([y, grads], {x:x_val})
+
+print('x = \n', x_val)
+print('y = \n', y_val)
+print('dy/dx = \n', grads_val[0])
+</code></pre>
+
+<p>This gives the following output:</p>
+
+<pre><code>x = 
+ [[5 3 7]
+ [2 2 5]
+ [7 5 0]
+ [3 7 6]]
+y = 
+ [[50. 18. 98.]
+ [ 8.  8. 50.]
+ [98. 50.  0.]
+ [18. 98. 72.]]
+dy/dx = 
+ [[20. 12. 28.]
+ [ 8.  8. 20.]
+ [28. 20.  0.]
+ [12. 28. 24.]]
+</code></pre>
+
+<p>This is the output I would expect, simply the derivative dy/dx for every element in the batch. I don't see any summing happening. I have seen in other examples that this operation is followed by dividing by the batch size to account for tf.gradients() summing the gradients over the batch (see here: <a href=""https://pemami4911.github.io/blog/2016/08/21/ddpg-rl.html"" rel=""noreferrer"">https://pemami4911.github.io/blog/2016/08/21/ddpg-rl.html</a>). Why is this necessary?</p>
+
+<p>I am using Tensorflow 1.6 and Python 3.</p>
+","<p>If y and x have the same shape then the sum over the dy/dx is the sum over exactly one value. However, if you have more than one y for each x, then the gradients are summed.</p>
+
+<pre><code>import numpy as np
+import tensorflow as tf
+
+x_dims = 3
+batch_size = 4
+
+x = tf.placeholder(tf.float32, (None, x_dims))
+y = 2*(x**2)
+z = tf.stack([y, y]) # There are twice as many z's as x's
+
+dy_dx = tf.gradients(y,x)
+dz_dx = tf.gradients(z,x)
+
+sess = tf.Session()
+
+x_val = np.random.randint(0, 10, (batch_size, x_dims))
+y_val, z_val, dy_dx_val, dz_dx_val = sess.run([y, z, dy_dx, dz_dx], {x:x_val})
+
+print('x.shape =', x_val.shape)
+print('x = \n', x_val)
+print('y.shape = ', y_val.shape)
+print('y = \n', y_val)
+print('z.shape = ', z_val.shape)
+print('z = \n', z_val)
+print('dy/dx = \n', dy_dx_val[0])
+print('dz/dx = \n', dz_dx_val[0])
+</code></pre>
+
+<p>Produces the following output:</p>
+
+<pre><code>x.shape = (4, 3)
+x = 
+ [[1 4 8]
+ [0 2 8]
+ [2 8 1]
+ [4 5 2]]
+
+y.shape =  (4, 3)
+y = 
+ [[  2.  32. 128.]
+ [  0.   8. 128.]
+ [  8. 128.   2.]
+ [ 32.  50.   8.]]
+
+z.shape =  (2, 4, 3)
+z = 
+ [[[  2.  32. 128.]
+  [  0.   8. 128.]
+  [  8. 128.   2.]
+  [ 32.  50.   8.]]
+
+ [[  2.  32. 128.]
+  [  0.   8. 128.]
+  [  8. 128.   2.]
+  [ 32.  50.   8.]]]
+
+dy/dx = 
+ [[ 4. 16. 32.]
+ [ 0.  8. 32.]
+ [ 8. 32.  4.]
+ [16. 20.  8.]]
+dz/dx = 
+ [[ 8. 32. 64.]
+ [ 0. 16. 64.]
+ [16. 64.  8.]
+ [32. 40. 16.]]
+</code></pre>
+
+<p>In particular, notice that the values of dz/dx are twice those of dy/dz since they are summed over the inputs to the stack.</p>
+","The user is trying to understand whether the tf.gradients() function in TensorFlow sums the gradients over the batch and why this summing is necessary, as they do not observe this behavior in their example.","According to the information available to me, it is stated that the function tf.gradients() does sum over the ys. The ys are summed up to make a single scalar y, and then tf.gradients computes dy/dx where x represents variables from xs. 
+
+Moreover, it is mentioned that if y and x have the same shape then the sum over the dy/dx is the sum over exactly one value. However, if you have more than one y for each x, then the gradients are summed.",0.909090909,"According to the TensorFlow documentation, the tf.gradients(ys, xs) function constructs the symbolic partial derivatives of the sum of ys with respect to x in xs.
+
+The grad_ys parameter is only needed in advanced use cases. It represents the initial gradients for each y in ys. When grad_ys is None, TensorFlow fills in a tensor of 1's of the shape of y for each y in ys. However, users can provide their own initial grad_ys to compute the derivatives using a different initial gradient for each y. This multiplier can be useful in several cases, for example, when computing the gradients of a model with a huge fan-in or when approximating gradients using the chain rule.
+
+In your example, since y and x have the same shape, the sum over the dy/dx is the sum over exactly one value. Therefore, the gradients are not summed. If you had more than one y for each x, then the gradients would be summed. For instance, if you stacked your y values twice as in z = tf.stack([y, y]), the gradients dz/dx would be twice those of dy/dx because they are summed over the inputs to the stack.",0.9,"According to the TensorFlow documentation, the function tf.gradients() does sum the gradients over the batch. The documentation states that:
+> Thus, if you ask for the gradient of multiple targets, the result for each source is: The gradient of the sum of the targets, or equivalently The sum of the gradients of each target.
+Moreover, the function is described as computing the gradient of a computation with respect to some inputs, usually the model's variables.",0.919280999
+60013980,tf.nn.embedding_lookup_sparse,Documentation Replicability,tf.nn.embedding_lookup_sparse 3D sparse tensor input,"<p>I have an embedding matrix and there is a 3D sparse tensor which is used to get the embedding output, after reading the docs of <a href=""https://www.tensorflow.org/api_docs/python/tf/nn/embedding_lookup_sparse"" rel=""nofollow noreferrer""><code>tf.nn.embedding_lookup_sparse</code></a> I found it only supports 2D sparse tensors,</p>
+
+<blockquote>
+  <p>sp_ids: N x M SparseTensor of int64 ids where N is typically batch size and M is arbitrary.</p>
+</blockquote>
+
+<p>My example code here</p>
+
+<pre><code>import numpy as np
+import tensorflow as tf
+tf.enable_eager_execution()
+
+# [feature number, embedding dim] 
+w = tf.get_variable(""w"", [4, 4], initializer=tf.random_normal_initializer())
+
+z = np.array(
+     [
+      [
+        [0, 1, 2, 3],   # get the vector of row 0, 1, 2, 3 of the embedding matrix w and get the sum
+        [2, 3]
+      ],
+
+      [
+        [1, 3],
+        [2]
+      ],
+
+      [
+        [0, 1, 3],
+        [1, 2]
+      ]
+     ])
+
+sp = tf.SparseTensor(values=[0, 1, 2, 3, 2, 3, 1, 3, 2, 0, 1, 3, 1, 2],
+                     indices=[[0,0,0],[0,0,1],[0,0,2],[0,0,3],[0,1,2],
+                              [0,1,3],[1,0,1],[1,0,3],[1,1,2],[2,0,0],
+                              [2,0,1],[2,0,3],[2,1,1],[2,1,2]],
+                     dense_shape=[3, 2, 4])
+
+tf.nn.embedding_lookup_sparse(w, sp, None, combiner='sum')
+# the outputs
+&lt;tf.Tensor: id=970, shape=(3, 4), dtype=float32, numpy=
+array([[-5.8729677 , -1.3900641 ,  0.8126096 , -3.1223912 ],
+       [-1.0788026 , -1.1324122 ,  0.34160078,  0.23714277],
+       [-2.497394  , -2.7855003 ,  3.0201516 , -1.8009453 ]],
+      dtype=float32)&gt;
+
+print(w)
+&lt;tf.Variable 'w:0' shape=(4, 4) dtype=float32, numpy=
+array([[-2.5669768 , -0.38916406,  1.4039794 , -2.8173826 ],
+       [ 1.1483854 , -1.2639242 ,  1.2745714 ,  0.7792944 ],
+       [-1.3400027 , -0.46362385, -1.3652185 ,  0.27220532],
+       [-0.8871854 ,  0.5951359 ,  0.43224794, -0.8143569 ]],
+      dtype=float32)&gt;
+</code></pre>
+
+<p>But the expected output is a matrix with a dimension of <code>3x2x4</code>, not <code>3x4</code>. Does <code>tf.nn.embedding_lookup_sparse</code> support this operation?</p>
+","<p>The most easier way to do so is to make the sparse tensor as a 2D tensor and get the weights of the embedding matrix and then reshape.</p>
+
+<pre class=""lang-py prettyprint-override""><code># First make the z as a 2D arr and create a sparse tensor 
+z = np.array([
+        [0, 1, 2, 3],  # get the row 0,1,2,3 of the embedding matrix w and get the sum
+        [2, 3],
+        [1, 3],
+        [2],
+        [0, 1, 3],
+        [1, 2]
+      ])
+
+sp = tf.SparseTensor(values=[0, 1, 2, 3, 2, 3, 1, 3, 2, 0, 1, 3, 1, 2],
+                     indices=[[0,0],[0,1],[0,2],[0,3],[1,2],[1,3],[2,1],
+                              [2,3],[3,2],[4,0],[4,1],[4,3],[5,1],[5,2]],
+                     dense_shape=[6, 4])
+
+res = tf.nn.embedding_lookup_sparse(w, sp, None, combiner='sum')
+
+res.numpy()
+# the output
+array([[-3.6457794 , -1.5215762 ,  1.7455802 , -2.5802398 ],
+       [-2.227188  ,  0.13151208, -0.9329706 , -0.5421516 ],
+       [ 0.2612    , -0.6687883 ,  1.7068193 , -0.03506255],
+       [-1.3400027 , -0.46362385, -1.3652185 ,  0.27220532],
+       [-2.3057768 , -1.0579524 ,  3.1107986 , -2.8524451 ],
+       [-0.19161725, -1.7275481 , -0.0906471 ,  1.0514997 ]],
+
+# reshape
+tf.reshape(res, [-1, 2, 4])
+# that is exacly what I want.
+array([[[-3.6457794 , -1.5215762 ,  1.7455802 , -2.5802398 ],
+        [-2.227188  ,  0.13151208, -0.9329706 , -0.5421516 ]],
+
+       [[ 0.2612    , -0.6687883 ,  1.7068193 , -0.03506255],
+        [-1.3400027 , -0.46362385, -1.3652185 ,  0.27220532]],
+
+       [[-2.3057768 , -1.0579524 ,  3.1107986 , -2.8524451 ],
+        [-0.19161725, -1.7275481 , -0.0906471 ,  1.0514997 ]]])
+
+# print w, and the above result is right
+w.numpy()
+
+array([[-2.5669768 , -0.38916406,  1.4039794 , -2.8173826 ],
+       [ 1.1483854 , -1.2639242 ,  1.2745714 ,  0.7792944 ],
+       [-1.3400027 , -0.46362385, -1.3652185 ,  0.27220532],
+       [-0.8871854 ,  0.5951359 ,  0.43224794, -0.8143569 ]],
+      dtype=float32)
+</code></pre>
+
+<p>So, forget the 3D sparse tensor, simply convert it to 2D tensor. Because you only care about the values (index of rows, which are used to get the corresponding rows of the embedding matrix) in the sparse tensor.</p>
+","The user is trying to understand if tf.nn.embedding_lookup_sparse supports 3D sparse tensor inputs to produce an output with dimensions 3x2x4, as their current output is 3x4.","The function `tf.nn.embedding_lookup_sparse` in TensorFlow appears to support input in the form of a 3D sparse tensor. 
+
+The function takes a sparse tensor and returns the corresponding vectors from the embedding matrix as a dense tensor. The sparse tensor should contain the indices of the rows desired to be retrieved from the embedding matrix.
+
+For instance, providing a 3D sparse tensor with shape [batch size, arbitrary length, dim1] will return a tensor with shape [batch size, arbitrary length, embedding dimension].
+
+The operation can be performed on a single large embedding matrix or a partition of multiple smaller matrices.",1,"Unfortunately, it looks like tf.nn.embedding_lookup_sparse does not support 3D sparse tensors. However, there is a workaround. As suggested in one of the sources, you could convert the 3D sparse tensor to a 2D tensor and then perform the embedding lookup operation. The operation would then involve two steps: getting the weights of the embedding matrix and reshaping the tensor.",1,"According to a source, the easiest way to obtain a 3D output is to convert the 3D sparse tensor into a 2D tensor. The source also states that converting the tensor is possible because users only care about the values ​​(index of rows) in the sparse tensor.",1
+57349824,tf.keras,Documentation Replication on Other Examples,"Recurrent neural network, time series prediction with newer Tensorflow 1.14","<p>How to use new tf.keras API with recurrent neural network? I have checked the documentation but there is no example of such a situation.
+There is this great book Hands on machine learning from 2017. Since that year the API of tensorflow has evolved and I am trying to rewrite recurrent neural network for time series prediction with using version <code>1.14</code> code.
+The code from the book is using older <code>tf.nn.dynamic_rnn</code> and <code>tf.nn.rnn_cell.BasicRNNCell</code>:</p>
+
+<pre><code>n_steps = 20
+n_inputs = 1
+n_neurons = 100
+n_outputs = 1
+learning_rate = 0.001
+
+X = tf.placeholder(tf.float32, [None, n_steps, n_inputs])
+y = tf.placeholder(tf.float32, [None, n_steps, n_outputs])
+cell = tf.nn.rnn_cell.BasicRNNCell(num_units=n_neurons, activation=tf.nn.relu)
+rnn_outputs, states = tf.nn.dynamic_rnn(cell, X, dtype=tf.float32)
+stacked_rnn_outputs = tf.reshape(rnn_outputs, [-1, n_neurons])
+stacked_outputs = tf.layers.dense(stacked_rnn_outputs, n_outputs)
+outputs = tf.reshape(stacked_outputs, [-1, n_steps, n_outputs])
+loss = tf.reduce_mean(tf.square(outputs - y))
+optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+training_op = optimizer.minimize(loss)
+
+init = tf.global_variables_initializer()
+saver = tf.train.Saver()
+n_iterations = 500
+batch_size = 50
+
+with tf.Session() as sess:
+    init.run()
+        for iteration in range(n_iterations):
+        X_batch, y_batch = next_batch(batch_size, n_steps)
+        sess.run(training_op, feed_dict={X: X_batch, y: y_batch})
+        if iteration % 100 == 0:
+            mse = loss.eval(feed_dict={X: X_batch, y: y_batch})
+            print(iteration, ""\tMSE:"", mse)
+
+    X_new = time_series(np.array(t_instance[:-1].reshape(-1, n_steps, n_inputs)))
+    y_pred = sess.run(outputs, feed_dict={X: X_new})
+</code></pre>
+
+<p>And this code works just fine (except that it throws warnings about deprecation left and right). I wanted to use <code>tf.keras</code> API as suggested in warning. My code is the same except:</p>
+
+<pre><code>cell =  tf.keras.layers.SimpleRNNCell(units=n_neurons, activation=tf.nn.relu)  
+rnn_outputs = tf.keras.layers.RNN(cell,dtype=tf.float32, name=""hidden1"")(X)
+</code></pre>
+
+<p>But this yields following exception:</p>
+
+<pre><code>InvalidArgumentError: Input to reshape is a tensor with 50 values, but the requested shape requires a multiple of 20
+ [[node Reshape_1 (defined at &lt;ipython-input-9-879361be49dd&gt;:3) ]]
+</code></pre>
+
+<p>so I understand that the problematic line is</p>
+
+<pre><code>outputs = tf.reshape(stacked_outputs, [-1, n_steps, n_outputs])
+</code></pre>
+
+<p>After checking and comparing documentation for both cells <a href=""https://www.tensorflow.org/api_docs/python/tf/nn/dynamic_rnn"" rel=""nofollow noreferrer"">https://www.tensorflow.org/api_docs/python/tf/nn/dynamic_rnn</a> and 
+<a href=""https://www.tensorflow.org/api_docs/python/tf/keras/layers/RNN"" rel=""nofollow noreferrer"">https://www.tensorflow.org/api_docs/python/tf/keras/layers/RNN</a> I can't find the culprit.</p>
+
+<p><strong>What is the difference with these two cells? How to use tf.keras API with time series?</strong></p>
+
+<p>Full old code: <a href=""https://github.com/ageron/handson-ml/blob/master/14_recurrent_neural_networks.ipynb"" rel=""nofollow noreferrer"">https://github.com/ageron/handson-ml/blob/master/14_recurrent_neural_networks.ipynb</a></p>
+
+<p>Full ""my"" code:</p>
+
+<pre><code>import numpy as np
+import tensorflow as tf
+from datetime import datetime
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+import pandas as pd
+from utils import shuffle_batch, variable_summaries
+import os
+
+
+dir_path = os.getcwd()
+
+now = datetime.utcnow().strftime(""%Y%m%d%H%M%S"")
+root_logdir = ""tf_logs""
+logdir = ""{}/run-{}/"".format(root_logdir, now)
+print(dir_path)
+
+
+t_min, t_max = -5, 5
+section_start = (t_max + t_min) / 2
+resolution = 0.1
+n_steps = 20
+
+def time_series(t):
+    return np.sin(t)
+
+def next_batch(batch_size, n_steps):
+    t0 = np.random.rand(batch_size, 1) * (t_max - t_min - n_steps * resolution)
+    Ts = t0 + np.arange(0., n_steps + 1) * resolution
+    ys = time_series(Ts)
+    return ys[:, :-1].reshape(-1, n_steps, 1), ys[:, 1:].reshape(-1, n_steps, 1)
+
+
+t = np.linspace(t_min, t_max, int((t_max - t_min) / resolution))
+
+t_instance = np.linspace(start = section_start, stop = section_start + resolution * (n_steps + 1),num = n_steps + 1)
+
+plt.figure(figsize=(11,4))
+plt.subplot(121)
+plt.title(""A time series (generated)"", fontsize=14)
+plt.plot(t, time_series(t), label=r""original"")
+plt.plot(t_instance[:-1], time_series(t_instance[:-1]), ""b-"", linewidth=3, label=""A training instance"")
+plt.legend(loc=""lower left"", fontsize=14)
+#plt.axis([-10, 10, -17, 13])
+plt.xlabel(""Time"")
+plt.ylabel(""Value"")
+
+plt.subplot(122)
+plt.title(""A training instance"", fontsize=14)
+plt.plot(t_instance[:-1], time_series(t_instance[:-1]), ""bo"", markersize=10, label=""instance"")
+plt.plot(t_instance[1:], time_series(t_instance[1:]), ""c*"", markersize=10, label=""target"")
+plt.legend(loc=""upper left"")
+plt.xlabel(""Time"")
+
+
+# In[6]:
+
+
+n_steps = 20
+n_inputs = 1
+n_neurons = 100
+n_outputs = 1
+
+X = tf.placeholder(tf.float32, [None, n_steps, n_inputs])
+y = tf.placeholder(tf.float32, [None, n_steps, n_outputs])
+
+
+# In[7]:
+
+
+cell =  tf.keras.layers.SimpleRNNCell(units=n_neurons, activation=tf.nn.relu)                        
+
+
+rnn_outputs = tf.keras.layers.RNN(cell,dtype=tf.float32, name=""hidden1"")(X)
+print(rnn_outputs.get_shape())
+
+
+stacked_rnn_outputs = tf.reshape(rnn_outputs, [-1, n_neurons], name='reshape1')
+stacked_outputs = tf.keras.layers.Dense(n_outputs,name=""hidden2"")(stacked_rnn_outputs)
+outputs = tf.reshape(stacked_outputs, [-1, n_steps, n_outputs], name='reshape2')
+
+
+learning_rate = 0.001
+
+loss = tf.reduce_mean(tf.square(outputs - y)) # MSE
+optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+training_op = optimizer.minimize(loss)
+
+init = tf.global_variables_initializer()
+saver = tf.train.Saver()
+
+n_iterations = 1500
+batch_size = 50
+save_path =os.path.join(dir_path,""model"",""recurrent_sinus_model"")
+
+with tf.Session() as sess:
+    init.run()
+    for iteration in range(n_iterations):
+        X_batch, y_batch = next_batch(batch_size, n_steps)
+        sess.run(training_op, feed_dict={X: X_batch, y: y_batch})
+        if iteration % 100 == 0:
+            mse = loss.eval(feed_dict={X: X_batch, y: y_batch})
+            print(iteration, ""\tMSE:"", mse)
+
+    saver.save(sess, save_path)
+
+
+with tf.Session() as sess:                      
+    saver.restore(sess, save_path)  
+
+    X_new = time_series(np.array(t_instance[:-1].reshape(-1, n_steps, n_inputs)))
+    y_pred = sess.run(outputs, feed_dict={X: X_new})
+
+
+plt.title(""Testing the model"", fontsize=14)
+plt.plot(t_instance[:-1], time_series(t_instance[:-1]), ""bo"", markersize=10, label=""instance"")
+plt.plot(t_instance[1:], time_series(t_instance[1:]), ""w*"", markersize=10, label=""target"")
+plt.plot(t_instance[1:], y_pred[0,:,0], ""r."", markersize=10, label=""prediction"")
+plt.legend(loc=""upper left"")
+plt.xlabel(""Time"")
+
+plt.show()
+
+
+# In[ ]:
+
+
+with tf.Session() as sess:                      
+    saver.restore(sess, save_path)  
+
+    X_new = time_series(np.array(t.reshape(-1, n_steps, n_inputs)))
+    y_pred = sess.run(outputs, feed_dict={X: X_new})
+
+
+
+plt.title(""A time series (generated)"", fontsize=14)
+plt.plot(t, time_series(t), label=r""original"",linewidth=5,c='r')
+plt.plot(t[:-1], time_series(t[:-1]), ""b-"", linewidth=3, label=""A training instance"")
+plt.legend(loc=""lower left"", fontsize=14)
+
+plt.xlabel(""Time"")
+plt.ylabel(""Value"")
+</code></pre>
+","<p>So the answer is:</p>
+
+<pre><code>rnn_outputs, rnn_states  = tf.keras.layers.RNN(cell,dtype=tf.float32, name=""hidden1"", return_state=True, return_sequences=True)(X)
+</code></pre>
+
+<p>instead of </p>
+
+<pre><code>rnn_outputs = tf.keras.layers.RNN(cell,dtype=tf.float32, name=""hidden1"")(X)
+</code></pre>
+
+<p>so the parameter <code>return_sequences=True</code> make the RNN return the time series as well, and well, this is the point.</p>
+","The user is trying to understand how to use the new tf.keras API for implementing a recurrent neural network for time series prediction in TensorFlow 1.14, and resolve an error related to tensor reshaping.","Time series forecasting using recurrent neural networks is discussed in the TensorFlow Core tutorial. The tutorial uses a weather time series dataset recorded by the Max Planck Institute for Biogeochemistry, which contains 14 features such as air temperature, atmospheric pressure and humidity, collected every 10 minutes. 
+
+The steps taken in the tutorial include importing the required packages, downloading and preparing the dataset, and scaling the features present in the dataset. Next, a 'WindowGenerator' class is created, which returns consecutive input and label windows from the dataset. Various window styles can be created depending on the task and type of model.
+
+Several models are then built, including linear, dense, convolutional and recurrent neural network models, and their performances are compared. The tutorial also covers topics such as residual connections, bidirectional RNNs, and handling nested inputs and outputs.
+
+Another tutorial on TensorFlow covers text classification using RNNs. It walks through the steps of setting up input pipelines for the IMDB large movie review dataset, creating a text encoder, building a text classification model using a bidirectional RNN layer, and compiling and training the model.",0.888888889,"The main difference between the older TensorFlow API and the new tf.keras API is that in the older version, the function tf.nn.dynamic_rnn replaces elements after the sequence end with 0s, which cannot be replicated in the new API. In the new API, the behaviour of rnn computation is different. It simply stops the computation and carries the last outputs and states forward. 
+
+To use the new tf.keras API with a recurrent neural network, you will need to make the following changes to your code:
+```
+rnn_outputs, rnn_states = tf.keras.layers.RNN(cell,dtype=tf.float32, name=""hidden1"", return_state=True, return_sequences=True)(X)
+```
+Here, the parameter return_sequences=True ensures that the RNN returns the time series as well.",0.933333333,"You can implement a recurrent neural network for time series prediction in TensorFlow 1.14 by following this tutorial. It uses the TensorFlow WindowGenerator class to create batches of input and output pairs from a time series dataset. 
+
+The tutorial recommends using the tf.keras.layers.RNN class, which manages the state and sequence results, combined with a tf.keras.layers.LSTMCell class as the lower-level interface for handling single time-step interactions.
+
+I didn't find any specific solutions for tensor reshaping errors in the context you've described, but the tutorial does mention using the tf.keras.layers.Reshape class to change the shapes of tensors. It also provides some general advice on handling tensors with the wrong shapes:
+
+> The convolutional layer is applied to a sliding window of inputs. If you run it on wider input, it produces wider output. Note that the output is shorter than the input. To make training or plotting work, you need the labels and prediction to have the same length. So build a WindowGenerator to produce wide windows with a few extra input time steps so the label and prediction lengths match.",0.916666667
+55573670,tf.nn.sparse_softmax_cross_entropy_with_logits,Documentation Replication on Other Examples,Unexpected output for tf.nn.sparse_softmax_cross_entropy_with_logits,"<p>The TensorFlow documentation for <code>tf.nn.sparse_softmax_cross_entropy_with_logits</code> explicitly declares that I should not apply softmax to the inputs of this op:</p>
+
+<blockquote>
+  <p>This op expects unscaled logits, since it performs a softmax on logits
+  internally for efficiency. Do not call this op with the output of
+  softmax, as it will produce incorrect results.</p>
+</blockquote>
+
+<p>However if I use cross entropy without softmax it gives me unexpected results. According to <a href=""https://cs231n.github.io/neural-networks-3/#sanitycheck"" rel=""nofollow noreferrer"">CS231n course</a> the expected loss value is around 2.3 for CIFAR-10:</p>
+
+<blockquote>
+  <p>For example, for CIFAR-10 with a Softmax classifier we would expect
+  the initial loss to be 2.302, because we expect a diffuse probability
+  of 0.1 for each class (since there are 10 classes), and Softmax loss
+  is the negative log probability of the correct class so: -ln(0.1) =
+  2.302.</p>
+</blockquote>
+
+<p>However without softmax I get much bigger values, for example 108.91984.</p>
+
+<p>What exactly am I doing wrong with <code>sparse_softmax_cross_entropy_with_logits</code>? The TF code is shown below.</p>
+
+<pre><code>import tensorflow as tf
+import numpy as np
+from tensorflow.python import keras
+
+
+(_, _), (x_test, y_test) = keras.datasets.cifar10.load_data()
+x_test = np.reshape(x_test, [-1, 32, 32, 3])
+
+y_test = np.reshape(y_test, (10000,))
+y_test = y_test.astype(np.int32)
+
+x = tf.placeholder(dtype=tf.float32, shape=(None, 32, 32, 3))
+y = tf.placeholder(dtype=tf.int32, shape=(None,))
+
+layer = tf.layers.Conv2D(filters=16, kernel_size=3)(x)
+layer = tf.nn.relu(layer)
+layer = tf.layers.Flatten()(layer)
+layer = tf.layers.Dense(units=1000)(layer)
+layer = tf.nn.relu(layer)
+logits = tf.layers.Dense(units=10)(layer)
+
+# If this line is uncommented I get expected value around 2.3
+# logits = tf.nn.softmax(logits)
+
+loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y,
+                                                      logits=logits)
+loss = tf.reduce_mean(loss, name='cross_entropy')
+
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+
+    res = sess.run(loss, feed_dict={x: x_test[0:256], y: y_test[0:256]})
+    print(""loss: "", res)
+    # Expected output is value close to 2.3
+    # Real outputs are 108.91984, 72.82324, etc.
+
+</code></pre>
+","<p>The issue is not in the lines </p>
+
+<pre><code># If this line is uncommented I get expected value around 2.3
+# logits = tf.nn.softmax(logits)
+</code></pre>
+
+<p>Images in cifar10 dataset are in RGB, thus pixel values are in range [0, 256). If you divide your <code>x_test</code> by 255 </p>
+
+<pre><code>x_test = np.reshape(x_test, [-1, 32, 32, 3]).astype(np.float32) / 255
+</code></pre>
+
+<p>the values will be rescaled to [0,1] and <code>tf.nn.sparse_softmax_cross_entropy_with_logits</code> will return expected values</p>
+","The user is trying to understand why they are getting unexpected high loss values when using tf.nn.sparse_softmax_cross_entropy_with_logits without applying softmax to the logits, despite the TensorFlow documentation advising against applying softmax before using this function.","The function `tf.nn.sparse_softmax_cross_entropy_with_logits` returns the softmax cross-entropy loss, which is the negative log probability of the true class. This function accepts arguments like `logits`, `labels`, `dtype`, and `name`. An unexpected output could be the result of misconfiguring these arguments. 
+
+For example, if the `logits` and `labels` tensors do not have the same shape, it will result in an error. The `logits` tensor must be shaped so that the number of classes is the last dimension. Make sure both your `logits` and `labels` tensors are compatible.
+
+Another possible issue could be related to the `dtype` argument. By default, the function expects the dtype of both `logits` and `labels` to be `tf.float32`. Specifying an incorrect data type could lead to unexpected outcomes.
+
+Ensure that you have correctly configured these arguments according to the documentation: https://www.tensorflow.org/api_docs/python/tf/nn/sparse_softmax_cross_entropy_with_logits",0.785714,"The issue with your code is that the images in the CIFAR-10 dataset are in RGB format, so the pixel values are in the range [0, 256). To fix this, you should divide your x_test by 255 to rescale the values to the range [0,1].
+
+Here is the line of code that needs to be added:
+```
+x_test = np.reshape(x_test, [-1, 32, 32, 3]).astype(np.float32) / 255
+```",0.818181818,"According to the TensorFlow documentation, the function `tf.nn.sparse_softmax_cross_entropy_with_logits` expects unscaled logits since it performs a softmax on logits internally for efficiency. The documentation also mentions that one should not call this function with the output of softmax as it will produce incorrect results.
+
+The function computes the cost of a sparse softmax layer and is used during training. It returns high gradients when used with weakly labeled data, which causes the training process to diverge, leading to incorrect results. The issue can be resolved by using the function provided in the TensorFlow documentation for loss computation. 
+
+Another reason for unexpected high loss values could be due to the images in the CIFAR-10 dataset being in RGB format, with pixel values in the range [0, 256). Dividing the `x_test` values by 255 to rescale them to the range [0,1] may help, as mentioned in a user response to a related question.",0.714286
+51612489,tf.edit_distance,Lack of Alternative Solutions/Documentation,tensorflow tf.edit_distance explanation required?,"<p>How does tensorflow <code>tf.edit_distance</code> function works?
+How it compares string stored in two different sparse matrix equivalent of 2d or 3d dense matrix. </p>
+
+<p>Example given on tensorflow web page <a href=""https://www.tensorflow.org/api_docs/python/tf/edit_distance"" rel=""nofollow noreferrer"">https://www.tensorflow.org/api_docs/python/tf/edit_distance</a> is not so obvious. Please provide explanation using some other examples. </p>
+
+<p>Also this example is not clear.</p>
+
+<pre><code>#'hypothesis' is a tensor of shape [2, 1] with variable-length values:
+#(0,0) = [""a""] and (1,0) = [""b""]
+
+hypothesis = tf.SparseTensor([[0, 0, 0],[1, 0, 0]],[""a"", ""b""],(2, 1, 1))
+
+#'truth' is a tensor of shape `[2, 2]` with variable-length values:
+#(0,0) = [], (0,1) = [""a""], (1,0) = [""b"", ""c""],(1,1) = [""a""]
+
+truth = tf.SparseTensor([[0, 1, 0],[1, 0, 0],[1, 0, 1],[1, 1, 0]],[""a"", ""b"", 
+""c"", ""a""],(2, 2, 2))
+
+normalize = True
+
+#'output' is a tensor of shape [2, 2] with edit distances normalized by 
+#'truth' lengths.
+
+output ==&gt; [[inf, 1.0],[0.5, 1.0]],
+
+(0,0): no truth, (0,1): no hypothesis, (1,0): addition, (1,1): no hypothesis
+</code></pre>
+
+<p>How output is of dimension [2,2]?</p>
+
+<p>What normalization is doing here?</p>
+","<p>hypothesis in dense form looks like this</p>
+
+<pre><code>[[['a']],
+ [['b']]] # (2, 1, 1)
+</code></pre>
+
+<p>truth is this</p>
+
+<pre><code>[[[],['a']],
+ [['b', 'c'], ['a']]] # (2, 2, 2)
+</code></pre>
+
+<p>We are trying to find the <a href=""https://en.wikipedia.org/wiki/Levenshtein_distance"" rel=""nofollow noreferrer"">Levenshtein distance</a> between hypothesis and truth value.
+So, here is what is happening:</p>
+
+<p>at (0,0,0) - how far is ['a'] in hypothesis from [] - no truth in that position so can't calculate distance</p>
+
+<p>at (0,0,1) - since there is nothing in that position at hypothesis we return 1. Unlike the case above, the distance is 1 because in theory the hypothesis can be made same as truth by inserting one character (See Levenshtein distance calculations)</p>
+
+<p>at (1,0,0) - how far is ['b'] in hyp from ['b', 'c'] in truth. This is again 1, since we can insert a character to make hyp same as truth. But, we selected to normalize the output distance. So we divide by length of truth segment, which is 2. So you get 0.5</p>
+
+<p>at (1,0,1) - how far is [] in hyp from ['a'], since there is nothing in that position at hyp, we return 1</p>
+
+<p>Output is (2,2) because rank of hyp and truth is 3. The function returns tensor with rank (rank-1) </p>
+
+<p>It helps by imagining what we are trying to do here. You have 2 sequences in hypothesis and 2 sequences in the truth. So your output score will be such that you get scores for each position in each sequence.</p>
+
+<p>Here is an example where we try to match 4 hypotheses to a truth value. I think you have to do this for each truth sequence for the use case that you describe in your comment - let me know if you find something more efficient :-)</p>
+
+<pre><code>import tensorflow as tf
+
+hypothesis = tf.SparseTensor(
+            [[0, 0, 0],
+             [1, 0, 0],
+             [2, 0, 0],
+             [3, 0, 0]],
+             [""a"", ""b"", ""c"", ""d""],
+            (4, 1, 1))
+
+truth = tf.SparseTensor([[0, 0, 0], [0, 0, 1], [0, 1, 0]], [""b"", ""c"", ""a""], (1,2,2))
+num_hyp = 4
+truth = tf.sparse_concat(0, [truth] * num_hyp)
+
+d = tf.edit_distance(hypothesis, truth)
+
+with tf.Session() as sess:
+    print(sess.run(d))
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>[[1.  1. ]
+ [0.5 1. ]
+ [0.5 1. ]
+ [1.  1. ]]
+</code></pre>
+","The user is trying to understand how the TensorFlow function tf.edit_distance works, specifically how it compares strings stored in sparse matrices and how the output dimensions and normalization are determined.","The function tf.edit_distance returns the edit distance between two input strings. The edit distance is calculated by finding the Levenshtein distance between two sequences of characters. 
+
+The two input strings can be stored in sparse matrices of any dimension; the function will return a tensor with one less dimension than the input matrices. For example, if the input matrices are 2D, the output will be a 1D tensor.
+
+The function also has an optional normalise parameter which, when set to True, will normalise the edit distances by the length of the strings being compared.
+
+The mean Euclidean distance between two tensors of shape [batch_size, seq_length, 2] can be calculated using tf.norm or tf.math.reduce_euclidean_norm.",0.941176471,"The **tf.edit_distance** function in TensorFlow calculates the edit distance between two strings, which can be stored in sparse matrices. The function works by calculating the Levenshtein distance between the **'hypothesis'** and **'truth'** values.
+
+The output dimension in the example you provided, **[[inf, 1.0], [0.5, 1.0]]**, is a tensor of shape  [2,2] because the rank of both the hypothesis and truth tensors is 3. The function returns a tensor with rank (rank-1).
+
+Normalization is used to divide the edit distances by the lengths of the truth sequences. This can be useful when comparing multiple truth sequences to the same hypothesis sequence, as it normalizes the output distances.",0.979090909,"TensorFlow's `tf.edit_distance` function is used to find the edit distance between two strings. It can indeed compare strings stored in sparse matrices, as the function accepts a variety of tensor types. According to the documentation, the function works with both dense and sparse tensors. Sparse tensors encoded in the coordinate list (COO) format are among the supported types.
+
+The output dimensions of `tf.edit_distance` are determined by the shape of the input tensors. The function outputs a tensor with the same shape as the input, replacing each element with its corresponding edit distance. The edit distance is a measure of similarity between two strings, indicating the minimum number of operations needed to transform one string into the other.
+
+As for normalization, I couldn't find specific information on how the outputs of the `tf.edit_distance` function are normalized. However, TensorFlow does have normalization layers that can be applied to tensors to normalize their values. These layers rescale and recenter the tensor by calculating the mean and standard deviation of the output.",1
+54047604,tf.custom_gradient,Documentation Replication on Other Examples,How to assign custom gradient to TensorFlow op with multiple inputs,"<p>I'm trying to use TensorFlow's <code>@tf.custom_gradient</code> functionality to assign a custom gradient to a function with multiple inputs.  I can put together a working setup for only one input, but not for two or more.</p>
+
+<p>I've based my code on <a href=""https://www.tensorflow.org/api_docs/python/tf/custom_gradient"" rel=""nofollow noreferrer"">TensorFlow's custom_gradient documentation</a>, which works just fine for one input, as in this example:</p>
+
+<pre><code>import tensorflow as tf
+import os
+
+# Suppress Tensorflow startup info
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+
+# Custom gradient decorator on a function,
+# as described in documentation
+@tf.custom_gradient
+def my_identity(x):
+
+    # The custom gradient
+    def grad(dy):
+        return dy
+
+    # Return the result AND the gradient
+    return tf.identity(x), grad
+
+# Make a variable, run it through the custom op
+x = tf.get_variable('x', initializer=1.)
+y = my_identity(x)
+
+# Calculate loss, make an optimizer, train the variable
+loss = tf.abs(y)
+opt = tf.train.GradientDescentOptimizer(learning_rate=0.001)
+train = opt.minimize(loss)
+
+# Start a TensorFlow session, initialize variables, train
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    sess.run(train)
+</code></pre>
+
+<p>This example runs silently, then closes.  No issues, no errors.  The variable optimizes as expected.  However, in my application, I need to do such a calculation with multiple inputs, so something of this form:</p>
+
+<pre><code>@tf.custom_gradient
+def my_identity(x, z):
+
+    def grad(dy):
+        return dy
+
+    return tf.identity(x*z), grad
+</code></pre>
+
+<p>Running this in place of the example (and adding another variable input to the call of <code>my_identify</code>) results in the following error output.  Best as I can tell, the last parts of the error are from the dynamic generation of the op -- the information format matches the C++ formatting required in the op establishment (though that's about all I know about it).</p>
+
+<pre><code>Traceback (most recent call last):
+  File ""testing.py"", line 27, in &lt;module&gt;
+    train = opt.minimize(loss)
+  File ""/usr/lib/python3/dist-packages/tensorflow/python/training/optimizer.py"", line 400, in minimize
+    grad_loss=grad_loss)
+  File ""/usr/lib/python3/dist-packages/tensorflow/python/training/optimizer.py"", line 519, in compute_gradients
+    colocate_gradients_with_ops=colocate_gradients_with_ops)
+  File ""/usr/lib/python3/dist-packages/tensorflow/python/ops/gradients_impl.py"", line 630, in gradients
+    gate_gradients, aggregation_method, stop_gradients)
+  File ""/usr/lib/python3/dist-packages/tensorflow/python/ops/gradients_impl.py"", line 821, in _GradientsHelper
+    _VerifyGeneratedGradients(in_grads, op)
+  File ""/usr/lib/python3/dist-packages/tensorflow/python/ops/gradients_impl.py"", line 323, in _VerifyGeneratedGradients
+    ""inputs %d"" % (len(grads), op.node_def, len(op.inputs)))
+ValueError: Num gradients 2 generated for op name: ""IdentityN""
+op: ""IdentityN""
+input: ""Identity""
+input: ""x/read""
+input: ""y/read""
+attr {
+  key: ""T""
+  value {
+    list {
+      type: DT_FLOAT
+      type: DT_FLOAT
+      type: DT_FLOAT
+    }
+  }
+}
+attr {
+  key: ""_gradient_op_type""
+  value {
+    s: ""CustomGradient-9""
+  }
+}
+ do not match num inputs 3
+</code></pre>
+
+<p>Based on other custom gradient options, I surmised that the issue was a lack of supplied gradient for the second input argument.  So, I changed my function to this:</p>
+
+<pre><code>@tf.custom_gradient
+def my_identity(x, z):
+
+    def grad(dy):
+        return dy
+
+    return tf.identity(x*z), grad, grad
+</code></pre>
+
+<p>This results in the following more familiar error:</p>
+
+<pre><code>Traceback (most recent call last):
+  File ""testing.py"", line 22, in &lt;module&gt;
+    y = my_identity(x, z)
+  File ""/usr/lib/python3/dist-packages/tensorflow/python/ops/custom_gradient.py"", line 111, in decorated
+    return _graph_mode_decorator(f, *args, **kwargs)
+  File ""/usr/lib/python3/dist-packages/tensorflow/python/ops/custom_gradient.py"", line 132, in _graph_mode_decorator
+    result, grad_fn = f(*args)
+ValueError: too many values to unpack (expected 2)
+</code></pre>
+
+<p>The <code>@custom_gradient</code> decorator is only identifying the last returned element as a gradient.  So, I tried putting the two gradients into a tuple as <code>(grad, grad)</code> such that there would only be ""two"" outputs for the function.  TensorFlow rejected this too, this time because it can't call a tuple like it would a Tensor -- entirely reasonable, in hindsight.</p>
+
+<p>I've fussed around with the example some more, but to no avail.  No matter what I try, I can't get the custom-defined gradient to deal with multiple inputs.  I'm hoping that somebody with more knowledge than I regarding custom ops and gradients will have a better idea on this -- thanks in advance for the help!</p>
+","<p>If we use multiple variables as input, the number of gradients return from ""grad"" function should be equals to number of input variables, though we maybe don't care about some of them. </p>
+
+<p>For example:</p>
+
+<pre><code>@tf.custom_gradient
+def my_multiple(x,z):
+
+def grad(dy):
+    # return two gradients, one for 'x' and one for 'z'
+    return (dy*z, dy*x)
+
+return tf.identity(x*z), grad
+</code></pre>
+
+<p>Note that the second output of ""my_multiple"" is a function, not a gradient tensor. </p>
+","The user is trying to understand how to correctly assign a custom gradient to a TensorFlow operation that has multiple inputs, as their current attempts result in errors.","TensorFlow provides the tf.GradientTape API for automatic differentiation. To assign a custom gradient to TensorFlow op with multiple inputs, follow these steps:
+1. Create a new op by subclassing the tf.Operation class and implementing the compute method. You can also use a tf.custom_gradient decorator to set up your own.
+2. Use tf.RegisterGradient to set up your own gradient function. The gradient function must take in the gradients computed for the output of the loss function and return the gradients for the inputs.
+
+Here is an example that applies tf.clip_by_norm to the intermediate gradient:
+```python
+@tf.custom_gradient
+def clip_gradients(y):
+    def backward(dy):
+        return tf.clip_by_norm(dy, 0.5)
+    return y, backward
+```",0.785714286,"I'm afraid I wasn't able to find a definitive answer to your question, but I did find some information that might help. 
+
+According to TensorFlow's documentation, the @tf.custom_gradient decorator establishes an identity operation, but applies a clip during the gradient pass. The documentation goes on to provide an example of applying the @tf.custom_gradient decorator to a function with two inputs. The function multiplies two inputs, x and z, and applies tf.clip_by_norm to the intermediate gradient. The code for this is provided as follows:
+
+```python
+@tf.custom_gradient
+def clip_gradients(y, z):
+    def backward(dy, dz):
+        return tf.clip_by_norm(dy, dz, 0.5), None
+
+    return y * z, backward
+```
+
+The documentation then goes on to use this custom gradient in a subsequent operation, which suggests that the above code ought to work for your use case. Perhaps there is an issue elsewhere in your code?",0.857142857,"To assign a custom gradient to a TensorFlow operation with multiple inputs, you should use the @tf.custom_gradient decorator. The function being decorated should return the same number of gradients as there are inputs, even if some inputs don't require gradients to be defined. The gradients should be returned as separate outputs, not as a list or a tuple.
+
+As an example, take a look at the following code that defines a custom operation with two inputs and returns two gradients:
+
+```python
+@tf.custom_gradient def my_identity(x, z):
+     def grad(dy):
+         return dy, dy
+     return tf.identity(x*z), grad
+```",0.7
+59555206,tf.keras,Documentation Replication on Other Examples,keras to tf.keras Conversion: Dense layer dimensions not defined?,"<p>So I've built a convnet using pure <code>keras</code>. It compiles and operates exactly as intended, but I need to convert it to use <code>tf.keras</code> so that I can make use of <code>tfmot</code>. Having read documentation, I attempted to convert it, only to get the following error:</p>
+
+<p><code>The last dimension of the inputs to Dense should be defined. Found None.</code> </p>
+
+<p>Any idea what I'm doing wrong?</p>
+
+<p>Thanks!</p>
+
+<p>Original <code>keras</code> model:</p>
+
+<pre><code>input_layer = keras.layers.Input(shape=(100,))
+reshape_layer = keras.layers.Reshape((-1, 100, 1))(input_layer)
+conv_layer_1 = keras.layers.Convolution2D(filters=30, kernel_size=(10, 1), strides=(1, 1), padding=""same"", activation=""relu"")(reshape_layer)
+conv_layer_2 = keras.layers.Convolution2D(filters=30, kernel_size=(8, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_1)
+conv_layer_3 = keras.layers.Convolution2D(filters=40, kernel_size=(6, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_2)
+conv_layer_4 = keras.layers.Convolution2D(filters=50, kernel_size=(5, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_3)
+conv_layer_5 = keras.layers.Convolution2D(filters=50, kernel_size=(5, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_4)
+flatten_layer = keras.layers.Flatten()(conv_layer_5)
+label_layer = keras.layers.Dense(200, activation=""relu"")(flatten_layer)
+output_layer = keras.layers.Dense(1, activation=""linear"")(label_layer)
+
+model = keras.Model(inputs=input_layer, outputs=output_layer)
+</code></pre>
+
+<p>Converted <code>tf.keras</code> model:</p>
+
+<pre><code>input_layer = tf.keras.layers.InputLayer(input_shape=(100,))
+reshape_layer = tf.keras.layers.Reshape((-1, 100, 1))(input_layer)
+conv_layer_1 = tf.keras.layers.Convolution2D(filters=30, kernel_size=(10, 1), strides=(1, 1), padding=""same"", activation=""relu"")(reshape_layer)
+conv_layer_2 = tf.keras.layers.Convolution2D(filters=30, kernel_size=(8, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_1)
+conv_layer_3 = tf.keras.layers.Convolution2D(filters=40, kernel_size=(6, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_2)
+conv_layer_4 = tf.keras.layers.Convolution2D(filters=50, kernel_size=(5, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_3)
+conv_layer_5 = tf.keras.layers.Convolution2D(filters=50, kernel_size=(5, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_4)
+flatten_layer = tf.keras.layers.Flatten()(conv_layer_5)
+label_layer = tf.keras.layers.Dense(200, activation=""relu"")(flatten_layer)
+output_layer = tf.keras.layers.Dense(1, activation=""linear"")(label_layer)
+
+model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+</code></pre>
+
+<p>EDIT 1:</p>
+
+<p>I thought maybe I could get around the issue by saving the <code>keras</code> model after creation and loading it as a <code>tf.keras</code> model immediately before compilation / training. That throws the same error! </p>
+","<p>There's few issues with your code. Fix them and you should be good to go,</p>
+
+<h2>Issue 1: Use <code>Input</code> instead of <code>InputLayer</code></h2>
+
+<p>The standard is to use <code>Input</code> layer instead of <code>InputLayer</code> (which infact uses <code>InputLayer</code> internally). You also need to change <code>input_shape</code> to <code>shape</code> if you are using <code>Input</code> layer.</p>
+
+<pre><code>input_layer = tf.keras.layers.Input(shape=(100,))
+</code></pre>
+
+<h2>Issue 2: 2 <code>None</code> dimensions in the output</h2>
+
+<p>When you execute the following line, you get two <code>None</code> dimensions in your output. </p>
+
+<pre><code>reshape_layer = tf.keras.layers.Reshape((-1, 100, 1))(input_layer)
+</code></pre>
+
+<p>Which is why you are getting the above error. When defining the <code>Reshape</code> layer you don't define the <code>batch</code> dimension, which will be None. And that's the only dimension you can have as <code>None</code> if you want to use a <code>Dense</code> layer. Otherwise, the <code>Dense</code> layer cannot infer the shape of its weights (which is why you get the error). So change that to,</p>
+
+<pre><code>reshape_layer = tf.keras.layers.Reshape((1, 100, 1))(input_layer)
+</code></pre>
+
+<p>The rest stays the same.</p>
+
+<pre><code>conv_layer_1 = tf.keras.layers.Convolution2D(filters=30, kernel_size=(10, 1), strides=(1, 1), padding=""same"", activation=""relu"")(reshape_layer)
+conv_layer_2 = tf.keras.layers.Convolution2D(filters=30, kernel_size=(8, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_1)
+conv_layer_3 = tf.keras.layers.Convolution2D(filters=40, kernel_size=(6, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_2)
+conv_layer_4 = tf.keras.layers.Convolution2D(filters=50, kernel_size=(5, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_3)
+conv_layer_5 = tf.keras.layers.Convolution2D(filters=50, kernel_size=(5, 1), strides=(1, 1), padding=""same"", activation=""relu"")(conv_layer_4)
+flatten_layer = tf.keras.layers.Flatten()(conv_layer_5)
+label_layer = tf.keras.layers.Dense(200, activation=""relu"")(flatten_layer)
+output_layer = tf.keras.layers.Dense(1, activation=""linear"")(label_layer)
+
+model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+model.summary()
+</code></pre>
+","The user is trying to understand why they are encountering the error 'The last dimension of the inputs to Dense should be defined. Found None.' when converting a Keras model to a tf.keras model, and how to resolve this issue.","It seems like you are encountering an issue while migrating a Keras code to use the tf.keras library. The error you are experiencing is likely because the dimensions of the Dense layers are not defined. 
+
+In TensorFlow, the number of input dimensions for a Dense layer is often inferred the first time the layer is used; however, they can also be provided manually. 
+
+Here's how you can define the dimensions:
+```python
+layer = tf.keras.layers.Dense(10, input_shape=(None, 5))
+```
+In this code snippet, the first argument specifies the number of output dimensions, and the second argument defines the input shape.
+
+If you are converting an existing Keras code, make sure that you have updated all the instances of the Dense layer to use the TensorFlow API, i.e., tf.keras.layers.Dense.
+
+Let me know if the above suggestion fixes the issue you were facing or if you have any other queries related to the error.",0.777777778,"The error you're encountering has to do with the shape of your input tensors not being defined, specifically the last dimension of the input shape being undefined.
+
+In your converted tf.keras model, you define the input layer as having shape (100), however, do note that the InputLayer in tf.keras expects the batch size to be defined as well, which in this case would be the first dimension of the tensor. The shape should therefore be defined as (batch_size, 100).
+
+As an example, consider the following models which should work:
+
+```python
+# keras model
+input_layer = keras.layers.Input(shape=(100,))
+# defined as (batch_size, 100)
+
+model = keras.Model(inputs=input_layer, outputs=output_layer)
+
+# Convert to tf.keras model
+input_layer = tf.keras.layers.InputLayer(input_shape=(100,))
+model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+```
+
+or
+
+```python
+# tf.keras model
+input_layer = tf.keras.layers.InputLayer(input_shape=(None, 100))
+model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+```
+
+The batch size dimension can also be defined implicitly by passing a tensor of shape (batch_size, ...) to the InputLayer.",0.816666667,"You're encountering this error because the last dimension of the inputs to the Dense layer should be defined, but in your case, it's set to None.
+
+To resolve this issue, you have a few options:
+1. Convert a Keras model using the Python API tf.lite. This is the recommended method and allows you to integrate the conversion into your development pipeline, apply optimizations, and add metadata.
+2. Use the command line for basic model conversion. This option only supports basic model conversion and has limited capabilities compared to the Python API.
+
+Here's an example of how to convert a Keras model to a TensorFlow Lite model using the Python API:
+```python
+import tensorflow as tf
+# Create a model using high-level tf.keras.* APIs
+model = tf.keras.models.Sequential(
+    [tf.keras.layers.Dense(units=1, input_shape=[1]),
+     tf.keras.layers.Dense(units=16, activation='relu'),
+     tf.keras.layers.Dense(units=1)]
+)
+# Convert the model
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+tflite_model = converter.convert()
+# Save the model
+with open('model.tflite', 'wb') as f:
+    f.write(tflite_model)
+```
+
+Ensure that you have the required TensorFlow version installed before running the conversion script.",0.633333333

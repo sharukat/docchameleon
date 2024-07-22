@@ -16,7 +16,7 @@ def construct_graph(debug=True):
     graph = edges.enrich(graph)
 
     # set the starting and ending nodes of the graph
-    graph.set_entry_point(key="intent_soanswers_courses")
+    graph.set_entry_point(key="generate")
     graph.set_finish_point(key="finish")
     return graph
 

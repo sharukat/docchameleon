@@ -79,10 +79,10 @@ def get_documentation(filename):
   try:
     with open(filename_with_ext, "r", encoding="utf-8") as file:
       content = file.read()
-    print(f"{config.COLOR['GREEN']}🔍 FOUND {filename} API DOCUMENTATION.{config.COLOR['ENDC']}\n")
+    # print(f"{config.COLOR['GREEN']}🔍 FOUND {filename} API DOCUMENTATION.{config.COLOR['ENDC']}\n")
     return content
   except FileNotFoundError:
-    raise ValueError(f"{config.COLOR['RED']} ❗ DOCUMENTATION NOT FOUND.{config.COLOR['ENDC']}\n")
+    raise ValueError(f"❗ DOCUMENTATION NOT FOUND.\n")
 
 
 

@@ -5,17 +5,17 @@ from lib.common import GraphState
 from lib.config import COLOR
 
 EXPECTED_NODES = [
-    "intent_soanswers_courses",
-    "check_additional_resources",
-    "context_retrieval",
-    "check_context_relevancy",
-    "check_hallucination_and_answer_relevancy",
-    "check_issue_type",
+    # "intent_soanswers_courses",
+    # "check_additional_resources",
+    # "context_retrieval",
+    # "check_context_relevancy",
+    # "check_hallucination_and_answer_relevancy",
+    # "check_issue_type",
     "generate",
-    "generate_without_examples",
+    # "generate_without_examples",
     "check_code_imports",
     "check_code_execution",
-    "ragas_eval",
+    # "ragas_eval",
     "finish",
 ]
 
@@ -26,45 +26,45 @@ def enrich(graph):
     for node_name in set(EXPECTED_NODES):
         assert node_name in graph.nodes, f"Node {node_name} not found in graph"
 
-    graph.add_edge("intent_soanswers_courses", "check_additional_resources")
-    graph.add_conditional_edges(
-        "check_additional_resources",
-        EDGE_MAP["decide_context_or_finish"],
-        {
-            "finish":"finish",
-            "context_retrieval":"context_retrieval",
-        }
-    )
+    # graph.add_edge("intent_soanswers_courses", "check_additional_resources")
+    # graph.add_conditional_edges(
+    #     "check_additional_resources",
+    #     EDGE_MAP["decide_context_or_finish"],
+    #     {
+    #         "finish":"finish",
+    #         "context_retrieval":"context_retrieval",
+    #     }
+    # )
 
-    graph.add_edge("context_retrieval", "check_context_relevancy")
-    graph.add_conditional_edges(
-        "check_context_relevancy",
-        EDGE_MAP["decide_context_relevancy"],
-        {
-            "check_hallucination_and_answer_relevancy":"check_hallucination_and_answer_relevancy",
-            "context_retrieval":"context_retrieval",
-        }
-    )
-    graph.add_conditional_edges(
-        "check_hallucination_and_answer_relevancy",
-        EDGE_MAP["decide_context_retrieval"],
-        {
-            "context_retrieval":"context_retrieval",
-            "check_issue_type":"check_issue_type",
-        }
-    )
+    # graph.add_edge("context_retrieval", "check_context_relevancy")
+    # graph.add_conditional_edges(
+    #     "check_context_relevancy",
+    #     EDGE_MAP["decide_context_relevancy"],
+    #     {
+    #         "check_hallucination_and_answer_relevancy":"check_hallucination_and_answer_relevancy",
+    #         "context_retrieval":"context_retrieval",
+    #     }
+    # )
+    # graph.add_conditional_edges(
+    #     "check_hallucination_and_answer_relevancy",
+    #     EDGE_MAP["decide_context_retrieval"],
+    #     {
+    #         "context_retrieval":"context_retrieval",
+    #         "check_issue_type":"check_issue_type",
+    #     }
+    # )
     # End of first iterative graph
-    graph.add_conditional_edges(
-        "check_issue_type",
-        EDGE_MAP["decide_example_requirement"],
-        { 
-            "generate":"generate",
-            "generate_without_examples":"generate_without_examples",
-        },
-    )
+    # graph.add_conditional_edges(
+    #     "check_issue_type",
+    #     EDGE_MAP["decide_example_requirement"],
+    #     { 
+    #         "generate":"generate",
+    #         "generate_without_examples":"generate_without_examples",
+    #     },
+    # )
 
     graph.add_edge("generate", "check_code_imports")
-    graph.add_edge("generate_without_examples", "ragas_eval")
+    # graph.add_edge("generate_without_examples", "ragas_eval")
     graph.add_conditional_edges(
         "check_code_imports",
         EDGE_MAP["decide_to_check_code_exec"],
@@ -73,15 +73,26 @@ def enrich(graph):
             "generate": "generate",
         },
     )
+    # graph.add_conditional_edges(
+    #     "check_code_execution",
+    #     EDGE_MAP["decide_to_finish"],
+    #     {
+    #         "ragas_eval": "ragas_eval",
+    #         "generate": "generate",
+    #     },
+    # )
+
     graph.add_conditional_edges(
         "check_code_execution",
         EDGE_MAP["decide_to_finish"],
         {
-            "ragas_eval": "ragas_eval",
+            "finish": "finish",
             "generate": "generate",
         },
     )
-    graph.add_edge("ragas_eval", "finish")
+    # graph.add_edge("ragas_eval", "finish")
+
+    
     return graph
 
 
@@ -153,6 +164,9 @@ def decide_to_check_code_exec(state: GraphState) -> str:
         # We will re-generate a new query
         print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: TEST CODE EXECUTION ---{COLOR['ENDC']}\n")
         return "check_code_execution"
+    elif error == "No imports are required":
+        print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: TEST CODE EXECUTION ---{COLOR['ENDC']}\n")
+        return "check_code_execution"
     else:
         # We have relevant documents, so generate answer
         print(f"\t{COLOR['RED']}--- 🔄 DECISION: RE-TRY SOLUTION---{COLOR['ENDC']}\n")
@@ -178,7 +192,7 @@ def decide_to_finish(state: GraphState) -> str:
 
     if error == "None" or iter >= 1:
         print(f"\t{COLOR['GREEN']}--- ✅ DECISION: FINISH ---{COLOR['ENDC']}\n")
-        return "ragas_eval"
+        return "finish"
     else:
         print(f"\t{COLOR['RED']}--- 🔄 DECISION: RE-TRY SOLUTION ---{COLOR['ENDC']}\n")
         return "generate"
