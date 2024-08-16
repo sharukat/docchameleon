@@ -26,6 +26,8 @@ image = modal.Image.debian_slim(python_version="3.11").from_registry(
         "numpy==1.26.4",
         "pandas==2.2.1",
         "ragas==0.1.4",
+        "matplotlib==3.9.2",
+        "scikit-learn==1.5.1",
         # "setfit==1.0.3",
         "langchain-experimental==0.0.58",
         "langchain-cohere==0.1.4",

@@ -8,12 +8,12 @@ from operator import itemgetter
 # Custom Modules
 import time
 import tasks
-import intent
-import search
+import knowledge_identifier
+# import search
 import sandbox
 import graders
 # import retrieval
-import stackoverflow
+# import stackoverflow
 import lib.utils as utils
 from lib.config import COLOR
 from lib.common import GraphState, image
@@ -64,21 +64,18 @@ class Nodes:
         self.context_iter = None
         self.intent: str = None
         self.so_answers = None
-        self.course_urls = None
         self.ground_truth = None
 
         self.context = None
-        self.definition = None
-        self.task = None
+        # self.definition = None
+        # self.task = None
         self.urls: list = None
         self.documentation = None
         self.debug = debug
         self.model ="gpt-4o"
         self.node_map = {
             # "intent_soanswers_courses": self.intent_soanswers_courses,
-            # "check_additional_resources": self.check_additional_resources,
             # "context_retrieval": self.context_retrieval,
-            # "check_context_relevancy": self.check_context_relevancy,
             # "check_hallucination_and_answer_relevancy": self.check_hallucination_and_answer_relevancy,
             # "check_issue_type": self.check_issue_type,
             "generate": self.generate,
@@ -90,20 +87,9 @@ class Nodes:
         }
         self.sources = [
             "https://stackoverflow.com", 
-            "https://www.tensorflow.org",
-            "https://medium.com",
-            "https://towardsdatascience.com",
-            "https://github.com"
         ]
 
-        self.examples_required = [
-            "Documentation Replication on Other Examples", 
-            "Documentation Replicability", 
-            "Inadequate Examples"]
-        
-        self.description_only = [
-            "Documentation Ambiguity",
-            "Documentation Completeness"]
+
     
 
 
@@ -130,65 +116,23 @@ class Nodes:
         #     self.issue_type = 'description_only'
 
 
-        results = intent.question_intent_identifier(self.title, self.question)
-        self.intention = results['intent']
-        keywords = results['keywords']
-        so_relevant_answers = stackoverflow.retrieval(self.title, self.question, keywords)
-        if so_relevant_answers is not None:
-            self.so_answers = so_relevant_answers['urls']
-
-        if self.issue_type == 'additional_resources':
-            search_results = search.course_urls_retriever(self.intention)
-            course_urls = search_results['urls']
-            if not course_urls:
-                self.course_urls = utils.remove_broken_urls(course_urls)
+        results = knowledge_identifier.generate_queries(self.question)
+        self.intention = results['query']
+        
 
         return {
             "keys": {
-                "intent": self.intention,
-                "so_answers": self.so_answers,
-                "course_urls": self.course_urls,
                 "iterations": iterations,
                 "context_iter": context_iter,
-                "issue_type": self.issue_type,
-                "api_name": self.api_name,
                 "documentation": self.documentation,
             }
         }
     
-    def check_additional_resources(self, state: GraphState) -> GraphState:
-        state_dict = state["keys"]
-        iterations = state_dict["iterations"]
-        context_iter = state_dict["context_iter"]
-        intent = state_dict["intent"]
-        flag = False
-
-        if self.issue_type == "additional_resources":
-            flag = True
-
-        return {
-            "keys": {
-                "iterations": iterations,
-                "context_iter": context_iter,
-                "example_required": flag,
-                "issue_type": self.issue_type,
-                "api_name": self.api_name,
-                "documentation": self.documentation,
-                "intent":intent,
-            }
-        }
+    
     
 
     # ========================================================================================================================
     def context_retrieval(self, state: GraphState) -> GraphState:
-        """
-        Retrieve relevant context from web using Cohere RAG Retriever
-        Args:
-            state (dict): The current graph state
-        Returns:
-            state (dict): New key added to state, generation, that contains LLM generation
-        """
-
         state_dict = state["keys"]
         iterations = state_dict["iterations"]
         context_iter = state_dict["context_iter"]
@@ -223,58 +167,12 @@ class Nodes:
         }
     
 
-    # ========================================================================================================================
-    def check_context_relevancy(self, state: GraphState) -> GraphState:
-        """
-        Determines whether the retrieved documents are relevant to the question.
-        Args:
-            state (dict): The current graph state
-        Returns:
-            state (dict): Updates documents key with only filtered relevant documents
-        """
-        print(f"{COLOR['BLUE']}🚀: EXECUTING GRADER: Context vs Question Checker.{COLOR['ENDC']}")
-
-        state_dict = state["keys"]
-        documents_sets = state_dict["documents"]
-        generationed_context = state_dict["generation"]
-        iterations = state_dict["iterations"]
-        context_iter = state_dict["context_iter"]
-
-        # Score each doc
-        filtered_docs = []
-        for documents in documents_sets:
-            docs = []
-            for d in documents:
-                rg = graders.retrieval_grader()
-                score = rg.invoke({"question": self.question, "document": d.page_content})
-                time.sleep(10)
-                grade = score['binary_score']
-                if grade == "yes":
-                    print(f"\t{COLOR['GREEN']}--- ➡️ GRADE: DOCUMENT RELEVANT ---{COLOR['ENDC']}")
-                    docs.append(d.page_content)
-                else:
-                    print(f"\t{COLOR['RED']}--- ➡️ GRADE: DOCUMENT NOT RELEVANT ---{COLOR['ENDC']}")
-                    continue
-            filtered_docs.append(docs)
-
-        print(f"{COLOR['GREEN']}✅: EXECUTION COMPLETED{COLOR['ENDC']}\n")
-        
-        return {
-            "keys": {
-                "documents": filtered_docs, 
-                "generation": generationed_context,
-                "iterations": iterations,
-                "context_iter": context_iter,
-                "issue_type": self.issue_type,
-                "api_name": self.api_name,
-                "documentation": self.documentation,
-            }
-        }
+    
 
 
 
     # ========================================================================================================================
-    def check_hallucination_and_answer_relevancy(self, state: GraphState) -> GraphState:
+    def check_hallucination(self, state: GraphState) -> GraphState:
         print(f"{COLOR['BLUE']}🚀: EXECUTING GRADER: Hallucination and Answer Relevancy Checker.{COLOR['ENDC']}")
         state_dict = state["keys"]
         documents_set = state_dict["documents"]
@@ -290,7 +188,7 @@ class Nodes:
 
             hg = graders.hallucination_grader()
             score = hg.invoke({"documents": documents, "generation": generated_context[i]})
-            time.sleep(10)
+            time.sleep(5)
             answer_grounded = score['binary_score']
             if answer_grounded == "no":
                 print(f"\t{COLOR['RED']}--- ➡️ DECISION: GENERATED CONTEXT IS NOT GROUNDED ---{COLOR['ENDC']}")
@@ -300,26 +198,13 @@ class Nodes:
                 grade = "yes"
                 contexts.append(generated_context[i])
 
-            # ag = graders.answer_grader()
-            # score = ag.invoke({"question": self.question,"generation": generation})
-            # answer_relevancy = score['binary_score']
-            # if answer_relevancy == "yes":
-            #     print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: LLM GENERATION RESOLVES THE QUESTION ---{COLOR['ENDC']}")
-            #     grade = "yes"
-            # else:
-            #     grade = "no"
-            #     print(f"\t{COLOR['RED']}--- ➡️ DECISON: LLM GENERATION DOES NOT RESOLVES THE QUESTION. Re-TRY ---{COLOR['ENDC']}")
+            
         print(f"{COLOR['GREEN']}✅: EXECUTION COMPLETED{COLOR['ENDC']}\n")
-        context = "\n\n".join([con for con in contexts])
         return {
             "keys": {
-                "documents": documents, 
-                "context": context,
                 "grade": grade,
                 "iterations": iterations,
                 "context_iter": context_iter,
-                "issue_type": self.issue_type,
-                "api_name": self.api_name,
                 "documentation": self.documentation,
             }
         }
@@ -349,171 +234,33 @@ class Nodes:
 
 
     # ========================================================================================================================
-    # def generate(self, state: GraphState) -> GraphState:
-    #     """ 
-    #     Generate a code solution based on LCEL docs and the input question
-    #     with optional feedback from code execution tests
-
-    #     Args:
-    #         state (dict): The current graph state
-
-    #     Returns:
-    #         state (dict): New key added to state, documents, that contains retrieved documents
-    #     """
-
-    #     ## State
-    #     state_dict = state["keys"]
-    #     context = state_dict["context"]
-    #     iterations = state_dict["iterations"]
-
-    #     try:
-    #         self.documentation = utils.get_documentation(self.api_name)
-    #         results = tasks.prompt_task(self.issue_type)
-    #         self.definition = results['definition']
-    #         self.task = results['task']
-
-    #         ## Data model
-    #         class code(BaseModel):
-    #             """Code output"""
-
-    #             prefix: str = Field(
-    #                 description="Description of the problem and approach"
-    #             )
-    #             imports: str = Field(description="Code block import statements")
-    #             code: str = Field(
-    #                 description="Code block not including import statements"
-    #             )
-
-    #         ## LLM
-    #         llm = ChatOpenAI(temperature=0, model=self.model, streaming=True)
-
-    #         # Tool
-    #         code_tool_oai = convert_to_openai_tool(code)
-
-    #         # LLM with tool and enforce invocation
-    #         llm_with_tool = llm.bind(
-    #             tools=[code_tool_oai],
-    #             tool_choice={"type": "function", "function": {"name": "code"}},
-    #         )
-
-    #         # Parser
-    #         parser_tool = PydanticToolsParser(tools=[code])
-
-    #         ## Prompt
-    #         template = template_1.return_template(image)
-
-    #         ## Generation
-    #         if "error" in state_dict:
-    #             print(f"{COLOR['RED']} {'='*10} 🔄 RE-GENERATE SOLUTION w/ ERROR FEEDBACK {'='*10} {COLOR['ENDC']}\n")
-
-    #             error = state_dict["error"]
-    #             code_solution = state_dict["generation"]
-
-    #             # Update prompt
-    #             addendum = """  
-    #                     \n --- --- --- \n You previously tried to solve this problem. \n 
-    #                     Here is your solution:
-    #                     \n --- --- --- \n {generation}  \n --- --- --- \n  
-                        
-    #                     Here is the resulting error from code execution:  
-    #                     \n --- --- --- \n {error}  \n --- --- --- \n 
-    #                     Please re-try to answer this.
-    #                     Structure your answer with a instructional description of the code solution. \n 
-    #                     Then list the imports. And finally list the functioning code block. Structure your answer with a description of the code solution. \n 
-    #                     Then list the imports. And finally list the functioning code block.
-    #                     \n Here is the user question: \n --- --- --- \n {question}
-    #                     """
-    #             template = template + addendum
-
-    #             # Prompt
-    #             prompt = PromptTemplate(
-    #                 template=template,
-    #                 input_variables=["context", "api_name", "title", "question", "documentation", 
-    #                                  "issue_type", "definition", "task", "generation", "error"],
-    #             )
-
-    #             # Chain
-    #             chain = (
-    #                 {
-    #                     "context": itemgetter("context"),
-    #                     "documentation": lambda _: self.documentation,
-    #                     "title": lambda _: self.title,
-    #                     "question": lambda _: self.question,
-    #                     "api_name": lambda _: self.api_name,
-    #                     "issue_type": lambda _: self.issue_type,
-    #                     "definition": lambda _: self.definition,
-    #                     "task": lambda _: self.task,
-    #                     "generation": itemgetter("generation"),
-    #                     "error": itemgetter("error"),
-    #                 }
-    #                 | prompt
-    #                 | llm_with_tool
-    #                 | parser_tool
-    #             )
-
-    #             code_solution = chain.invoke(
-    #                 {   "context": context,
-    #                     "generation": str(code_solution[0]),
-    #                     "error": error,
-    #                 }
-    #             )
-
-    #         else:
-    #             print(f"{COLOR['YELLOW']} {'='*10} 🛠 GENERATE SOLUTION {'='*10} {COLOR['ENDC']}\n")
-
-    #             # Prompt
-    #             prompt = PromptTemplate(
-    #                 template=template,
-    #                 input_variables=['context', 'api_name', 'title', 'question', 'documentation',
-    #                                 'issue_type', 'definition', 'task'])
-
-    #             # Chain
-    #             chain = (
-    #                 {
-    #                     "context": itemgetter("context"),
-    #                     "documentation": lambda _: self.documentation,
-    #                     "title": lambda _: self.title,
-    #                     "question": lambda _: self.question,
-    #                     "api_name": lambda _: self.api_name,
-    #                     "issue_type": lambda _: self.issue_type,
-    #                     "definition": lambda _: self.definition,
-    #                     "task": lambda _: self.task,
-    #                 }
-    #                 | prompt
-    #                 | llm_with_tool
-    #                 | parser_tool
-    #             )
-
-    #             code_solution = chain.invoke(
-    #                 {
-    #                     "context": context,
-    #                 }
-    #             )
-                
-    #         iterations += 1
-    #         return {
-    #             "keys": {
-    #                 "generation": code_solution,
-    #                 "context": context,
-    #                 "iterations": iterations,
-    #                 "issue_type": self.issue_type,
-    #                 "api_name": self.api_name,
-    #                 "documentation": self.documentation,
-    #             }
-    #         }
-    
-    #     except ValueError as e:
-    #         print(e)
-
-
-# Function created for HumanEval
     def generate(self, state: GraphState) -> GraphState:
+        """ 
+        Generate a code solution based on LCEL docs and the input question
+        with optional feedback from code execution tests
+
+        Args:
+            state (dict): The current graph state
+
+        Returns:
+            state (dict): New key added to state, documents, that contains retrieved documents
+        """
+
+        ## State
         state_dict = state["keys"]
-        self.problem = state_dict["problem"]
-        self.input = state_dict["prompt"]
+        self.question_id = state_dict["question_id"]
+        self.title = state_dict["title"]
+        self.question = state_dict["question"]
+        self.api_name = state_dict["api_name"]
+        self.context = state_dict["context"]
         iterations = state_dict["iterations"]
 
         try:
+            self.documentation = utils.get_documentation(self.api_name)
+            # results = tasks.prompt_task(self.issue_type)
+            # self.definition = results['definition']
+            self.task = "Your task is to generate complete executable code example to address the quesetion body by only using the knowledge provided as 'context'."
+
             ## Data model
             class code(BaseModel):
                 """Code output"""
@@ -521,8 +268,10 @@ class Nodes:
                 imports: str = Field(description="Code block import statements")
                 code: str = Field(description="Code block not including import statements")
 
-
+            ## LLM
             llm = ChatOpenAI(temperature=0, model=self.model, streaming=True)
+
+            # Tool
             code_tool_oai = convert_to_openai_tool(code)
 
             # LLM with tool and enforce invocation
@@ -556,20 +305,28 @@ class Nodes:
                         Structure your answer with a instructional description of the code solution. \n 
                         Then list the imports. And finally list the functioning code block. Structure your answer with a description of the code solution. \n 
                         Then list the imports. And finally list the functioning code block.
-                        \n Here is the user question: \n --- --- --- \n {prompt}
+                        \n Here is the user question: \n --- --- --- \n {question}
                         """
                 template = template + addendum
 
                 # Prompt
                 prompt = PromptTemplate(
                     template=template,
-                    input_variables=["prompt", "generation", "error"],
+                    input_variables=["context", "title", "question", "documentation", 
+                                     "task", "generation", "error"],
                 )
 
-
+                # Chain
                 chain = (
                     {
-                        "prompt": lambda _: self.input,
+                        "context": lambda _: self.context,
+                        "documentation": lambda _: self.documentation,
+                        "title": lambda _: self.title,
+                        "question": lambda _: self.question,
+                        # "api_name": lambda _: self.api_name,
+                        # "issue_type": lambda _: self.issue_type,
+                        # "definition": lambda _: self.definition,
+                        "task": lambda _: self.task,
                         "generation": itemgetter("generation"),
                         "error": itemgetter("error"),
                     }
@@ -579,12 +336,15 @@ class Nodes:
                 )
 
                 code_solution = chain.invoke(
-                    {   "context": self.input,
+                    {   "context": self.context,
+                        "documentation": self.documentation,
+                        "title": self.title,
+                        "question": self.question,
+                        "task": self.task,
                         "generation": str(code_solution[0]),
                         "error": error,
                     }
                 )
-
 
             else:
                 print(f"{COLOR['YELLOW']} {'='*10} 🛠 GENERATE SOLUTION {'='*10} {COLOR['ENDC']}\n")
@@ -592,20 +352,32 @@ class Nodes:
                 # Prompt
                 prompt = PromptTemplate(
                     template=template,
-                    input_variables=['prompt'])
+                    input_variables=['context', 'title', 'question', 'documentation','task'])
 
+                # Chain
                 chain = (
                     {
-                        "prompt": lambda _: self.input,
+                        "context": lambda _: self.context,
+                        "documentation": lambda _: self.documentation,
+                        "title": lambda _: self.title,
+                        "question": lambda _: self.question,
+                        # "api_name": lambda _: self.api_name,
+                        # "issue_type": lambda _: self.issue_type,
+                        # "definition": lambda _: self.definition,
+                        "task": lambda _: self.task,
                     }
                     | prompt
                     | llm_with_tool
                     | parser_tool
                 )
 
-
                 code_solution = chain.invoke(
-                    {   "context": self.input,
+                    {
+                        "context": self.context,
+                        "documentation": self.documentation,
+                        "title": self.title,
+                        "question": self.question,
+                        "task": self.task,
                     }
                 )
                 
@@ -613,13 +385,141 @@ class Nodes:
             return {
                 "keys": {
                     "generation": code_solution,
+                    "context": self.context,
                     "iterations": iterations,
-                    "problem": self.problem,
+                    "question_id": self.question_id,
+                    "title": self.title,
+                    "question": self.question,
+                    # "issue_type": self.issue_type,
+                    "api_name": self.api_name,
+                    "documentation": self.documentation,
                 }
             }
     
         except ValueError as e:
             print(e)
+
+
+# Function created for HumanEval
+    # def generate(self, state: GraphState) -> GraphState:
+    #     state_dict = state["keys"]
+    #     self.question_id = state_dict["question_id"]
+    #     self.title = state_dict["title"]
+    #     self.question = state_dict["question"]
+    #     self.context = state_dict["context"]
+    #     self.documentation = state_dict["documentation"]
+    #     # self.problem = state_dict["problem"]
+    #     # self.input = state_dict["prompt"]
+    #     iterations = state_dict["iterations"]
+
+    #     try:
+    #         ## Data model
+    #         class code(BaseModel):
+    #             """Code output"""
+    #             prefix: str = Field(description="Description of the problem and approach")
+    #             imports: str = Field(description="Code block import statements")
+    #             code: str = Field(description="Code block not including import statements")
+
+
+    #         llm = ChatOpenAI(temperature=0, model=self.model, streaming=True)
+    #         code_tool_oai = convert_to_openai_tool(code)
+
+    #         # LLM with tool and enforce invocation
+    #         llm_with_tool = llm.bind(
+    #             tools=[code_tool_oai],
+    #             tool_choice={"type": "function", "function": {"name": "code"}},
+    #         )
+
+    #         # Parser
+    #         parser_tool = PydanticToolsParser(tools=[code])
+
+    #         ## Prompt
+    #         template = template_1.return_template(image)
+
+    #         ## Generation
+    #         if "error" in state_dict:
+    #             print(f"{COLOR['RED']} {'='*10} 🔄 RE-GENERATE SOLUTION w/ ERROR FEEDBACK {'='*10} {COLOR['ENDC']}\n")
+
+    #             error = state_dict["error"]
+    #             code_solution = state_dict["generation"]
+
+    #             # Update prompt
+    #             addendum = """  
+    #                     \n --- --- --- \n You previously tried to solve this problem. \n 
+    #                     Here is your solution:
+    #                     \n --- --- --- \n {generation}  \n --- --- --- \n  
+                        
+    #                     Here is the resulting error from code execution:  
+    #                     \n --- --- --- \n {error}  \n --- --- --- \n 
+    #                     Please re-try to answer this.
+    #                     Structure your answer with a instructional description of the code solution. \n 
+    #                     Then list the imports. And finally list the functioning code block. Structure your answer with a description of the code solution. \n 
+    #                     Then list the imports. And finally list the functioning code block.
+    #                     \n Here is the user question: \n --- --- --- \n {prompt}
+    #                     """
+    #             template = template + addendum
+
+    #             # Prompt
+    #             prompt = PromptTemplate(
+    #                 template=template,
+    #                 input_variables=["prompt", "generation", "error"],
+    #             )
+
+
+    #             chain = (
+    #                 {
+    #                     "prompt": lambda _: self.input,
+    #                     "generation": itemgetter("generation"),
+    #                     "error": itemgetter("error"),
+    #                 }
+    #                 | prompt
+    #                 | llm_with_tool
+    #                 | parser_tool
+    #             )
+
+    #             code_solution = chain.invoke(
+    #                 {   "context": self.input,
+    #                     "generation": str(code_solution[0]),
+    #                     "error": error,
+    #                 }
+    #             )
+
+
+    #         else:
+    #             print(f"{COLOR['YELLOW']} {'='*10} 🛠 GENERATE SOLUTION {'='*10} {COLOR['ENDC']}\n")
+
+    #             # Prompt
+    #             prompt = PromptTemplate(
+    #                 template=template,
+    #                 input_variables=['prompt'])
+
+    #             chain = (
+    #                 {
+    #                     "prompt": lambda _: self.input,
+    #                 }
+    #                 | prompt
+    #                 | llm_with_tool
+    #                 | parser_tool
+    #             )
+
+
+    #             code_solution = chain.invoke(
+    #                 {   "prompt": self.input,
+    #                 }
+    #             )
+                
+    #         iterations += 1
+    #         return {
+    #             "keys": {
+    #                 # "question": self.question,
+    #                 "generation": code_solution,
+    #                 "iterations": iterations,
+    #                 "problem": self.problem,
+    #             }
+    #         }
+    
+    #     except ValueError as e:
+    #         print(e)
 
 
     # ========================================================================================================================
@@ -716,35 +616,34 @@ class Nodes:
         ## State
         print(f"{COLOR['BLUE']}⏳ CHECKING CODE IMPORTS{COLOR['ENDC']}")
         state_dict = state["keys"]
-        # context = state_dict["context"]
         code_solution = state_dict["generation"]
         imports = code_solution[0].imports
         iterations = state_dict["iterations"]
-        problem = state_dict["problem"]
+        # problem = state_dict["problem"]
 
         # Attempt to execute the imports
         sb = sandbox.run(imports)
         output, error = sb.stdout.read(), sb.stderr.read()
 
         if error:
-            if error_status in str(error):
-                print(f"\t{COLOR['RED']}--- ❌ {error_status} ---{COLOR['ENDC']}\n")
-                error = error_status
-            else:
-                print(f"\t{COLOR['RED']}--- ❌ CODE IMPORT CHECK: FAILED ---{COLOR['ENDC']}\n")
-                # Catch any error during execution (e.g., ImportError, SyntaxError)
-                error = f"Execution error: {error}"
-                print(f"Error: {error}", file=sys.stderr)
-                if "error" in state_dict:
-                    error_prev_runs = state_dict["error"]
-                    error = (
-                        error_prev_runs
-                        + "\n --- Most recent run output and error --- \n"
-                        " ------ output ------ \n"
-                        + output
-                        + "\n ------ error ------ \n"
-                        + error
-                    )
+            # if error_status in str(error):
+            #     print(f"\t{COLOR['RED']}--- ❌ {error_status} ---{COLOR['ENDC']}\n")
+            #     error = error_status
+            # else:
+            print(f"\t{COLOR['RED']}--- ❌ CODE IMPORT CHECK: FAILED ---{COLOR['ENDC']}\n")
+            # Catch any error during execution (e.g., ImportError, SyntaxError)
+            error = f"Execution error: {error}"
+            print(f"Error: {error}", file=sys.stderr)
+            if "error" in state_dict:
+                error_prev_runs = state_dict["error"]
+                error = (
+                    error_prev_runs
+                    + "\n --- Most recent run output and error --- \n"
+                    " ------ output ------ \n"
+                    + output
+                    + "\n ------ error ------ \n"
+                    + error
+                )
         else:
             print(f"\t{COLOR['GREEN']}--- ✅ CODE IMPORT CHECK: SUCCESS---{COLOR['ENDC']}\n")
             # No errors occurred
@@ -754,12 +653,16 @@ class Nodes:
             "keys": {
                 "generation": code_solution,
                 "error": error,
-                # "context": context,
                 "iterations": iterations,
-                # "issue_type": self.issue_type,
-                # "api_name": self.api_name,
-                # "documentation": self.documentation,
-                "problem": problem,
+                "context": self.context,
+                "iterations": iterations,
+                "question_id": self.question_id,
+                "title": self.title,
+                "question": self.question,
+                "api_name": self.api_name,
+                "documentation": self.documentation,
+                "error": error,
+                # "problem": problem,
             }
         }
 
@@ -787,14 +690,15 @@ class Nodes:
         imports = code_solution[0].imports
         code = code_solution[0].code
         iterations = state_dict["iterations"]
-        prev_error = state_dict["error"]
-        problem = state_dict["problem"]
+        # prev_error = state_dict["error"]
+        # problem = state_dict["problem"]
 
-        error_status = "No imports are required"
-        if prev_error == error_status:
-            code_block = code
-        else:
-            code_block = imports + "\n" + code
+        # error_status = "No imports are required"
+        # if prev_error == error_status:
+        #     code_block = code
+        # else:
+            
+        code_block = imports + "\n" + code
 
         sb = sandbox.run(code_block)
         output, error = sb.stdout.read(), sb.stderr.read()
@@ -813,65 +717,63 @@ class Nodes:
                     + error
                 )
 
-            pass_at_1_mean = 0
-            bleu_score_1 = 0
-            bleu_score_2 = 0
-            bleu_score_3 = 0
-            bleu_score_4 = 0
+            # pass_at_1_mean = 0
+            # bleu_score_1 = 0
+            # bleu_score_2 = 0
+            # bleu_score_3 = 0
+            # bleu_score_4 = 0
         else:
             print(f"\t{COLOR['GREEN']}--- ✅ CODE BLOCK CHECK: SUCCESS ---{COLOR['ENDC']}\n")
             error = "None"
 
-            result = check_correctness(problem, code_block, timeout=10)
-            results[result["task_id"]].append((result["completion_id"], result))
+            # result = check_correctness(problem, code_block, timeout=10)
+            # results[result["task_id"]].append((result["completion_id"], result))
 
-            total, correct = [], []
-            for result in results.values():
-                passed = [r[1]["passed"] for r in result]
-                total.append(len(passed))
-                correct.append(sum(passed))
+            # total, correct = [], []
+            # for result in results.values():
+            #     passed = [r[1]["passed"] for r in result]
+            #     total.append(len(passed))
+            #     correct.append(sum(passed))
 
-            total = np.array(total)
-            correct = np.array(correct)
+            # total = np.array(total)
+            # correct = np.array(correct)
 
-            # Compute pass@1
-            pass_at_1 = correct / total
-            pass_at_1_mean = pass_at_1.mean()
-            # print(f"pass@1: {pass_at_1.mean()}")
+            # # Compute pass@1
+            # pass_at_1 = correct / total
+            # pass_at_1_mean = pass_at_1.mean()
+            # # print(f"pass@1: {pass_at_1.mean()}")
 
-            reference_tokens = nltk.word_tokenize(problem['canonical_solution'])
-            generated_tokens = nltk.word_tokenize(code_block)
-            # smoothie = SmoothingFunction().method4
-            bleu_score_1 = sentence_bleu([reference_tokens], generated_tokens, weights=(1, 0, 0, 0))
-            bleu_score_2 = sentence_bleu([reference_tokens], generated_tokens, weights=(0, 1, 0, 0))
-            bleu_score_3 = sentence_bleu([reference_tokens], generated_tokens, weights=(0, 0, 1, 0))
-            bleu_score_4 = sentence_bleu([reference_tokens], generated_tokens, weights=(0, 0, 0, 1))
+            # reference_tokens = nltk.word_tokenize(problem['canonical_solution'])
+            # generated_tokens = nltk.word_tokenize(code_block)
+            # # smoothie = SmoothingFunction().method4
+            # bleu_score_1 = sentence_bleu([reference_tokens], generated_tokens, weights=(1, 0, 0, 0))
+            # bleu_score_2 = sentence_bleu([reference_tokens], generated_tokens, weights=(0, 1, 0, 0))
+            # bleu_score_3 = sentence_bleu([reference_tokens], generated_tokens, weights=(0, 0, 1, 0))
+            # bleu_score_4 = sentence_bleu([reference_tokens], generated_tokens, weights=(0, 0, 0, 1))
 
-            print(f"pass@1: {pass_at_1_mean}")
-            print(f"bleu_score_1: {bleu_score_1}")
-            print(f"bleu_score_2: {bleu_score_2}")
-            print(f"bleu_score_3: {bleu_score_3}")
-            print(f"bleu_score_4: {bleu_score_4}")
+            # print(f"pass@1: {pass_at_1_mean}")
+            # print(f"bleu_score_1: {bleu_score_1}")
+            # print(f"bleu_score_2: {bleu_score_2}")
+            # print(f"bleu_score_3: {bleu_score_3}")
+            # print(f"bleu_score_4: {bleu_score_4}")
 
         return {
             "keys": {
+                "question": self.question,
                 "generation": code_solution,
                 "error": error,
                 "prefix": prefix,
                 "imports": imports,
-                # "context": context,
-                "iterations": iterations,
                 "code": code,
-                # "issue_type": self.issue_type,
-                # "api_name": self.api_name,
-                # "documentation": self.documentation,
-                "task_id": problem["task_id"],
-                "problem": problem,
-                "pass_at_1": pass_at_1_mean,
-                "bleu_score_1": bleu_score_1,
-                "bleu_score_2": bleu_score_2,
-                "bleu_score_3": bleu_score_3,
-                "bleu_score_4": bleu_score_4,
+                "iterations": iterations,
+                "question_id": self.question_id,
+                "title": self.title,
+                "question": self.question,
+                "api_name": self.api_name,
+                "documentation": self.documentation,
+                # "task_id": problem["task_id"],
+                # "problem": problem,
+                # "pass_at_1": pass_at_1_mean,
             }
         }
 
@@ -1082,16 +984,22 @@ def extract_eval_response(state: GraphState) -> str:
         execution = "Failed"
 
     output = {
-        "task_id": state_dict["task_id"],
-        "problem": state_dict["problem"],
+        # "task_id": state_dict["task_id"],
+        # "problem": state_dict["problem"],
+        # "question": state_dict["question"],
+        "question_id": state_dict["question_id"],
+        "title": state_dict["title"],
+        "question": state_dict["question"],
+        "api_name": state_dict["api_name"],
+        "documentation": state_dict["documentation"],
         "generated_answer": answer,
         "execution_status": execution,
         "iterations": state_dict["iterations"],
-        "pass_at_1": state_dict["pass_at_1"],
-        "bleu_score_1": state_dict["bleu_score_1"],
-        "bleu_score_2": state_dict["bleu_score_2"],
-        "bleu_score_3": state_dict["bleu_score_3"],
-        "bleu_score_4": state_dict["bleu_score_4"],
+        # "pass_at_1": state_dict["pass_at_1"],
+        # "bleu_score_1": state_dict["bleu_score_1"],
+        # "bleu_score_2": state_dict["bleu_score_2"],
+        # "bleu_score_3": state_dict["bleu_score_3"],
+        # "bleu_score_4": state_dict["bleu_score_4"],
     }
 
     return json.dumps(output)

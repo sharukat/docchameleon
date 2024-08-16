@@ -1,136 +1,768 @@
 problem,prompt,task_id,generated_answer,execution_status,iterations,pass_at_1,bleu_score_1,bleu_score_2,bleu_score_3,bleu_score_4
-"{'task_id': 'HumanEval/0', 'prompt': 'from typing import List\n\n\ndef has_close_elements(numbers: List[float], threshold: float) -> bool:\n    """""" Check if in given list of numbers, are any two numbers closer to each other than\n    given threshold.\n    >>> has_close_elements([1.0, 2.0, 3.0], 0.5)\n    False\n    >>> has_close_elements([1.0, 2.8, 3.0, 4.0, 5.0, 2.0], 0.3)\n    True\n    """"""\n', 'entry_point': 'has_close_elements', 'canonical_solution': '    for idx, elem in enumerate(numbers):\n        for idx2, elem2 in enumerate(numbers):\n            if idx != idx2:\n                distance = abs(elem - elem2)\n                if distance < threshold:\n                    return True\n\n    return False\n', 'test': ""\n\nMETADATA = {\n    'author': 'jt',\n    'dataset': 'test'\n}\n\n\ndef check(candidate):\n    assert candidate([1.0, 2.0, 3.9, 4.0, 5.0, 2.2], 0.3) == True\n    assert candidate([1.0, 2.0, 3.9, 4.0, 5.0, 2.2], 0.05) == False\n    assert candidate([1.0, 2.0, 5.9, 4.0, 5.0], 0.95) == True\n    assert candidate([1.0, 2.0, 5.9, 4.0, 5.0], 0.8) == False\n    assert candidate([1.0, 2.0, 3.0, 4.0, 5.0, 2.0], 0.1) == True\n    assert candidate([1.1, 2.2, 3.1, 4.1, 5.1], 1.0) == True\n    assert candidate([1.1, 2.2, 3.1, 4.1, 5.1], 0.5) == False\n\n""}","from typing import List
+"{'task_id': 'HumanEval/50', 'prompt': '\n\ndef encode_shift(s: str):\n    """"""\n    returns encoded string by shifting every character by 5 in the alphabet.\n    """"""\n    return """".join([chr(((ord(ch) + 5 - ord(""a"")) % 26) + ord(""a"")) for ch in s])\n\n\ndef decode_shift(s: str):\n    """"""\n    takes as input string encoded with encode_shift function. Returns decoded string.\n    """"""\n', 'entry_point': 'decode_shift', 'canonical_solution': '    return """".join([chr(((ord(ch) - 5 - ord(""a"")) % 26) + ord(""a"")) for ch in s])\n', 'test': ""\n\nMETADATA = {}\n\n\ndef check(candidate):\n    from random import randint, choice\n    import copy\n    import string\n\n    letters = string.ascii_lowercase\n    for _ in range(100):\n        str = ''.join(choice(letters) for i in range(randint(10, 20)))\n        encoded_str = encode_shift(str)\n        assert candidate(copy.deepcopy(encoded_str)) == str\n\n""}","
+
+def encode_shift(s: str):
+    """"""
+    returns encoded string by shifting every character by 5 in the alphabet.
+    """"""
+    return """".join([chr(((ord(ch) + 5 - ord(""a"")) % 26) + ord(""a"")) for ch in s])
 
 
-def has_close_elements(numbers: List[float], threshold: float) -> bool:
-    """""" Check if in given list of numbers, are any two numbers closer to each other than
-    given threshold.
-    >>> has_close_elements([1.0, 2.0, 3.0], 0.5)
+def decode_shift(s: str):
+    """"""
+    takes as input string encoded with encode_shift function. Returns decoded string.
+    """"""
+",HumanEval/50,"The `decode_shift` function is designed to reverse the encoding performed by the `encode_shift` function. The `encode_shift` function shifts each character in the input string by 5 positions forward in the alphabet. To decode this, we need to shift each character in the encoded string by 5 positions backward. The approach is similar to the encoding function but with a subtraction instead of an addition. Here's the complete solution:
+No imports are required for this function as it only uses basic string and character operations.
+def decode_shift(s: str):
+    """"""
+    takes as input string encoded with encode_shift function. Returns decoded string.
+    """"""
+    return """".join([chr(((ord(ch) - 5 - ord(""a"")) % 26) + ord(""a"")) for ch in s])",Success,1,1.0,0.6119402985074627,0.6060606060606061,0.6,0.59375
+"{'task_id': 'HumanEval/51', 'prompt': '\n\ndef remove_vowels(text):\n    """"""\n    remove_vowels is a function that takes string and returns string without vowels.\n    >>> remove_vowels(\'\')\n    \'\'\n    >>> remove_vowels(""abcdef\\nghijklm"")\n    \'bcdf\\nghjklm\'\n    >>> remove_vowels(\'abcdef\')\n    \'bcdf\'\n    >>> remove_vowels(\'aaaaa\')\n    \'\'\n    >>> remove_vowels(\'aaBAA\')\n    \'B\'\n    >>> remove_vowels(\'zbcd\')\n    \'zbcd\'\n    """"""\n', 'entry_point': 'remove_vowels', 'canonical_solution': '    return """".join([s for s in text if s.lower() not in [""a"", ""e"", ""i"", ""o"", ""u""]])\n', 'test': '\n\nMETADATA = {}\n\n\ndef check(candidate):\n    assert candidate(\'\') == \'\'\n    assert candidate(""abcdef\\nghijklm"") == \'bcdf\\nghjklm\'\n    assert candidate(\'fedcba\') == \'fdcb\'\n    assert candidate(\'eeeee\') == \'\'\n    assert candidate(\'acBAA\') == \'cB\'\n    assert candidate(\'EcBOO\') == \'cB\'\n    assert candidate(\'ybcd\') == \'ybcd\'\n\n'}","
+
+def remove_vowels(text):
+    """"""
+    remove_vowels is a function that takes string and returns string without vowels.
+    >>> remove_vowels('')
+    ''
+    >>> remove_vowels(""abcdef\nghijklm"")
+    'bcdf\nghjklm'
+    >>> remove_vowels('abcdef')
+    'bcdf'
+    >>> remove_vowels('aaaaa')
+    ''
+    >>> remove_vowels('aaBAA')
+    'B'
+    >>> remove_vowels('zbcd')
+    'zbcd'
+    """"""
+",HumanEval/51,"The function `remove_vowels` takes a string as input and returns a new string with all the vowels removed. Vowels in this context are 'a', 'e', 'i', 'o', 'u' and their uppercase counterparts 'A', 'E', 'I', 'O', 'U'. The function iterates through each character in the input string and includes it in the result only if it is not a vowel. This can be efficiently achieved using a list comprehension.
+
+def remove_vowels(text):
+    vowels = 'aeiouAEIOU'
+    return ''.join([char for char in text if char not in vowels])",Success,1,1.0,0.33671854508283117,0.16342073388020076,0.04863712317863117,1.2986542960532383e-308
+"{'task_id': 'HumanEval/52', 'prompt': '\n\ndef below_threshold(l: list, t: int):\n    """"""Return True if all numbers in the list l are below threshold t.\n    >>> below_threshold([1, 2, 4, 10], 100)\n    True\n    >>> below_threshold([1, 20, 4, 10], 5)\n    False\n    """"""\n', 'entry_point': 'below_threshold', 'canonical_solution': '    for e in l:\n        if e >= t:\n            return False\n    return True\n', 'test': '\n\nMETADATA = {}\n\n\ndef check(candidate):\n    assert candidate([1, 2, 4, 10], 100)\n    assert not candidate([1, 20, 4, 10], 5)\n    assert candidate([1, 20, 4, 10], 21)\n    assert candidate([1, 20, 4, 10], 22)\n    assert candidate([1, 8, 4, 10], 11)\n    assert not candidate([1, 8, 4, 10], 10)\n\n'}","
+
+def below_threshold(l: list, t: int):
+    """"""Return True if all numbers in the list l are below threshold t.
+    >>> below_threshold([1, 2, 4, 10], 100)
+    True
+    >>> below_threshold([1, 20, 4, 10], 5)
     False
-    >>> has_close_elements([1.0, 2.8, 3.0, 4.0, 5.0, 2.0], 0.3)
+    """"""
+",HumanEval/52,"The function `below_threshold` checks if all elements in the list `l` are below a given threshold `t`. It returns `True` if all elements are below the threshold, otherwise it returns `False`. The function uses a simple iteration to check each element in the list.
+No imports are required for this function.
+def below_threshold(l: list, t: int):
+    """"""Return True if all numbers in the list l are below threshold t.
+    >>> below_threshold([1, 2, 4, 10], 100)
+    True
+    >>> below_threshold([1, 20, 4, 10], 5)
+    False
+    """"""
+    for number in l:
+        if number >= t:
+            return False
+    return True",Success,1,1.0,0.15853658536585366,0.12345679012345677,0.10000000000000002,0.0759493670886076
+"{'task_id': 'HumanEval/53', 'prompt': '\n\ndef add(x: int, y: int):\n    """"""Add two numbers x and y\n    >>> add(2, 3)\n    5\n    >>> add(5, 7)\n    12\n    """"""\n', 'entry_point': 'add', 'canonical_solution': '    return x + y\n', 'test': '\n\nMETADATA = {}\n\n\ndef check(candidate):\n    import random\n\n    assert candidate(0, 1) == 1\n    assert candidate(1, 0) == 1\n    assert candidate(2, 3) == 5\n    assert candidate(5, 7) == 12\n    assert candidate(7, 5) == 12\n\n    for i in range(100):\n        x, y = random.randint(0, 1000), random.randint(0, 1000)\n        assert candidate(x, y) == x + y\n\n'}","
+
+def add(x: int, y: int):
+    """"""Add two numbers x and y
+    >>> add(2, 3)
+    5
+    >>> add(5, 7)
+    12
+    """"""
+",HumanEval/53,"The function `add` takes two integers `x` and `y` as input and returns their sum. The function includes docstring examples that demonstrate its usage. The implementation is straightforward and does not require any additional imports.
+
+def add(x: int, y: int):
+    """"""Add two numbers x and y
+    >>> add(2, 3)
+    5
+    >>> add(5, 7)
+    12
+    """"""
+    return x + y",Success,1,1.0,0.08333333333333333,0.06382978723404255,0.043478260869565216,0.022222222222222227
+"{'task_id': 'HumanEval/54', 'prompt': '\n\ndef same_chars(s0: str, s1: str):\n    """"""\n    Check if two words have the same characters.\n    >>> same_chars(\'eabcdzzzz\', \'dddzzzzzzzddeddabc\')\n    True\n    >>> same_chars(\'abcd\', \'dddddddabc\')\n    True\n    >>> same_chars(\'dddddddabc\', \'abcd\')\n    True\n    >>> same_chars(\'eabcd\', \'dddddddabc\')\n    False\n    >>> same_chars(\'abcd\', \'dddddddabce\')\n    False\n    >>> same_chars(\'eabcdzzzz\', \'dddzzzzzzzddddabc\')\n    False\n    """"""\n', 'entry_point': 'same_chars', 'canonical_solution': '    return set(s0) == set(s1)\n', 'test': ""\n\nMETADATA = {}\n\n\ndef check(candidate):\n    assert candidate('eabcdzzzz', 'dddzzzzzzzddeddabc') == True\n    assert candidate('abcd', 'dddddddabc') == True\n    assert candidate('dddddddabc', 'abcd') == True\n    assert candidate('eabcd', 'dddddddabc') == False\n    assert candidate('abcd', 'dddddddabcf') == False\n    assert candidate('eabcdzzzz', 'dddzzzzzzzddddabc') == False\n    assert candidate('aabb', 'aaccc') == False\n\n""}","
+
+def same_chars(s0: str, s1: str):
+    """"""
+    Check if two words have the same characters.
+    >>> same_chars('eabcdzzzz', 'dddzzzzzzzddeddabc')
+    True
+    >>> same_chars('abcd', 'dddddddabc')
+    True
+    >>> same_chars('dddddddabc', 'abcd')
+    True
+    >>> same_chars('eabcd', 'dddddddabc')
+    False
+    >>> same_chars('abcd', 'dddddddabce')
+    False
+    >>> same_chars('eabcdzzzz', 'dddzzzzzzzddddabc')
+    False
+    """"""
+",HumanEval/54,"The function `same_chars` checks if two words have the same characters. To achieve this, we can use the `Counter` class from the `collections` module to count the occurrences of each character in both strings. If the counts are the same for both strings, then the strings have the same characters. Here's the solution:
+from collections import Counter
+def same_chars(s0: str, s1: str):
+    """"""
+    Check if two words have the same characters.
+    >>> same_chars('eabcdzzzz', 'dddzzzzzzzddeddabc')
+    True
+    >>> same_chars('abcd', 'dddddddabc')
+    True
+    >>> same_chars('dddddddabc', 'abcd')
+    True
+    >>> same_chars('eabcd', 'dddddddabc')
+    False
+    >>> same_chars('abcd', 'dddddddabce')
+    False
+    >>> same_chars('eabcdzzzz', 'dddzzzzzzzddddabc')
+    False
+    """"""
+    return Counter(s0) == Counter(s1)",Success,1,0.0,0.07079646017699115,0.044642857142857144,0.02702702702702703,0.009090909090909087
+"{'task_id': 'HumanEval/55', 'prompt': '\n\ndef fib(n: int):\n    """"""Return n-th Fibonacci number.\n    >>> fib(10)\n    55\n    >>> fib(1)\n    1\n    >>> fib(8)\n    21\n    """"""\n', 'entry_point': 'fib', 'canonical_solution': '    if n == 0:\n        return 0\n    if n == 1:\n        return 1\n    return fib(n - 1) + fib(n - 2)\n', 'test': '\n\nMETADATA = {}\n\n\ndef check(candidate):\n    assert candidate(10) == 55\n    assert candidate(1) == 1\n    assert candidate(8) == 21\n    assert candidate(11) == 89\n    assert candidate(12) == 144\n\n'}","
+
+def fib(n: int):
+    """"""Return n-th Fibonacci number.
+    >>> fib(10)
+    55
+    >>> fib(1)
+    1
+    >>> fib(8)
+    21
+    """"""
+",HumanEval/55,"The function `fib` calculates the n-th Fibonacci number using a simple iterative approach. The Fibonacci sequence is a series of numbers where each number is the sum of the two preceding ones, usually starting with 0 and 1. The function uses a loop to compute the sequence up to the n-th number. This approach is efficient and avoids the pitfalls of recursion, such as stack overflow for large values of n.
+No imports are required for this function.
+def fib(n: int):
+    """"""Return n-th Fibonacci number.
+    >>> fib(10)
+    55
+    >>> fib(1)
+    1
+    >>> fib(8)
+    21
+    """"""
+    if n <= 0:
+        return 0
+    elif n == 1:
+        return 1
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b",Success,1,1.0,0.2727272727272727,0.14942528735632185,0.08139534883720931,0.047058823529411764
+"{'task_id': 'HumanEval/56', 'prompt': '\n\ndef correct_bracketing(brackets: str):\n    """""" brackets is a string of ""<"" and "">"".\n    return True if every opening bracket has a corresponding closing bracket.\n\n    >>> correct_bracketing(""<"")\n    False\n    >>> correct_bracketing(""<>"")\n    True\n    >>> correct_bracketing(""<<><>>"")\n    True\n    >>> correct_bracketing(""><<>"")\n    False\n    """"""\n', 'entry_point': 'correct_bracketing', 'canonical_solution': '    depth = 0\n    for b in brackets:\n        if b == ""<"":\n            depth += 1\n        else:\n            depth -= 1\n        if depth < 0:\n            return False\n    return depth == 0\n', 'test': '\n\nMETADATA = {}\n\n\ndef check(candidate):\n    assert candidate(""<>"")\n    assert candidate(""<<><>>"")\n    assert candidate(""<><><<><>><>"")\n    assert candidate(""<><><<<><><>><>><<><><<>>>"")\n    assert not candidate(""<<<><>>>>"")\n    assert not candidate(""><<>"")\n    assert not candidate(""<"")\n    assert not candidate(""<<<<"")\n    assert not candidate("">"")\n    assert not candidate(""<<>"")\n    assert not candidate(""<><><<><>><>><<>"")\n    assert not candidate(""<><><<><>><>>><>"")\n\n'}","
+
+def correct_bracketing(brackets: str):
+    """""" brackets is a string of ""<"" and "">"".
+    return True if every opening bracket has a corresponding closing bracket.
+
+    >>> correct_bracketing(""<"")
+    False
+    >>> correct_bracketing(""<>"")
+    True
+    >>> correct_bracketing(""<<><>>"")
+    True
+    >>> correct_bracketing(""><<>"")
+    False
+    """"""
+",HumanEval/56,"The function `correct_bracketing` checks if every opening bracket '<' has a corresponding closing bracket '>'. The approach is to use a counter to keep track of the number of unmatched opening brackets. We increment the counter for each '<' and decrement it for each '>'. If the counter goes negative, it means there is a closing bracket without a matching opening bracket, so we return False. At the end, if the counter is zero, it means all opening brackets have been matched by closing brackets, so we return True. Otherwise, we return False.
+import doctest
+def correct_bracketing(brackets: str):
+    """""" brackets is a string of ""<"" and "">"".
+    return True if every opening bracket has a corresponding closing bracket.
+
+    >>> correct_bracketing(""<"")
+    False
+    >>> correct_bracketing(""<>"")
+    True
+    >>> correct_bracketing(""<<><>>"")
+    True
+    >>> correct_bracketing(""><<>"")
+    False
+    """"""
+    count = 0
+    for char in brackets:
+        if char == '<':
+            count += 1
+        elif char == '>':
+            count -= 1
+        if count < 0:
+            return False
+    return count == 0
+
+doctest.testmod()",Success,1,1.0,0.19696969696969696,0.12213740458015265,0.06923076923076923,0.031007751937984492
+"{'task_id': 'HumanEval/57', 'prompt': '\n\ndef monotonic(l: list):\n    """"""Return True is list elements are monotonically increasing or decreasing.\n    >>> monotonic([1, 2, 4, 20])\n    True\n    >>> monotonic([1, 20, 4, 10])\n    False\n    >>> monotonic([4, 1, 0, -10])\n    True\n    """"""\n', 'entry_point': 'monotonic', 'canonical_solution': '    if l == sorted(l) or l == sorted(l, reverse=True):\n        return True\n    return False\n', 'test': '\n\nMETADATA = {}\n\n\ndef check(candidate):\n    assert candidate([1, 2, 4, 10]) == True\n    assert candidate([1, 2, 4, 20]) == True\n    assert candidate([1, 20, 4, 10]) == False\n    assert candidate([4, 1, 0, -10]) == True\n    assert candidate([4, 1, 1, 0]) == True\n    assert candidate([1, 2, 3, 2, 5, 60]) == False\n    assert candidate([1, 2, 3, 4, 5, 60]) == True\n    assert candidate([9, 9, 9, 9]) == True\n\n'}","
+
+def monotonic(l: list):
+    """"""Return True is list elements are monotonically increasing or decreasing.
+    >>> monotonic([1, 2, 4, 20])
+    True
+    >>> monotonic([1, 20, 4, 10])
+    False
+    >>> monotonic([4, 1, 0, -10])
     True
     """"""
-",HumanEval/0,"The function `has_close_elements` checks if any two numbers in a given list are closer to each other than a specified threshold. The approach involves sorting the list first, which allows us to only check adjacent elements for the threshold condition. This reduces the complexity compared to a brute-force approach. If any two adjacent elements in the sorted list have a difference less than the threshold, the function returns True; otherwise, it returns False.
-from typing import List
-def has_close_elements(numbers: List[float], threshold: float) -> bool:
-    # Sort the list to make it easier to find close elements
-    numbers.sort()
-    
-    # Iterate through the list and check adjacent elements
-    for i in range(len(numbers) - 1):
-        if abs(numbers[i] - numbers[i + 1]) < threshold:
-            return True
-    
-    return False",Success,1,1.0,0.2962962962962963,0.15,0.08860759493670887,0.05128205128205127
-"{'task_id': 'HumanEval/1', 'prompt': 'from typing import List\n\n\ndef separate_paren_groups(paren_string: str) -> List[str]:\n    """""" Input to this function is a string containing multiple groups of nested parentheses. Your goal is to\n    separate those group into separate strings and return the list of those.\n    Separate groups are balanced (each open brace is properly closed) and not nested within each other\n    Ignore any spaces in the input string.\n    >>> separate_paren_groups(\'( ) (( )) (( )( ))\')\n    [\'()\', \'(())\', \'(()())\']\n    """"""\n', 'entry_point': 'separate_paren_groups', 'canonical_solution': ""    result = []\n    current_string = []\n    current_depth = 0\n\n    for c in paren_string:\n        if c == '(':\n            current_depth += 1\n            current_string.append(c)\n        elif c == ')':\n            current_depth -= 1\n            current_string.append(c)\n\n            if current_depth == 0:\n                result.append(''.join(current_string))\n                current_string.clear()\n\n    return result\n"", 'test': ""\n\nMETADATA = {\n    'author': 'jt',\n    'dataset': 'test'\n}\n\n\ndef check(candidate):\n    assert candidate('(()()) ((())) () ((())()())') == [\n        '(()())', '((()))', '()', '((())()())'\n    ]\n    assert candidate('() (()) ((())) (((())))') == [\n        '()', '(())', '((()))', '(((())))'\n    ]\n    assert candidate('(()(())((())))') == [\n        '(()(())((())))'\n    ]\n    assert candidate('( ) (( )) (( )( ))') == ['()', '(())', '(()())']\n""}","from typing import List
-
-
-def separate_paren_groups(paren_string: str) -> List[str]:
-    """""" Input to this function is a string containing multiple groups of nested parentheses. Your goal is to
-    separate those group into separate strings and return the list of those.
-    Separate groups are balanced (each open brace is properly closed) and not nested within each other
-    Ignore any spaces in the input string.
-    >>> separate_paren_groups('( ) (( )) (( )( ))')
-    ['()', '(())', '(()())']
+",HumanEval/57,"The function `monotonic` checks if the elements of a list are monotonically increasing or decreasing. A list is monotonically increasing if each element is greater than or equal to the previous one, and monotonically decreasing if each element is less than or equal to the previous one. The function will return `True` if the list is either monotonically increasing or decreasing, and `False` otherwise. The approach involves iterating through the list and checking the conditions for both increasing and decreasing sequences.
+No imports are required for this function.
+def monotonic(l: list):
+    """"""Return True if list elements are monotonically increasing or decreasing.
+    >>> monotonic([1, 2, 4, 20])
+    True
+    >>> monotonic([1, 20, 4, 10])
+    False
+    >>> monotonic([4, 1, 0, -10])
+    True
     """"""
-",HumanEval/1,"The function `separate_paren_groups` takes a string containing multiple groups of nested parentheses and returns a list of those groups as separate strings. The function ignores any spaces in the input string. The approach involves iterating through the string while maintaining a balance counter to identify complete groups of parentheses. When the balance counter returns to zero, it indicates the end of a group, which is then added to the result list.
+    if not l:  # An empty list is considered monotonic
+        return True
+    increasing = decreasing = True
+    for i in range(1, len(l)):
+        if l[i] > l[i - 1]:
+            decreasing = False
+        if l[i] < l[i - 1]:
+            increasing = False
+    return increasing or decreasing",Success,1,1.0,0.11428571428571427,0.04316546762589929,0.0072463768115942,2.2250738585072626e-308
+"{'task_id': 'HumanEval/58', 'prompt': '\n\ndef common(l1: list, l2: list):\n    """"""Return sorted unique common elements for two lists.\n    >>> common([1, 4, 3, 34, 653, 2, 5], [5, 7, 1, 5, 9, 653, 121])\n    [1, 5, 653]\n    >>> common([5, 3, 2, 8], [3, 2])\n    [2, 3]\n\n    """"""\n', 'entry_point': 'common', 'canonical_solution': '    ret = set()\n    for e1 in l1:\n        for e2 in l2:\n            if e1 == e2:\n                ret.add(e1)\n    return sorted(list(ret))\n', 'test': '\n\nMETADATA = {}\n\n\ndef check(candidate):\n    assert candidate([1, 4, 3, 34, 653, 2, 5], [5, 7, 1, 5, 9, 653, 121]) == [1, 5, 653]\n    assert candidate([5, 3, 2, 8], [3, 2]) == [2, 3]\n    assert candidate([4, 3, 2, 8], [3, 2, 4]) == [2, 3, 4]\n    assert candidate([4, 3, 2, 8], []) == []\n\n'}","
+
+def common(l1: list, l2: list):
+    """"""Return sorted unique common elements for two lists.
+    >>> common([1, 4, 3, 34, 653, 2, 5], [5, 7, 1, 5, 9, 653, 121])
+    [1, 5, 653]
+    >>> common([5, 3, 2, 8], [3, 2])
+    [2, 3]
+
+    """"""
+",HumanEval/58,"The function `common` takes two lists as input and returns a sorted list of unique common elements between the two lists. The approach to solve this problem involves the following steps: 1. Convert both lists to sets to remove duplicates and allow for efficient intersection operations. 2. Find the intersection of the two sets to get the common elements. 3. Convert the resulting set back to a list. 4. Sort the list of common elements. 5. Return the sorted list of unique common elements.
+
+def common(l1: list, l2: list):
+    """"""Return sorted unique common elements for two lists.
+    >>> common([1, 4, 3, 34, 653, 2, 5], [5, 7, 1, 5, 9, 653, 121])
+    [1, 5, 653]
+    >>> common([5, 3, 2, 8], [3, 2])
+    [2, 3]
+
+    """"""
+    # Convert lists to sets
+    set1 = set(l1)
+    set2 = set(l2)
+    
+    # Find the intersection of the two sets
+    common_elements = set1.intersection(set2)
+    
+    # Convert the set to a list and sort it
+    sorted_common_elements = sorted(list(common_elements))
+    
+    return sorted_common_elements",Success,1,1.0,0.12751677852348997,0.060810810810810814,0.020408163265306117,0.006849315068493151
+"{'task_id': 'HumanEval/59', 'prompt': '\n\ndef largest_prime_factor(n: int):\n    """"""Return the largest prime factor of n. Assume n > 1 and is not a prime.\n    >>> largest_prime_factor(13195)\n    29\n    >>> largest_prime_factor(2048)\n    2\n    """"""\n', 'entry_point': 'largest_prime_factor', 'canonical_solution': '    def is_prime(k):\n        if k < 2:\n            return False\n        for i in range(2, k - 1):\n            if k % i == 0:\n                return False\n        return True\n    largest = 1\n    for j in range(2, n + 1):\n        if n % j == 0 and is_prime(j):\n            largest = max(largest, j)\n    return largest\n', 'test': '\n\nMETADATA = {}\n\n\ndef check(candidate):\n    assert candidate(15) == 5\n    assert candidate(27) == 3\n    assert candidate(63) == 7\n    assert candidate(330) == 11\n    assert candidate(13195) == 29\n\n'}","
+
+def largest_prime_factor(n: int):
+    """"""Return the largest prime factor of n. Assume n > 1 and is not a prime.
+    >>> largest_prime_factor(13195)
+    29
+    >>> largest_prime_factor(2048)
+    2
+    """"""
+",HumanEval/59,"To find the largest prime factor of a given number `n`, we can use the following approach: 1. Start by dividing `n` by the smallest prime number (2) and continue dividing by 2 until `n` is no longer even. 2. Then, check for the next possible factors starting from 3 and increment by 2 (since even numbers greater than 2 cannot be prime). 3. For each factor, divide `n` as long as it is divisible by that factor. 4. The largest factor that divides `n` will be the largest prime factor. This approach ensures that we efficiently find the largest prime factor without checking all numbers up to `n`.
+from math import isqrt
+def largest_prime_factor(n: int):
+    """"""Return the largest prime factor of n. Assume n > 1 and is not a prime.
+    >>> largest_prime_factor(13195)
+    29
+    >>> largest_prime_factor(2048)
+    2
+    """"""
+    # Start with the smallest prime factor
+    largest_factor = None
+    
+    # Check for the number of 2s that divide n
+    while n % 2 == 0:
+        largest_factor = 2
+        n //= 2
+    
+    # n must be odd at this point, so we can skip even numbers
+    for i in range(3, isqrt(n) + 1, 2):
+        while n % i == 0:
+            largest_factor = i
+            n //= i
+    
+    # This condition is to check if n is a prime number greater than 2
+    if n > 2:
+        largest_factor = n
+    
+    return largest_factor",Success,1,1.0,0.3051948051948052,0.09803921568627452,0.039473684210526314,0.02649006622516557
+"{'task_id': 'HumanEval/60', 'prompt': '\n\ndef sum_to_n(n: int):\n    """"""sum_to_n is a function that sums numbers from 1 to n.\n    >>> sum_to_n(30)\n    465\n    >>> sum_to_n(100)\n    5050\n    >>> sum_to_n(5)\n    15\n    >>> sum_to_n(10)\n    55\n    >>> sum_to_n(1)\n    1\n    """"""\n', 'entry_point': 'sum_to_n', 'canonical_solution': '    return sum(range(n + 1))\n', 'test': '\n\nMETADATA = {}\n\n\ndef check(candidate):\n    assert candidate(1) == 1\n    assert candidate(6) == 21\n    assert candidate(11) == 66\n    assert candidate(30) == 465\n    assert candidate(100) == 5050\n\n'}","
+
+def sum_to_n(n: int):
+    """"""sum_to_n is a function that sums numbers from 1 to n.
+    >>> sum_to_n(30)
+    465
+    >>> sum_to_n(100)
+    5050
+    >>> sum_to_n(5)
+    15
+    >>> sum_to_n(10)
+    55
+    >>> sum_to_n(1)
+    1
+    """"""
+",HumanEval/60,"The function `sum_to_n` calculates the sum of all integers from 1 to a given number `n`. This can be efficiently done using the formula for the sum of the first `n` natural numbers, which is `n * (n + 1) // 2`. This formula provides the result in constant time, O(1), making it very efficient.
+
+def sum_to_n(n: int):
+    """"""sum_to_n is a function that sums numbers from 1 to n.
+    >>> sum_to_n(30)
+    465
+    >>> sum_to_n(100)
+    5050
+    >>> sum_to_n(5)
+    15
+    >>> sum_to_n(10)
+    55
+    >>> sum_to_n(1)
+    1
+    """"""
+    return n * (n + 1) // 2",Success,1,1.0,0.10666666666666669,0.054054054054054064,0.04109589041095891,0.02777777777777778
+"{'task_id': 'HumanEval/61', 'prompt': '\n\ndef correct_bracketing(brackets: str):\n    """""" brackets is a string of ""("" and "")"".\n    return True if every opening bracket has a corresponding closing bracket.\n\n    >>> correct_bracketing(""("")\n    False\n    >>> correct_bracketing(""()"")\n    True\n    >>> correct_bracketing(""(()())"")\n    True\n    >>> correct_bracketing("")(()"")\n    False\n    """"""\n', 'entry_point': 'correct_bracketing', 'canonical_solution': '    depth = 0\n    for b in brackets:\n        if b == ""("":\n            depth += 1\n        else:\n            depth -= 1\n        if depth < 0:\n            return False\n    return depth == 0\n', 'test': '\n\nMETADATA = {}\n\n\ndef check(candidate):\n    assert candidate(""()"")\n    assert candidate(""(()())"")\n    assert candidate(""()()(()())()"")\n    assert candidate(""()()((()()())())(()()(()))"")\n    assert not candidate(""((()())))"")\n    assert not candidate("")(()"")\n    assert not candidate(""("")\n    assert not candidate(""(((("")\n    assert not candidate("")"")\n    assert not candidate(""(()"")\n    assert not candidate(""()()(()())())(()"")\n    assert not candidate(""()()(()())()))()"")\n\n'}","
+
+def correct_bracketing(brackets: str):
+    """""" brackets is a string of ""("" and "")"".
+    return True if every opening bracket has a corresponding closing bracket.
+
+    >>> correct_bracketing(""("")
+    False
+    >>> correct_bracketing(""()"")
+    True
+    >>> correct_bracketing(""(()())"")
+    True
+    >>> correct_bracketing("")(()"")
+    False
+    """"""
+",HumanEval/61,"The function `correct_bracketing` checks if every opening bracket '(' has a corresponding closing bracket ')'. The approach is to use a counter to keep track of the number of unmatched opening brackets. We increment the counter for each opening bracket and decrement it for each closing bracket. If the counter goes negative, it means there's a closing bracket without a matching opening bracket. At the end, the counter should be zero if all brackets are correctly matched.
+None
+def correct_bracketing(brackets: str):
+    count = 0
+    for bracket in brackets:
+        if bracket == '(': 
+            count += 1
+        elif bracket == ')':
+            count -= 1
+        if count < 0:  # More closing brackets than opening
+            return False
+    return count == 0",Success,1,1.0,0.4444444444444444,0.24528301886792456,0.1153846153846154,0.0196078431372549
+"{'task_id': 'HumanEval/62', 'prompt': '\n\ndef derivative(xs: list):\n    """""" xs represent coefficients of a polynomial.\n    xs[0] + xs[1] * x + xs[2] * x^2 + ....\n     Return derivative of this polynomial in the same form.\n    >>> derivative([3, 1, 2, 4, 5])\n    [1, 4, 12, 20]\n    >>> derivative([1, 2, 3])\n    [2, 6]\n    """"""\n', 'entry_point': 'derivative', 'canonical_solution': '    return [(i * x) for i, x in enumerate(xs)][1:]\n', 'test': '\n\nMETADATA = {}\n\n\ndef check(candidate):\n    assert candidate([3, 1, 2, 4, 5]) == [1, 4, 12, 20]\n    assert candidate([1, 2, 3]) == [2, 6]\n    assert candidate([3, 2, 1]) == [2, 2]\n    assert candidate([3, 2, 1, 0, 4]) == [2, 2, 0, 16]\n    assert candidate([1]) == []\n\n'}","
+
+def derivative(xs: list):
+    """""" xs represent coefficients of a polynomial.
+    xs[0] + xs[1] * x + xs[2] * x^2 + ....
+     Return derivative of this polynomial in the same form.
+    >>> derivative([3, 1, 2, 4, 5])
+    [1, 4, 12, 20]
+    >>> derivative([1, 2, 3])
+    [2, 6]
+    """"""
+",HumanEval/62,"The function `derivative` takes a list of coefficients representing a polynomial and returns the coefficients of its derivative. The polynomial is represented as `xs[0] + xs[1] * x + xs[2] * x^2 + ...`. The derivative of this polynomial is computed by multiplying each coefficient by its corresponding power of `x` and then reducing the power by one. The resulting list of coefficients represents the derivative of the polynomial.
+No imports are required for this function.
+def derivative(xs: list):
+    return [i * xs[i] for i in range(1, len(xs))]
+
+# Example usage
+print(derivative([3, 1, 2, 4, 5]))  # Output: [1, 4, 12, 20]
+print(derivative([1, 2, 3]))  # Output: [2, 6]",Success,1,1.0,0.21951219512195122,0.08641975308641973,0.012500000000000006,2.2250738585072626e-308
+"{'task_id': 'HumanEval/63', 'prompt': '\n\ndef fibfib(n: int):\n    """"""The FibFib number sequence is a sequence similar to the Fibbonacci sequnece that\'s defined as follows:\n    fibfib(0) == 0\n    fibfib(1) == 0\n    fibfib(2) == 1\n    fibfib(n) == fibfib(n-1) + fibfib(n-2) + fibfib(n-3).\n    Please write a function to efficiently compute the n-th element of the fibfib number sequence.\n    >>> fibfib(1)\n    0\n    >>> fibfib(5)\n    4\n    >>> fibfib(8)\n    24\n    """"""\n', 'entry_point': 'fibfib', 'canonical_solution': '    if n == 0:\n        return 0\n    if n == 1:\n        return 0\n    if n == 2:\n        return 1\n    return fibfib(n - 1) + fibfib(n - 2) + fibfib(n - 3)\n', 'test': '\n\nMETADATA = {}\n\n\ndef check(candidate):\n    assert candidate(2) == 1\n    assert candidate(1) == 0\n    assert candidate(5) == 4\n    assert candidate(8) == 24\n    assert candidate(10) == 81\n    assert candidate(12) == 274\n    assert candidate(14) == 927\n\n'}","
+
+def fibfib(n: int):
+    """"""The FibFib number sequence is a sequence similar to the Fibbonacci sequnece that's defined as follows:
+    fibfib(0) == 0
+    fibfib(1) == 0
+    fibfib(2) == 1
+    fibfib(n) == fibfib(n-1) + fibfib(n-2) + fibfib(n-3).
+    Please write a function to efficiently compute the n-th element of the fibfib number sequence.
+    >>> fibfib(1)
+    0
+    >>> fibfib(5)
+    4
+    >>> fibfib(8)
+    24
+    """"""
+",HumanEval/63,"The FibFib sequence is similar to the Fibonacci sequence but with an additional term in its recurrence relation. To compute the n-th element efficiently, we can use dynamic programming to store previously computed values and avoid redundant calculations. We'll use a list to store the values of the sequence up to n. The base cases are given as fibfib(0) = 0, fibfib(1) = 0, and fibfib(2) = 1. For n >= 3, we use the relation fibfib(n) = fibfib(n-1) + fibfib(n-2) + fibfib(n-3).
 from typing import List
-def separate_paren_groups(paren_string: str) -> List[str]:
-    paren_string = paren_string.replace(' ', '')  # Remove spaces
+def fibfib(n: int) -> int:
+    if n == 0 or n == 1:
+        return 0
+    elif n == 2:
+        return 1
+    
+    # Initialize the base cases
+    fibfib_seq: List[int] = [0, 0, 1] + [0] * (n - 2)
+    
+    # Compute the sequence up to n
+    for i in range(3, n + 1):
+        fibfib_seq[i] = fibfib_seq[i - 1] + fibfib_seq[i - 2] + fibfib_seq[i - 3]
+    
+    return fibfib_seq[n]
+
+# Example usage
+if __name__ == ""__main__"":
+    import doctest
+    doctest.testmod()",Success,1,1.0,0.30158730158730157,0.17600000000000002,0.11290322580645162,0.07317073170731705
+"{'task_id': 'HumanEval/64', 'prompt': '\nFIX = """"""\nAdd more test cases.\n""""""\n\ndef vowels_count(s):\n    """"""Write a function vowels_count which takes a string representing\n    a word as input and returns the number of vowels in the string.\n    Vowels in this case are \'a\', \'e\', \'i\', \'o\', \'u\'. Here, \'y\' is also a\n    vowel, but only when it is at the end of the given word.\n\n    Example:\n    >>> vowels_count(""abcde"")\n    2\n    >>> vowels_count(""ACEDY"")\n    3\n    """"""\n', 'entry_point': 'vowels_count', 'canonical_solution': '    vowels = ""aeiouAEIOU""\n    n_vowels = sum(c in vowels for c in s)\n    if s[-1] == \'y\' or s[-1] == \'Y\':\n        n_vowels += 1\n    return n_vowels\n', 'test': 'def check(candidate):\n\n    # Check some simple cases\n    assert candidate(""abcde"") == 2, ""Test 1""\n    assert candidate(""Alone"") == 3, ""Test 2""\n    assert candidate(""key"") == 2, ""Test 3""\n    assert candidate(""bye"") == 1, ""Test 4""\n    assert candidate(""keY"") == 2, ""Test 5""\n    assert candidate(""bYe"") == 1, ""Test 6""\n    assert candidate(""ACEDY"") == 3, ""Test 7""\n\n    # Check some edge cases that are easy to work out by hand.\n    assert True, ""This prints if this assert fails 2 (also good for debugging!)""\n\n'}","
+FIX = """"""
+Add more test cases.
+""""""
+
+def vowels_count(s):
+    """"""Write a function vowels_count which takes a string representing
+    a word as input and returns the number of vowels in the string.
+    Vowels in this case are 'a', 'e', 'i', 'o', 'u'. Here, 'y' is also a
+    vowel, but only when it is at the end of the given word.
+
+    Example:
+    >>> vowels_count(""abcde"")
+    2
+    >>> vowels_count(""ACEDY"")
+    3
+    """"""
+",HumanEval/64,"The function `vowels_count` takes a string as input and returns the number of vowels in the string. The vowels considered are 'a', 'e', 'i', 'o', 'u', and 'y' (only if 'y' is at the end of the word). The function is case-insensitive. The solution involves iterating through the string, checking each character to see if it is a vowel, and counting it if it is. Additionally, we need to handle the special case where 'y' is at the end of the word. The function also includes additional test cases to ensure its correctness.
+
+def vowels_count(s):
+    s = s.lower()  # Convert the string to lowercase to make the function case-insensitive
+    vowels = 'aeiou'
+    count = 0
+    for i, char in enumerate(s):
+        if char in vowels:
+            count += 1
+        elif char == 'y' and i == len(s) - 1:  # Check if 'y' is at the end of the word
+            count += 1
+    return count
+
+# Test cases
+print(vowels_count(""abcde""))  # Expected output: 2
+print(vowels_count(""ACEDY""))  # Expected output: 3
+print(vowels_count(""hello""))  # Expected output: 2
+print(vowels_count(""sky""))    # Expected output: 1
+print(vowels_count(""rhythm"")) # Expected output: 0
+print(vowels_count(""Y""))      # Expected output: 1
+print(vowels_count(""""))       # Expected output: 0",Success,1,1.0,0.15,0.04469273743016759,0.016853932584269656,0.0056497175141242955
+"{'task_id': 'HumanEval/65', 'prompt': '\ndef circular_shift(x, shift):\n    """"""Circular shift the digits of the integer x, shift the digits right by shift\n    and return the result as a string.\n    If shift > number of digits, return digits reversed.\n    >>> circular_shift(12, 1)\n    ""21""\n    >>> circular_shift(12, 2)\n    ""12""\n    """"""\n', 'entry_point': 'circular_shift', 'canonical_solution': '    s = str(x)\n    if shift > len(s):\n        return s[::-1]\n    else:\n        return s[len(s) - shift:] + s[:len(s) - shift]\n', 'test': 'def check(candidate):\n\n    # Check some simple cases\n    assert candidate(100, 2) == ""001""\n    assert candidate(12, 2) == ""12""\n    assert candidate(97, 8) == ""79""\n    assert candidate(12, 1) == ""21"", ""This prints if this assert fails 1 (good for debugging!)""\n\n    # Check some edge cases that are easy to work out by hand.\n    assert candidate(11, 101) == ""11"", ""This prints if this assert fails 2 (also good for debugging!)""\n\n'}","
+def circular_shift(x, shift):
+    """"""Circular shift the digits of the integer x, shift the digits right by shift
+    and return the result as a string.
+    If shift > number of digits, return digits reversed.
+    >>> circular_shift(12, 1)
+    ""21""
+    >>> circular_shift(12, 2)
+    ""12""
+    """"""
+",HumanEval/65,"The function `circular_shift` takes an integer `x` and a shift value `shift`. It performs a circular shift on the digits of `x` to the right by the specified `shift` value and returns the result as a string. If the shift value is greater than the number of digits in `x`, it returns the digits reversed. The function works as follows: 1. Convert the integer `x` to a string to easily manipulate the digits. 2. Calculate the effective shift by taking the modulus of the shift value with the number of digits. 3. If the effective shift is zero, return the original string. 4. If the effective shift is greater than zero, perform the circular shift by slicing the string and concatenating the parts. 5. If the original shift value is greater than the number of digits, return the reversed string.
+
+def circular_shift(x, shift):
+    s = str(x)
+    n = len(s)
+    effective_shift = shift % n
+    if effective_shift == 0:
+        return s
+    elif shift > n:
+        return s[::-1]
+    else:
+        return s[-effective_shift:] + s[:-effective_shift]
+
+# Example usage
+print(circular_shift(12, 1))  # Output: ""21""
+print(circular_shift(12, 2))  # Output: ""12""
+print(circular_shift(12345, 3))  # Output: ""34512""
+print(circular_shift(12345, 5))  # Output: ""12345""
+print(circular_shift(12345, 6))  # Output: ""54321""",Success,1,0.0,0.28888888888888886,0.1940298507462687,0.15037593984962405,0.12121212121212123
+"{'task_id': 'HumanEval/66', 'prompt': '\ndef digitSum(s):\n    """"""Task\n    Write a function that takes a string as input and returns the sum of the upper characters only\'\n    ASCII codes.\n\n    Examples:\n        digitSum("""") => 0\n        digitSum(""abAB"") => 131\n        digitSum(""abcCd"") => 67\n        digitSum(""helloE"") => 69\n        digitSum(""woArBld"") => 131\n        digitSum(""aAaaaXa"") => 153\n    """"""\n', 'entry_point': 'digitSum', 'canonical_solution': '    if s == """": return 0\n    return sum(ord(char) if char.isupper() else 0 for char in s)\n', 'test': 'def check(candidate):\n\n    # Check some simple cases\n    assert True, ""This prints if this assert fails 1 (good for debugging!)""\n    assert candidate("""") == 0, ""Error""\n    assert candidate(""abAB"") == 131, ""Error""\n    assert candidate(""abcCd"") == 67, ""Error""\n    assert candidate(""helloE"") == 69, ""Error""\n    assert candidate(""woArBld"") == 131, ""Error""\n    assert candidate(""aAaaaXa"") == 153, ""Error""\n\n    # Check some edge cases that are easy to work out by hand.\n    assert True, ""This prints if this assert fails 2 (also good for debugging!)""\n    assert candidate("" How are yOu?"") == 151, ""Error""\n    assert candidate(""You arE Very Smart"") == 327, ""Error""\n\n'}","
+def digitSum(s):
+    """"""Task
+    Write a function that takes a string as input and returns the sum of the upper characters only'
+    ASCII codes.
+
+    Examples:
+        digitSum("""") => 0
+        digitSum(""abAB"") => 131
+        digitSum(""abcCd"") => 67
+        digitSum(""helloE"") => 69
+        digitSum(""woArBld"") => 131
+        digitSum(""aAaaaXa"") => 153
+    """"""
+",HumanEval/66,"The function `digitSum` takes a string as input and returns the sum of the ASCII values of the uppercase characters in the string. The approach is to iterate through each character in the string, check if it is an uppercase letter using the `isupper()` method, and if so, add its ASCII value (obtained using the `ord()` function) to a running total. Finally, the function returns the total sum.
+No imports are required for this function.
+def digitSum(s):
+    total = 0
+    for char in s:
+        if char.isupper():
+            total += ord(char)
+    return total",Success,1,1.0,0.6666666666666666,0.4230769230769231,0.28,0.16666666666666669
+"{'task_id': 'HumanEval/67', 'prompt': '\ndef fruit_distribution(s,n):\n    """"""\n    In this task, you will be given a string that represents a number of apples and oranges \n    that are distributed in a basket of fruit this basket contains \n    apples, oranges, and mango fruits. Given the string that represents the total number of \n    the oranges and apples and an integer that represent the total number of the fruits \n    in the basket return the number of the mango fruits in the basket.\n    for examble:\n    fruit_distribution(""5 apples and 6 oranges"", 19) ->19 - 5 - 6 = 8\n    fruit_distribution(""0 apples and 1 oranges"",3) -> 3 - 0 - 1 = 2\n    fruit_distribution(""2 apples and 3 oranges"", 100) -> 100 - 2 - 3 = 95\n    fruit_distribution(""100 apples and 1 oranges"",120) -> 120 - 100 - 1 = 19\n    """"""\n', 'entry_point': 'fruit_distribution', 'canonical_solution': ""    lis = list()\n    for i in s.split(' '):\n        if i.isdigit():\n            lis.append(int(i))\n    return n - sum(lis)\n"", 'test': 'def check(candidate):\n\n    # Check some simple cases\n    assert candidate(""5 apples and 6 oranges"",19) == 8\n    assert candidate(""5 apples and 6 oranges"",21) == 10\n    assert candidate(""0 apples and 1 oranges"",3) == 2\n    assert candidate(""1 apples and 0 oranges"",3) == 2\n    assert candidate(""2 apples and 3 oranges"",100) == 95\n    assert candidate(""2 apples and 3 oranges"",5) == 0\n    assert candidate(""1 apples and 100 oranges"",120) == 19\n'}","
+def fruit_distribution(s,n):
+    """"""
+    In this task, you will be given a string that represents a number of apples and oranges 
+    that are distributed in a basket of fruit this basket contains 
+    apples, oranges, and mango fruits. Given the string that represents the total number of 
+    the oranges and apples and an integer that represent the total number of the fruits 
+    in the basket return the number of the mango fruits in the basket.
+    for examble:
+    fruit_distribution(""5 apples and 6 oranges"", 19) ->19 - 5 - 6 = 8
+    fruit_distribution(""0 apples and 1 oranges"",3) -> 3 - 0 - 1 = 2
+    fruit_distribution(""2 apples and 3 oranges"", 100) -> 100 - 2 - 3 = 95
+    fruit_distribution(""100 apples and 1 oranges"",120) -> 120 - 100 - 1 = 19
+    """"""
+",HumanEval/67,"The function `fruit_distribution` takes a string `s` that contains the number of apples and oranges, and an integer `n` that represents the total number of fruits in the basket. The goal is to determine the number of mangoes in the basket. The approach is to extract the number of apples and oranges from the string, subtract these from the total number of fruits, and return the result as the number of mangoes.
+import re
+def fruit_distribution(s, n):
+    # Use regular expressions to find all numbers in the string
+    numbers = list(map(int, re.findall(r'\d+', s)))
+    
+    # Sum the numbers found (apples and oranges)
+    total_apples_oranges = sum(numbers)
+    
+    # Calculate the number of mangoes
+    mangoes = n - total_apples_oranges
+    
+    return mangoes
+
+# Example usage
+print(fruit_distribution(""5 apples and 6 oranges"", 19))  # Output: 8
+print(fruit_distribution(""0 apples and 1 oranges"", 3))   # Output: 2
+print(fruit_distribution(""2 apples and 3 oranges"", 100)) # Output: 95
+print(fruit_distribution(""100 apples and 1 oranges"", 120)) # Output: 19",Success,1,1.0,0.15753424657534243,0.04827586206896551,0.006944444444444444,2.2250738585072626e-308
+"{'task_id': 'HumanEval/68', 'prompt': '\ndef pluck(arr):\n    """"""\n    ""Given an array representing a branch of a tree that has non-negative integer nodes\n    your task is to pluck one of the nodes and return it.\n    The plucked node should be the node with the smallest even value.\n    If multiple nodes with the same smallest even value are found return the node that has smallest index.\n\n    The plucked node should be returned in a list, [ smalest_value, its index ],\n    If there are no even values or the given array is empty, return [].\n\n    Example 1:\n        Input: [4,2,3]\n        Output: [2, 1]\n        Explanation: 2 has the smallest even value, and 2 has the smallest index.\n\n    Example 2:\n        Input: [1,2,3]\n        Output: [2, 1]\n        Explanation: 2 has the smallest even value, and 2 has the smallest index. \n\n    Example 3:\n        Input: []\n        Output: []\n    \n    Example 4:\n        Input: [5, 0, 3, 0, 4, 2]\n        Output: [0, 1]\n        Explanation: 0 is the smallest value, but  there are two zeros,\n                     so we will choose the first zero, which has the smallest index.\n\n    Constraints:\n        * 1 <= nodes.length <= 10000\n        * 0 <= node.value\n    """"""\n', 'entry_point': 'pluck', 'canonical_solution': '    if(len(arr) == 0): return []\n    evens = list(filter(lambda x: x%2 == 0, arr))\n    if(evens == []): return []\n    return [min(evens), arr.index(min(evens))]\n', 'test': 'def check(candidate):\n\n    # Check some simple cases\n    assert True, ""This prints if this assert fails 1 (good for debugging!)""\n    assert candidate([4,2,3]) == [2, 1], ""Error""\n    assert candidate([1,2,3]) == [2, 1], ""Error""\n    assert candidate([]) == [], ""Error""\n    assert candidate([5, 0, 3, 0, 4, 2]) == [0, 1], ""Error""\n\n    # Check some edge cases that are easy to work out by hand.\n    assert True, ""This prints if this assert fails 2 (also good for debugging!)""\n    assert candidate([1, 2, 3, 0, 5, 3]) == [0, 3], ""Error""\n    assert candidate([5, 4, 8, 4 ,8]) == [4, 1], ""Error""\n    assert candidate([7, 6, 7, 1]) == [6, 1], ""Error""\n    assert candidate([7, 9, 7, 1]) == [], ""Error""\n\n'}","
+def pluck(arr):
+    """"""
+    ""Given an array representing a branch of a tree that has non-negative integer nodes
+    your task is to pluck one of the nodes and return it.
+    The plucked node should be the node with the smallest even value.
+    If multiple nodes with the same smallest even value are found return the node that has smallest index.
+
+    The plucked node should be returned in a list, [ smalest_value, its index ],
+    If there are no even values or the given array is empty, return [].
+
+    Example 1:
+        Input: [4,2,3]
+        Output: [2, 1]
+        Explanation: 2 has the smallest even value, and 2 has the smallest index.
+
+    Example 2:
+        Input: [1,2,3]
+        Output: [2, 1]
+        Explanation: 2 has the smallest even value, and 2 has the smallest index. 
+
+    Example 3:
+        Input: []
+        Output: []
+    
+    Example 4:
+        Input: [5, 0, 3, 0, 4, 2]
+        Output: [0, 1]
+        Explanation: 0 is the smallest value, but  there are two zeros,
+                     so we will choose the first zero, which has the smallest index.
+
+    Constraints:
+        * 1 <= nodes.length <= 10000
+        * 0 <= node.value
+    """"""
+",HumanEval/68,"The function `pluck` aims to find the smallest even value in an array and return it along with its index. If there are multiple occurrences of the smallest even value, the function returns the first occurrence. If there are no even values or the array is empty, it returns an empty list. The approach involves iterating through the array, checking for even values, and keeping track of the smallest even value and its index.
+None
+def pluck(arr):
+    if not arr:
+        return []
+    
+    smallest_even = None
+    smallest_index = -1
+    
+    for index, value in enumerate(arr):
+        if value % 2 == 0:
+            if smallest_even is None or value < smallest_even:
+                smallest_even = value
+                smallest_index = index
+    
+    if smallest_even is None:
+        return []
+    else:
+        return [smallest_even, smallest_index]
+
+# Example usage
+print(pluck([4, 2, 3]))  # Output: [2, 1]
+print(pluck([1, 2, 3]))  # Output: [2, 1]
+print(pluck([]))         # Output: []
+print(pluck([5, 0, 3, 0, 4, 2]))  # Output: [0, 1]",Success,1,1.0,0.27450980392156865,0.13157894736842102,0.05298013245033112,0.02
+"{'task_id': 'HumanEval/69', 'prompt': ""\ndef search(lst):\n    '''\n    You are given a non-empty list of positive integers. Return the greatest integer that is greater than \n    zero, and has a frequency greater than or equal to the value of the integer itself. \n    The frequency of an integer is the number of times it appears in the list.\n    If no such a value exist, return -1.\n    Examples:\n        search([4, 1, 2, 2, 3, 1]) == 2\n        search([1, 2, 2, 3, 3, 3, 4, 4, 4]) == 3\n        search([5, 5, 4, 4, 4]) == -1\n    '''\n"", 'entry_point': 'search', 'canonical_solution': '    frq = [0] * (max(lst) + 1)\n    for i in lst:\n        frq[i] += 1;\n\n    ans = -1\n    for i in range(1, len(frq)):\n        if frq[i] >= i:\n            ans = i\n    \n    return ans\n', 'test': 'def check(candidate):\n\n    # manually generated tests\n    assert candidate([5, 5, 5, 5, 1]) == 1\n    assert candidate([4, 1, 4, 1, 4, 4]) == 4\n    assert candidate([3, 3]) == -1\n    assert candidate([8, 8, 8, 8, 8, 8, 8, 8]) == 8\n    assert candidate([2, 3, 3, 2, 2]) == 2\n\n    # automatically generated tests\n    assert candidate([2, 7, 8, 8, 4, 8, 7, 3, 9, 6, 5, 10, 4, 3, 6, 7, 1, 7, 4, 10, 8, 1]) == 1\n    assert candidate([3, 2, 8, 2]) == 2\n    assert candidate([6, 7, 1, 8, 8, 10, 5, 8, 5, 3, 10]) == 1\n    assert candidate([8, 8, 3, 6, 5, 6, 4]) == -1\n    assert candidate([6, 9, 6, 7, 1, 4, 7, 1, 8, 8, 9, 8, 10, 10, 8, 4, 10, 4, 10, 1, 2, 9, 5, 7, 9]) == 1\n    assert candidate([1, 9, 10, 1, 3]) == 1\n    assert candidate([6, 9, 7, 5, 8, 7, 5, 3, 7, 5, 10, 10, 3, 6, 10, 2, 8, 6, 5, 4, 9, 5, 3, 10]) == 5\n    assert candidate([1]) == 1\n    assert candidate([8, 8, 10, 6, 4, 3, 5, 8, 2, 4, 2, 8, 4, 6, 10, 4, 2, 1, 10, 2, 1, 1, 5]) == 4\n    assert candidate([2, 10, 4, 8, 2, 10, 5, 1, 2, 9, 5, 5, 6, 3, 8, 6, 4, 10]) == 2\n    assert candidate([1, 6, 10, 1, 6, 9, 10, 8, 6, 8, 7, 3]) == 1\n    assert candidate([9, 2, 4, 1, 5, 1, 5, 2, 5, 7, 7, 7, 3, 10, 1, 5, 4, 2, 8, 4, 1, 9, 10, 7, 10, 2, 8, 10, 9, 4]) == 4\n    assert candidate([2, 6, 4, 2, 8, 7, 5, 6, 4, 10, 4, 6, 3, 7, 8, 8, 3, 1, 4, 2, 2, 10, 7]) == 4\n    assert candidate([9, 8, 6, 10, 2, 6, 10, 2, 7, 8, 10, 3, 8, 2, 6, 2, 3, 1]) == 2\n    assert candidate([5, 5, 3, 9, 5, 6, 3, 2, 8, 5, 6, 10, 10, 6, 8, 4, 10, 7, 7, 10, 8]) == -1\n    assert candidate([10]) == -1\n    assert candidate([9, 7, 7, 2, 4, 7, 2, 10, 9, 7, 5, 7, 2]) == 2\n    assert candidate([5, 4, 10, 2, 1, 1, 10, 3, 6, 1, 8]) == 1\n    assert candidate([7, 9, 9, 9, 3, 4, 1, 5, 9, 1, 2, 1, 1, 10, 7, 5, 6, 7, 6, 7, 7, 6]) == 1\n    assert candidate([3, 10, 10, 9, 2]) == -1\n\n'}","
+def search(lst):
+    '''
+    You are given a non-empty list of positive integers. Return the greatest integer that is greater than 
+    zero, and has a frequency greater than or equal to the value of the integer itself. 
+    The frequency of an integer is the number of times it appears in the list.
+    If no such a value exist, return -1.
+    Examples:
+        search([4, 1, 2, 2, 3, 1]) == 2
+        search([1, 2, 2, 3, 3, 3, 4, 4, 4]) == 3
+        search([5, 5, 4, 4, 4]) == -1
+    '''
+",HumanEval/69,"The function `search` takes a list of positive integers and returns the greatest integer that is greater than zero and has a frequency greater than or equal to the value of the integer itself. If no such value exists, it returns -1. The approach involves using the `Counter` class from the `collections` module to count the frequency of each integer in the list. Then, we iterate through the counted integers to find the ones that meet the criteria and return the maximum of those integers.
+from collections import Counter
+def search(lst):
+    # Count the frequency of each integer in the list
+    freq = Counter(lst)
+    
+    # Initialize the result as -1 (default if no such integer is found)
+    result = -1
+    
+    # Iterate through the counted integers
+    for num, count in freq.items():
+        # Check if the integer's frequency is greater than or equal to the integer itself
+        if count >= num:
+            # Update the result with the maximum integer that meets the criteria
+            result = max(result, num)
+    
+    return result
+
+# Test cases
+print(search([4, 1, 2, 2, 3, 1]))  # Output: 2
+print(search([1, 2, 2, 3, 3, 3, 4, 4, 4]))  # Output: 3
+print(search([5, 5, 4, 4, 4]))  # Output: -1",Success,1,1.0,0.19553072625698323,0.0449438202247191,0.0056497175141242955,2.2250738585072626e-308
+"{'task_id': 'HumanEval/70', 'prompt': ""\ndef strange_sort_list(lst):\n    '''\n    Given list of integers, return list in strange order.\n    Strange sorting, is when you start with the minimum value,\n    then maximum of the remaining integers, then minimum and so on.\n\n    Examples:\n    strange_sort_list([1, 2, 3, 4]) == [1, 4, 2, 3]\n    strange_sort_list([5, 5, 5, 5]) == [5, 5, 5, 5]\n    strange_sort_list([]) == []\n    '''\n"", 'entry_point': 'strange_sort_list', 'canonical_solution': '    res, switch = [], True\n    while lst:\n        res.append(min(lst) if switch else max(lst))\n        lst.remove(res[-1])\n        switch = not switch\n    return res\n', 'test': 'def check(candidate):\n\n    # Check some simple cases\n    assert candidate([1, 2, 3, 4]) == [1, 4, 2, 3]\n    assert candidate([5, 6, 7, 8, 9]) == [5, 9, 6, 8, 7]\n    assert candidate([1, 2, 3, 4, 5]) == [1, 5, 2, 4, 3]\n    assert candidate([5, 6, 7, 8, 9, 1]) == [1, 9, 5, 8, 6, 7]\n    assert candidate([5, 5, 5, 5]) == [5, 5, 5, 5]\n    assert candidate([]) == []\n    assert candidate([1,2,3,4,5,6,7,8]) == [1, 8, 2, 7, 3, 6, 4, 5]\n    assert candidate([0,2,2,2,5,5,-5,-5]) == [-5, 5, -5, 5, 0, 2, 2, 2]\n    assert candidate([111111]) == [111111]\n\n    # Check some edge cases that are easy to work out by hand.\n    assert True\n\n'}","
+def strange_sort_list(lst):
+    '''
+    Given list of integers, return list in strange order.
+    Strange sorting, is when you start with the minimum value,
+    then maximum of the remaining integers, then minimum and so on.
+
+    Examples:
+    strange_sort_list([1, 2, 3, 4]) == [1, 4, 2, 3]
+    strange_sort_list([5, 5, 5, 5]) == [5, 5, 5, 5]
+    strange_sort_list([]) == []
+    '''
+",HumanEval/70,"The function `strange_sort_list` takes a list of integers and returns a new list sorted in a 'strange' order. The strange order is defined as starting with the minimum value, then the maximum of the remaining integers, then the next minimum, and so on. Here's how we can implement this:
+from typing import List
+def strange_sort_list(lst: List[int]) -> List[int]:
     result = []
-    balance = 0
-    current_group = []
-    
-    for char in paren_string:
-        current_group.append(char)
-        if char == '(': 
-            balance += 1
-        elif char == ')':
-            balance -= 1
-        
-        if balance == 0:  # A complete group is found
-            result.append(''.join(current_group))
-            current_group = []
-    
-    return result",Success,1,1.0,0.5052631578947369,0.2872340425531915,0.15053763440860216,0.07608695652173914
-"{'task_id': 'HumanEval/2', 'prompt': '\n\ndef truncate_number(number: float) -> float:\n    """""" Given a positive floating point number, it can be decomposed into\n    and integer part (largest integer smaller than given number) and decimals\n    (leftover part always smaller than 1).\n\n    Return the decimal part of the number.\n    >>> truncate_number(3.5)\n    0.5\n    """"""\n', 'entry_point': 'truncate_number', 'canonical_solution': '    return number % 1.0\n', 'test': ""\n\nMETADATA = {\n    'author': 'jt',\n    'dataset': 'test'\n}\n\n\ndef check(candidate):\n    assert candidate(3.5) == 0.5\n    assert abs(candidate(1.33) - 0.33) < 1e-6\n    assert abs(candidate(123.456) - 0.456) < 1e-6\n""}","
+    while lst:
+        result.append(min(lst))
+        lst.remove(min(lst))
+        if lst:
+            result.append(max(lst))
+            lst.remove(max(lst))
+    return result
 
-def truncate_number(number: float) -> float:
-    """""" Given a positive floating point number, it can be decomposed into
-    and integer part (largest integer smaller than given number) and decimals
-    (leftover part always smaller than 1).
-
-    Return the decimal part of the number.
-    >>> truncate_number(3.5)
-    0.5
-    """"""
-",HumanEval/2,"The function `truncate_number` takes a positive floating point number as input and returns the decimal part of the number. To achieve this, we can use the `math.modf` function from the `math` module, which returns the fractional and integer parts of a number as a tuple. We can then return the fractional part of the tuple.
+# Examples
+print(strange_sort_list([1, 2, 3, 4]))  # Output: [1, 4, 2, 3]
+print(strange_sort_list([5, 5, 5, 5]))  # Output: [5, 5, 5, 5]
+print(strange_sort_list([]))            # Output: []",Success,1,1.0,0.19230769230769232,0.124031007751938,0.078125,0.047244094488188976
+"{'task_id': 'HumanEval/71', 'prompt': ""\ndef triangle_area(a, b, c):\n    '''\n    Given the lengths of the three sides of a triangle. Return the area of\n    the triangle rounded to 2 decimal points if the three sides form a valid triangle. \n    Otherwise return -1\n    Three sides make a valid triangle when the sum of any two sides is greater \n    than the third side.\n    Example:\n    triangle_area(3, 4, 5) == 6.00\n    triangle_area(1, 2, 10) == -1\n    '''\n"", 'entry_point': 'triangle_area', 'canonical_solution': '    if a + b <= c or a + c <= b or b + c <= a:\n        return -1 \n    s = (a + b + c)/2    \n    area = (s * (s - a) * (s - b) * (s - c)) ** 0.5\n    area = round(area, 2)\n    return area\n', 'test': 'def check(candidate):\n\n    # Check some simple cases\n    assert candidate(3, 4, 5) == 6.00, ""This prints if this assert fails 1 (good for debugging!)""\n    assert candidate(1, 2, 10) == -1\n    assert candidate(4, 8, 5) == 8.18\n    assert candidate(2, 2, 2) == 1.73\n    assert candidate(1, 2, 3) == -1\n    assert candidate(10, 5, 7) == 16.25\n    assert candidate(2, 6, 3) == -1\n\n    # Check some edge cases that are easy to work out by hand.\n    assert candidate(1, 1, 1) == 0.43, ""This prints if this assert fails 2 (also good for debugging!)""\n    assert candidate(2, 2, 10) == -1\n\n'}","
+def triangle_area(a, b, c):
+    '''
+    Given the lengths of the three sides of a triangle. Return the area of
+    the triangle rounded to 2 decimal points if the three sides form a valid triangle. 
+    Otherwise return -1
+    Three sides make a valid triangle when the sum of any two sides is greater 
+    than the third side.
+    Example:
+    triangle_area(3, 4, 5) == 6.00
+    triangle_area(1, 2, 10) == -1
+    '''
+",HumanEval/71,"This function calculates the area of a triangle given the lengths of its three sides using Heron's formula. First, it checks if the three sides form a valid triangle by ensuring the sum of any two sides is greater than the third side. If the sides do not form a valid triangle, it returns -1. Otherwise, it calculates the area using Heron's formula and returns the area rounded to two decimal points.
 import math
-def truncate_number(number: float) -> float:
-    """""" Given a positive floating point number, it can be decomposed into
-    and integer part (largest integer smaller than given number) and decimals
-    (leftover part always smaller than 1).
+def triangle_area(a, b, c):
+    # Check if the sides form a valid triangle
+    if a + b <= c or a + c <= b or b + c <= a:
+        return -1
+    
+    # Calculate the semi-perimeter
+    s = (a + b + c) / 2
+    
+    # Calculate the area using Heron's formula
+    area = math.sqrt(s * (s - a) * (s - b) * (s - c))
+    
+    # Return the area rounded to 2 decimal points
+    return round(area, 2)",Success,1,1.0,0.6018518518518519,0.5327102803738317,0.49056603773584906,0.45714285714285713
+"{'task_id': 'HumanEval/72', 'prompt': ""\ndef will_it_fly(q,w):\n    '''\n    Write a function that returns True if the object q will fly, and False otherwise.\n    The object q will fly if it's balanced (it is a palindromic list) and the sum of its elements is less than or equal the maximum possible weight w.\n\n    Example:\n    will_it_fly([1, 2], 5) ➞ False \n    # 1+2 is less than the maximum possible weight, but it's unbalanced.\n\n    will_it_fly([3, 2, 3], 1) ➞ False\n    # it's balanced, but 3+2+3 is more than the maximum possible weight.\n\n    will_it_fly([3, 2, 3], 9) ➞ True\n    # 3+2+3 is less than the maximum possible weight, and it's balanced.\n\n    will_it_fly([3], 5) ➞ True\n    # 3 is less than the maximum possible weight, and it's balanced.\n    '''\n"", 'entry_point': 'will_it_fly', 'canonical_solution': '    if sum(q) > w:\n        return False\n\n    i, j = 0, len(q)-1\n    while i<j:\n        if q[i] != q[j]:\n            return False\n        i+=1\n        j-=1\n    return True\n', 'test': 'def check(candidate):\n\n    # Check some simple cases\n    assert candidate([3, 2, 3], 9) is True\n    assert candidate([1, 2], 5) is False\n    assert candidate([3], 5) is True\n    assert candidate([3, 2, 3], 1) is False\n\n\n    # Check some edge cases that are easy to work out by hand.\n    assert candidate([1, 2, 3], 6) is False\n    assert candidate([5], 5) is True\n\n'}","
+def will_it_fly(q,w):
+    '''
+    Write a function that returns True if the object q will fly, and False otherwise.
+    The object q will fly if it's balanced (it is a palindromic list) and the sum of its elements is less than or equal the maximum possible weight w.
 
-    Return the decimal part of the number.
-    >>> truncate_number(3.5)
-    0.5
+    Example:
+    will_it_fly([1, 2], 5) ➞ False 
+    # 1+2 is less than the maximum possible weight, but it's unbalanced.
+
+    will_it_fly([3, 2, 3], 1) ➞ False
+    # it's balanced, but 3+2+3 is more than the maximum possible weight.
+
+    will_it_fly([3, 2, 3], 9) ➞ True
+    # 3+2+3 is less than the maximum possible weight, and it's balanced.
+
+    will_it_fly([3], 5) ➞ True
+    # 3 is less than the maximum possible weight, and it's balanced.
+    '''
+",HumanEval/72,"The function `will_it_fly` determines if an object `q` will fly based on two conditions: whether the list `q` is palindromic (balanced) and whether the sum of its elements is less than or equal to a given maximum weight `w`. Here's how the function is implemented:
+No imports are required for this function.
+def will_it_fly(q, w):
+    # Check if the list is palindromic
+    is_palindromic = (q == q[::-1])
+    
+    # Calculate the sum of the elements in the list
+    total_weight = sum(q)
+    
+    # Check if the object is balanced and the total weight is within the limit
+    return is_palindromic and total_weight <= w
+
+# Example test cases
+print(will_it_fly([1, 2], 5))  # False
+print(will_it_fly([3, 2, 3], 1))  # False
+print(will_it_fly([3, 2, 3], 9))  # True
+print(will_it_fly([3], 5))  # True",Success,1,1.0,0.2076923076923077,0.03875968992248061,0.015625000000000007,0.007874015748031496
+"{'task_id': 'HumanEval/73', 'prompt': '\ndef smallest_change(arr):\n    """"""\n    Given an array arr of integers, find the minimum number of elements that\n    need to be changed to make the array palindromic. A palindromic array is an array that\n    is read the same backwards and forwards. In one change, you can change one element to any other element.\n\n    For example:\n    smallest_change([1,2,3,5,4,7,9,6]) == 4\n    smallest_change([1, 2, 3, 4, 3, 2, 2]) == 1\n    smallest_change([1, 2, 3, 2, 1]) == 0\n    """"""\n', 'entry_point': 'smallest_change', 'canonical_solution': '    ans = 0\n    for i in range(len(arr) // 2):\n        if arr[i] != arr[len(arr) - i - 1]:\n            ans += 1\n    return ans\n', 'test': 'def check(candidate):\n\n    # Check some simple cases\n    assert candidate([1,2,3,5,4,7,9,6]) == 4\n    assert candidate([1, 2, 3, 4, 3, 2, 2]) == 1\n    assert candidate([1, 4, 2]) == 1\n    assert candidate([1, 4, 4, 2]) == 1\n\n    # Check some edge cases that are easy to work out by hand.\n    assert candidate([1, 2, 3, 2, 1]) == 0\n    assert candidate([3, 1, 1, 3]) == 0\n    assert candidate([1]) == 0\n    assert candidate([0, 1]) == 1\n\n'}","
+def smallest_change(arr):
     """"""
-    fractional_part, _ = math.modf(number)
-    return fractional_part",Success,1,1.0,0.025316455696202535,2.2250738585072626e-308,2.2250738585072626e-308,2.2250738585072626e-308
-"{'task_id': 'HumanEval/3', 'prompt': 'from typing import List\n\n\ndef below_zero(operations: List[int]) -> bool:\n    """""" You\'re given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account fallls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> below_zero([1, 2, 3])\n    False\n    >>> below_zero([1, 2, -4, 5])\n    True\n    """"""\n', 'entry_point': 'below_zero', 'canonical_solution': '    balance = 0\n\n    for op in operations:\n        balance += op\n        if balance < 0:\n            return True\n\n    return False\n', 'test': ""\n\nMETADATA = {\n    'author': 'jt',\n    'dataset': 'test'\n}\n\n\ndef check(candidate):\n    assert candidate([]) == False\n    assert candidate([1, 2, -3, 1, 2, -3]) == False\n    assert candidate([1, 2, -4, 5, 6]) == True\n    assert candidate([1, -1, 2, -2, 5, -5, 4, -4]) == False\n    assert candidate([1, -1, 2, -2, 5, -5, 4, -5]) == True\n    assert candidate([1, -2, 2, -2, 5, -5, 4, -4]) == True\n""}","from typing import List
+    Given an array arr of integers, find the minimum number of elements that
+    need to be changed to make the array palindromic. A palindromic array is an array that
+    is read the same backwards and forwards. In one change, you can change one element to any other element.
 
-
-def below_zero(operations: List[int]) -> bool:
-    """""" You're given a list of deposit and withdrawal operations on a bank account that starts with
-    zero balance. Your task is to detect if at any point the balance of account fallls below zero, and
-    at that point function should return True. Otherwise it should return False.
-    >>> below_zero([1, 2, 3])
-    False
-    >>> below_zero([1, 2, -4, 5])
-    True
+    For example:
+    smallest_change([1,2,3,5,4,7,9,6]) == 4
+    smallest_change([1, 2, 3, 4, 3, 2, 2]) == 1
+    smallest_change([1, 2, 3, 2, 1]) == 0
     """"""
-",HumanEval/3,"The function `below_zero` takes a list of integers representing deposit and withdrawal operations on a bank account. The goal is to determine if the account balance ever falls below zero. The function iterates through the list, updating the balance with each operation. If the balance falls below zero at any point, the function returns True. If the loop completes without the balance falling below zero, the function returns False.
-from typing import List
-def below_zero(operations: List[int]) -> bool:
-    balance = 0
-    for operation in operations:
-        balance += operation
-        if balance < 0:
-            return True
-    return False
+",HumanEval/73,"The function `smallest_change` aims to determine the minimum number of changes required to make an array palindromic. A palindromic array reads the same forwards and backwards. To achieve this, we can compare elements from the start and end of the array moving towards the center. If the elements at symmetric positions are different, we count a change. The total number of such changes will give us the minimum number of changes required to make the array palindromic.
+No imports are required for this function.
+def smallest_change(arr):
+    n = len(arr)
+    changes = 0
+    for i in range(n // 2):
+        if arr[i] != arr[n - i - 1]:
+            changes += 1
+    return changes
 
-# Example usage
-if __name__ == ""__main__"":
-    print(below_zero([1, 2, 3]))  # False
-    print(below_zero([1, 2, -4, 5]))  # True",Success,1,1.0,0.225,0.189873417721519,0.15384615384615385,0.11688311688311687
-"{'task_id': 'HumanEval/4', 'prompt': 'from typing import List\n\n\ndef mean_absolute_deviation(numbers: List[float]) -> float:\n    """""" For a given list of input numbers, calculate Mean Absolute Deviation\n    around the mean of this dataset.\n    Mean Absolute Deviation is the average absolute difference between each\n    element and a centerpoint (mean in this case):\n    MAD = average | x - x_mean |\n    >>> mean_absolute_deviation([1.0, 2.0, 3.0, 4.0])\n    1.0\n    """"""\n', 'entry_point': 'mean_absolute_deviation', 'canonical_solution': '    mean = sum(numbers) / len(numbers)\n    return sum(abs(x - mean) for x in numbers) / len(numbers)\n', 'test': ""\n\nMETADATA = {\n    'author': 'jt',\n    'dataset': 'test'\n}\n\n\ndef check(candidate):\n    assert abs(candidate([1.0, 2.0, 3.0]) - 2.0/3.0) < 1e-6\n    assert abs(candidate([1.0, 2.0, 3.0, 4.0]) - 1.0) < 1e-6\n    assert abs(candidate([1.0, 2.0, 3.0, 4.0, 5.0]) - 6.0/5.0) < 1e-6\n\n""}","from typing import List
+# Example test cases
+print(smallest_change([1, 2, 3, 5, 4, 7, 9, 6]))  # Output: 4
+print(smallest_change([1, 2, 3, 4, 3, 2, 2]))    # Output: 1
+print(smallest_change([1, 2, 3, 2, 1]))          # Output: 0",Success,1,1.0,0.2926829268292683,0.24590163934426226,0.19834710743801656,0.15
+"{'task_id': 'HumanEval/74', 'prompt': ""\ndef total_match(lst1, lst2):\n    '''\n    Write a function that accepts two lists of strings and returns the list that has \n    total number of chars in the all strings of the list less than the other list.\n\n    if the two lists have the same number of chars, return the first list.\n\n    Examples\n    total_match([], []) ➞ []\n    total_match(['hi', 'admin'], ['hI', 'Hi']) ➞ ['hI', 'Hi']\n    total_match(['hi', 'admin'], ['hi', 'hi', 'admin', 'project']) ➞ ['hi', 'admin']\n    total_match(['hi', 'admin'], ['hI', 'hi', 'hi']) ➞ ['hI', 'hi', 'hi']\n    total_match(['4'], ['1', '2', '3', '4', '5']) ➞ ['4']\n    '''\n"", 'entry_point': 'total_match', 'canonical_solution': '    l1 = 0\n    for st in lst1:\n        l1 += len(st)\n    \n    l2 = 0\n    for st in lst2:\n        l2 += len(st)\n    \n    if l1 <= l2:\n        return lst1\n    else:\n        return lst2\n', 'test': 'def check(candidate):\n\n    # Check some simple cases\n    assert True, ""This prints if this assert fails 1 (good for debugging!)""\n    assert candidate([], []) == []\n    assert candidate([\'hi\', \'admin\'], [\'hi\', \'hi\']) == [\'hi\', \'hi\']\n    assert candidate([\'hi\', \'admin\'], [\'hi\', \'hi\', \'admin\', \'project\']) == [\'hi\', \'admin\']\n    assert candidate([\'4\'], [\'1\', \'2\', \'3\', \'4\', \'5\']) == [\'4\']\n    assert candidate([\'hi\', \'admin\'], [\'hI\', \'Hi\']) == [\'hI\', \'Hi\']\n    assert candidate([\'hi\', \'admin\'], [\'hI\', \'hi\', \'hi\']) == [\'hI\', \'hi\', \'hi\']\n    assert candidate([\'hi\', \'admin\'], [\'hI\', \'hi\', \'hii\']) == [\'hi\', \'admin\']\n\n\n    # Check some edge cases that are easy to work out by hand.\n    assert True, ""This prints if this assert fails 2 (also good for debugging!)""\n    assert candidate([], [\'this\']) == []\n    assert candidate([\'this\'], []) == []\n\n'}","
+def total_match(lst1, lst2):
+    '''
+    Write a function that accepts two lists of strings and returns the list that has 
+    total number of chars in the all strings of the list less than the other list.
 
+    if the two lists have the same number of chars, return the first list.
 
-def mean_absolute_deviation(numbers: List[float]) -> float:
-    """""" For a given list of input numbers, calculate Mean Absolute Deviation
-    around the mean of this dataset.
-    Mean Absolute Deviation is the average absolute difference between each
-    element and a centerpoint (mean in this case):
-    MAD = average | x - x_mean |
-    >>> mean_absolute_deviation([1.0, 2.0, 3.0, 4.0])
-    1.0
-    """"""
-",HumanEval/4,"To complete the `mean_absolute_deviation` function, we need to follow these steps:
-1. Calculate the mean of the input list `numbers`.
-2. Compute the absolute differences between each element in the list and the mean.
-3. Calculate the average of these absolute differences.
-
-Here is the implementation of the function:
-
-
-from typing import List
-
-def mean_absolute_deviation(numbers: List[float]) -> float:
-    mean = sum(numbers) / len(numbers)
-    absolute_deviations = [abs(x - mean) for x in numbers]
-    mad = sum(absolute_deviations) / len(numbers)
-    return mad
-
-# Example usage
-if __name__ == ""__main__"":
-    print(mean_absolute_deviation([1.0, 2.0, 3.0, 4.0]))  # Output: 1.0",Success,1,1.0,0.35294117647058826,0.30952380952380953,0.26506024096385544,0.23170731707317074
+    Examples
+    total_match([], []) ➞ []
+    total_match(['hi', 'admin'], ['hI', 'Hi']) ➞ ['hI', 'Hi']
+    total_match(['hi', 'admin'], ['hi', 'hi', 'admin', 'project']) ➞ ['hi', 'admin']
+    total_match(['hi', 'admin'], ['hI', 'hi', 'hi']) ➞ ['hI', 'hi', 'hi']
+    total_match(['4'], ['1', '2', '3', '4', '5']) ➞ ['4']
+    '''
+",HumanEval/74,"The function `total_match` takes two lists of strings and returns the list that has the total number of characters in all strings of the list less than the other list. If the two lists have the same number of characters, it returns the first list. The approach is to calculate the total number of characters in each list and then compare them.
+No imports are required for this function.
+def total_match(lst1, lst2):
+    # Calculate the total number of characters in each list
+    total_chars_lst1 = sum(len(s) for s in lst1)
+    total_chars_lst2 = sum(len(s) for s in lst2)
+    
+    # Compare the total number of characters and return the appropriate list
+    if total_chars_lst1 < total_chars_lst2:
+        return lst1
+    elif total_chars_lst1 > total_chars_lst2:
+        return lst2
+    else:
+        return lst1",Success,1,1.0,0.33783783783783783,0.1232876712328767,0.041666666666666664,2.2250738585072626e-308

@@ -57,6 +57,9 @@ imblearn = "^0.0"
 nest-asyncio = "^1.6.0"
 selfcheckgpt = "^0.1.7"
 human-eval = "^1.0.3"
+deepeval = "^0.21.73"
+radon = "^6.0.1"
+rank-bm25 = "^0.2.2"
 
 
 [[tool.poetry.source]]

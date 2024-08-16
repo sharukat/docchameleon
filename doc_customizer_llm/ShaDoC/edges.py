@@ -164,9 +164,9 @@ def decide_to_check_code_exec(state: GraphState) -> str:
         # We will re-generate a new query
         print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: TEST CODE EXECUTION ---{COLOR['ENDC']}\n")
         return "check_code_execution"
-    elif error == "No imports are required":
-        print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: TEST CODE EXECUTION ---{COLOR['ENDC']}\n")
-        return "check_code_execution"
+    # elif error == "No imports are required":
+    #     print(f"\t{COLOR['GREEN']}--- ➡️ DECISION: TEST CODE EXECUTION ---{COLOR['ENDC']}\n")
+    #     return "check_code_execution"
     else:
         # We have relevant documents, so generate answer
         print(f"\t{COLOR['RED']}--- 🔄 DECISION: RE-TRY SOLUTION---{COLOR['ENDC']}\n")

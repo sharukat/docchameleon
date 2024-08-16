@@ -114,117 +114,116 @@ def process(content, knowledge):
 
 
 
-def course_urls_retriever(query:str, knowledge: str, sources: list):
+def course_urls_retriever(query:str, knowledge: str):
     print(f"🚀: EXECUTING: Background Knowledge Source Identifier")
     urls = set()
     docs = []
     answers = []
 
-    for source in sources:
-        rag = CohereRagRetriever(
-            llm=ChatCohere(model="command-r-plus"), 
-            connectors=[{"id": "web-search", "options": {"site": source}}])
-        
-        try:
-            documents = rag.invoke(query)
-            answers.append(documents[-1].page_content)
+    # for source in sources:
+    rag = CohereRagRetriever(
+        llm=ChatCohere(model="command-r"), 
+        connectors=[{"id": "web-search", "options": {"site": "https://stackoverflow.com/"}}])
+    
+    # try:
+    documents = rag.invoke(query)
+    answers.append(documents[-1].page_content)
 
-            for doc in documents:
-                url = doc.metadata.get('url')
-                if url and is_url_accessible(url):
-                    parsed_url = urlparse(url)
-                    base_url = f"{parsed_url.scheme}://{parsed_url.netloc}/"
-                    if base_url in source_path_checks:
-                        path_segments = parsed_url.path.strip('/').split('/')
-                        if path_segments and path_segments[0] == source_path_checks.get(source):
+    for doc in documents:
+        url = doc.metadata.get('url')
+        if url and is_url_accessible(url):
+            parsed_url = urlparse(url)
+            base_url = f"{parsed_url.scheme}://{parsed_url.netloc}/"
+            # if base_url in source_path_checks:
+            #     path_segments = parsed_url.path.strip('/').split('/')
+            #     if path_segments and path_segments[0] == source_path_checks.get(source):
+            #         if url not in urls and len(urls) < 6:
+            #             urls.add(url)
+                    
+
+            # if base_url == "https://www.youtube.com/":
+            #     try:
+            #         loader = YoutubeLoader.from_youtube_url(url, add_video_info=False)
+            #         content = loader.load()
+            #         reranked_answers = process(content, knowledge)
+            #         if reranked_answers is not None:
+            #             for index, answer in enumerate(reranked_answers):
+            #                 print(answer.metadata['relevance_score'])
+            #                 if answer.metadata['relevance_score'] > 0.5:
+            #                     if url not in urls and len(urls) < 6:
+            #                         urls.add(url)
+            #                         transcript = f'"""{content}"""'
+            #                         docs.append(transcript)
+                    
+            #         else:
+            #             print("No relevant videos")
+            #             pass
+
+            #     except Exception as e:
+            #         print(e)
+            #         continue
+                
+            if base_url == "https://stackoverflow.com/":
+                print("executing executing executing")
+                page_content = doc.page_content
+                page_content = page_content.split(phrase)[0]
+
+                for text in to_remove:
+                    page_content = page_content.replace(text, "")
+
+                for pattern in patterns:
+                    page_content = re.sub(pattern, '', page_content)
+
+                df = pd.DataFrame([{"document": page_content}])
+                loader = DataFrameLoader(df, page_content_column="document")
+                content = loader.load()
+
+                reranked_answers = process(content, knowledge)
+                if reranked_answers is not None:
+                    for index, answer in enumerate(reranked_answers):
+                        print(answer.metadata['relevance_score'])
+                        if answer.metadata['relevance_score'] > 0.5:
                             if url not in urls and len(urls) < 6:
                                 urls.add(url)
-                            
-
-                    elif base_url == "https://www.youtube.com/":
-                        try:
-                            loader = YoutubeLoader.from_youtube_url(url, add_video_info=False)
-                            content = loader.load()
-                            reranked_answers = process(content, knowledge)
-                            if reranked_answers is not None:
-                                for index, answer in enumerate(reranked_answers):
-                                    print(answer.metadata['relevance_score'])
-                                    if answer.metadata['relevance_score'] > 0.5:
-                                        if url not in urls and len(urls) < 6:
-                                            urls.add(url)
-                                            transcript = f'"""{content}"""'
-                                            docs.append(transcript)
-                            
-                            else:
-                                print("No relevant videos")
-                                pass
-
-                        except Exception as e:
-                            print(e)
-                            continue
-                        
-                    elif base_url == "https://stackoverflow.com/":
-                        print("executing executing executing")
-                        page_content = doc.page_content
-                        page_content = page_content.split(phrase)[0]
-
-                        for text in to_remove:
-                            page_content = page_content.replace(text, "")
-
-                        for pattern in patterns:
-                            page_content = re.sub(pattern, '', page_content)
-
-                        df = pd.DataFrame([{"document": page_content}])
-                        loader = DataFrameLoader(df, page_content_column="document")
-                        content = loader.load()
-
-                        reranked_answers = process(content, knowledge)
-                        if reranked_answers is not None:
-                            for index, answer in enumerate(reranked_answers):
-                                print(answer.metadata['relevance_score'])
-                                if answer.metadata['relevance_score'] > 0.5:
-                                    if url not in urls and len(urls) < 6:
-                                        urls.add(url)
-                                    answer_content = answer.page_content
-                                    answer_content = f'"""{answer_content}"""'
-                                    docs.append(answer_content)
-                        else:
-                            pass
-                    time.sleep(8)
+                            answer_content = answer.page_content
+                            answer_content = f'"""{answer_content}"""'
+                            docs.append(answer_content)
                 else:
-                    print("URL is not accessible")
                     pass
-                            
-        except Exception as e:
-            print(e)
-            continue
+            time.sleep(7)
+        else:
+            print("URL is not accessible")
+            pass
+                        
+    # except Exception as e:
+    #     print(e)
+    #     continue
 
-    print(answers)
     print(f"✅: EXECUTION COMPLETED\n")
     return urls, docs
 
-question = """
-<p>When <code>src</code> has shape <code>[?]</code>, <code>tf.gather(src, tf.where(src != 0))</code> returns a tensor with shape <code>[?, 0]</code>. I'm not sure how a dimension can have size 0, and I'm especially unsure how to change the tensor back. I didn't find anything in the documentation to explain this, either.</p>
+# question = """
+# <p>When <code>src</code> has shape <code>[?]</code>, <code>tf.gather(src, tf.where(src != 0))</code> returns a tensor with shape <code>[?, 0]</code>. I'm not sure how a dimension can have size 0, and I'm especially unsure how to change the tensor back. I didn't find anything in the documentation to explain this, either.</p>
 
-<p>I tried to <code>tf.transpose(tensor)[0]</code>, but the first dimension of the transposed tensor has size 0 and cannot be accessed! What's wrong?</p>
-"""
+# <p>I tried to <code>tf.transpose(tensor)[0]</code>, but the first dimension of the transposed tensor has size 0 and cannot be accessed! What's wrong?</p>
+# """
 
-knowledge = ['Understanding Tensor Shapes and Dimensions in TensorFlow', 'Tensor Manipulation and Operations in TensorFlow', 'Handling and Debugging Shape Mismatches in TensorFlow', 'Advanced TensorFlow Techniques for Data Processing', 'TensorFlow Documentation and Best Practices for Tensor Operations']
-knowledge = "\n".join(knowledge)
+# knowledge = ['Understanding Tensor Shapes and Dimensions in TensorFlow', 'Tensor Manipulation and Operations in TensorFlow', 'Handling and Debugging Shape Mismatches in TensorFlow', 'Advanced TensorFlow Techniques for Data Processing', 'TensorFlow Documentation and Best Practices for Tensor Operations']
+# knowledge = "\n".join(knowledge)
 
-# knowledge = '\n'.join(know)
-query = f"""
-Retrieve relevant online courses related to TensorFlow covering the following knowledge.
-{knowledge}
+# # knowledge = '\n'.join(know)
+# query = f"""
+# Retrieve relevant online courses related to TensorFlow covering the following knowledge.
+# {knowledge}
 
-Provide the course syllabus following its URL for each course you identified.
-"""
+# Provide the course syllabus following its URL for each course you identified.
+# """
 
-new_sources = ["https://stackoverflow.com/"]
+# new_sources = ["https://stackoverflow.com/"]
 
-urls, docs = course_urls_retriever(query, knowledge, sources)
-print(urls)
-print(docs)
+# urls, docs = course_urls_retriever(query, knowledge, sources)
+# print(urls)
+# print(docs)
 
 
 
