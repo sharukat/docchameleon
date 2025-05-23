@@ -1,5 +1,4 @@
 from cohere_rag_retriever import relevant_context_retriever
-from search import course_urls_retriever
 
 # ==========================================================================================================================
 # TEST EXECUTIONS

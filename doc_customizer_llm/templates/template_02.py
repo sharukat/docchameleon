@@ -1,5 +1,6 @@
-
-def return_prompt(title, body, issue_type, definition, api_name, documentation, task):
+def return_prompt(
+    context, title, body, issue_type, definition, api_name, documentation, task
+):
     template = """
         Use the following pieces of context as a support to answer the question at the end.  If cannot find relevant context, 
         please think rationally and answer from your own knowledge base.
@@ -29,16 +30,17 @@ def return_prompt(title, body, issue_type, definition, api_name, documentation, 
     """
 
     prompt = [
-            {
-                "context" : context,
-                "title" : title,
-                "body" : body,
-                "issue_type" : issue_type,
-                "definition" : definition,
-                "api_name": api_name,
-                "documentation": documentation,
-                "task": task,
-            },
-        ]
+        {
+            "context": context,
+            "title": title,
+            "body": body,
+            "issue_type": issue_type,
+            "definition": definition,
+            "api_name": api_name,
+            "documentation": documentation,
+            "task": task,
+        },
+    ]
 
     return template, prompt
+

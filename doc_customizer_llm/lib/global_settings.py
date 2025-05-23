@@ -16,4 +16,5 @@ COLOR = {
 }
 
 # Stack Exchange APIs
-base_url ='https://api.stackexchange.com/2.3/users/'
+base_url = "https://api.stackexchange.com/2.3/users/"
+

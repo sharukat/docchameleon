@@ -1,9 +1,19 @@
-
 from langchain.prompts import PromptTemplate
 
-def return_prompt(context, title, body, issue_type, definition, api_name, documentation, task, qa, urls, course_urls):
 
-
+def return_prompt(
+    context,
+    title,
+    body,
+    issue_type,
+    definition,
+    api_name,
+    documentation,
+    task,
+    qa,
+    urls,
+    course_urls,
+):
     template = """
         Your task is to provide a customized response to a user's question based on the given context, documentation, and the task itself. 
         Here are the steps to follow:
@@ -36,7 +46,7 @@ def return_prompt(context, title, body, issue_type, definition, api_name, docume
 
         ## Additional Resources
         Format the urls separating them with a title.
-        
+
         #### Stack Overflow Q&A
         {qa}
 
@@ -50,23 +60,38 @@ def return_prompt(context, title, body, issue_type, definition, api_name, docume
         </Format Output>
     """
 
-    prompt = [{
-        "context" : context,
-        "title" : title,
-        "body" : body,
-        "issue_type" : issue_type,
-        "definition" : definition,
-        "api_name": api_name,
-        "documentation": documentation,
-        "task": task,
-        "qa": qa,
-        "urls": urls,
-        "course_urls": course_urls,
-        },]
-        
-    
+    prompt = [
+        {
+            "context": context,
+            "title": title,
+            "body": body,
+            "issue_type": issue_type,
+            "definition": definition,
+            "api_name": api_name,
+            "documentation": documentation,
+            "task": task,
+            "qa": qa,
+            "urls": urls,
+            "course_urls": course_urls,
+        },
+    ]
+
     PROMPT = PromptTemplate(
         template=template,
-        input_variables=['context', 'title','body', 'issue_type','definition', 'api_name', 'documentation', 'task', 'qa', 'urls', 'course_urls'])
+        input_variables=[
+            "context",
+            "title",
+            "body",
+            "issue_type",
+            "definition",
+            "api_name",
+            "documentation",
+            "task",
+            "qa",
+            "urls",
+            "course_urls",
+        ],
+    )
 
     return PROMPT, prompt
+

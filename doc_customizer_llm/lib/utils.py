@@ -1,68 +1,63 @@
 import re
 import os
-from pathlib import Path
 from bs4 import BeautifulSoup
-import glob
 import json
 import requests
 import ast
-import numpy as np
 import pandas as pd
 import lib.global_settings as s
 
-from statistics import mean
 from datetime import datetime
 
-def make_user_dataset(df, type='questions'):
 
+def make_user_dataset(df, type="questions"):
     user_dataset = []
-    for index, row in df.iterrows():
-        user_id = row['user_id']
-        response = row['response']
+    for _, row in df.iterrows():
+        user_id = row["user_id"]
+        response = row["response"]
         response = ast.literal_eval(response)
 
-        up_vote_count   = []
+        up_vote_count = []
         down_vote_count = []
         count = 0
         reputation = 0
-        if response['items']:
-            for item in response['items']:
-                up_vote_count.append(item['up_vote_count'])
-                down_vote_count.append(item['down_vote_count'])
-                if type == 'answers':
-                    if item['is_accepted']:
+        if response["items"]:
+            for item in response["items"]:
+                up_vote_count.append(item["up_vote_count"])
+                down_vote_count.append(item["down_vote_count"])
+                if type == "answers":
+                    if item["is_accepted"]:
                         count = count + 1
 
             total_up_votes = sum(up_vote_count)
             total_down_votes = sum(down_vote_count)
-            if type == 'answers':
-                reputation = (total_up_votes * 10) + (count * 15) - (total_down_votes * 2)
-                v_index = sum(x >= n+1 for n, x in enumerate(sorted(  list(up_vote_count), reverse=True)))
-                user_dataset.append({
-                    'user_id': user_id, 'v_index': v_index, 'reputation': reputation})
+            if type == "answers":
+                reputation = (
+                    (total_up_votes * 10) + (count * 15) - (total_down_votes * 2)
+                )
+                v_index = sum(
+                    x >= n + 1
+                    for n, x in enumerate(sorted(list(up_vote_count), reverse=True))
+                )
+                user_dataset.append(
+                    {"user_id": user_id, "v_index": v_index,
+                        "reputation": reputation}
+                )
 
             else:
                 reputation = (total_up_votes * 10) - (total_down_votes * 2)
-                user_dataset.append({
-                    'user_id': user_id, 'reputation': reputation})
+                user_dataset.append(
+                    {"user_id": user_id, "reputation": reputation})
 
         else:
-            if type == 'answers':
-                user_dataset.append({
-                    'user_id': user_id, 'v_index': 0, 'reputation':0 })
+            if type == "answers":
+                user_dataset.append(
+                    {"user_id": user_id, "v_index": 0, "reputation": 0})
             else:
-                user_dataset.append({
-                    'user_id': user_id, 'reputation': 0})
-            
+                user_dataset.append({"user_id": user_id, "reputation": 0})
+
     dataset = pd.DataFrame(user_dataset)
     return dataset
-
-
-
-
-def get_accepted_answer(df):
-    pass
-
 
 
 # --------------------------------------------------------------------------------------------------------------------------------------
@@ -82,21 +77,30 @@ def get_first_date(df):
     """
 
     first_so_question = []
-    for index, row in df.iterrows():
-        user_id = row['user_id']
-        response = row['response']
+    for _, row in df.iterrows():
+        user_id = row["user_id"]
+        response = row["response"]
         response = ast.literal_eval(response)
-        if response['items']:
+        if response["items"]:
             # List comprehension
-            question_timestamps = [datetime.fromtimestamp(item['creation_date']).date() for item in response['items']]    
-            first_so_question.append({'user_id': user_id, 'first_q_date': min(question_timestamps)})
+            question_timestamps = [
+                datetime.fromtimestamp(item["creation_date"]).date()
+                for item in response["items"]
+            ]
+            first_so_question.append(
+                {"user_id": user_id, "first_q_date": min(question_timestamps)}
+            )
         else:
-            first_so_question.append({'user_id': user_id, 'first_q_date': None})
-            
+            first_so_question.append(
+                {"user_id": user_id, "first_q_date": None})
+
     df_first_so_question = pd.DataFrame(first_so_question)
-    df_first_so_question = df_first_so_question.drop_duplicates(subset='user_id', keep='last')
+    df_first_so_question = df_first_so_question.drop_duplicates(
+        subset="user_id", keep="last"
+    )
 
     return df_first_so_question
+
 
 # --------------------------------------------------------------------------------------------------------------------------------
 # compute user experience based on tags
@@ -120,17 +124,23 @@ def compute_experience(df, relative_exp=False, in_months=False):
 
     date_diff = []
     for index, row in df.iterrows():
-        user_id = row['user_id']
-        start_date = row['first_q_date']
-        end_date = datetime.strptime(row['creation_date'], '%Y-%m-%d').date() if relative_exp == True else datetime.now()
+        user_id = row["user_id"]
+        start_date = row["first_q_date"]
+        end_date = (
+            datetime.strptime(row["creation_date"], "%Y-%m-%d").date()
+            if relative_exp
+            else datetime.now()
+        )
         if start_date is not None:
             if in_months:
-                diff = (end_date.year - start_date.year)*12 + (end_date.month -  start_date.month)
+                diff = (end_date.year - start_date.year) * 12 + (
+                    end_date.month - start_date.month
+                )
             else:
                 diff = end_date.year - start_date.year
-            date_diff.append({'user_id': user_id, 'experience': diff})
+            date_diff.append({"user_id": user_id, "experience": diff})
         else:
-            date_diff.append({'user_id': user_id, 'experience': 0})
+            date_diff.append({"user_id": user_id, "experience": 0})
     return pd.DataFrame(date_diff)
 
 
@@ -146,7 +156,7 @@ def split(list_a, chunk_size):
         A generator object
     """
     for i in range(0, len(list_a), chunk_size):
-        yield list_a[i:i + chunk_size]
+        yield list_a[i: i + chunk_size]
 
 
 def get_response(url):
@@ -164,12 +174,11 @@ def get_response(url):
     return response
 
 
-
-def processed_dataset(df, type='questions'):
+def processed_dataset(df, type="questions"):
     user_dataset = [
         {
-            'user_id': row['user_id'],
-            **process_response(ast.literal_eval(row['response']), type)
+            "user_id": row["user_id"],
+            **process_response(ast.literal_eval(row["response"]), type),
         }
         for _, row in df.iterrows()
     ]
@@ -178,56 +187,64 @@ def processed_dataset(df, type='questions'):
 
 
 def process_response(response, type):
-    upvote_counts = [item['up_vote_count'] for item in response['items']]
-    down_vote_counts = [item['down_vote_count'] for item in response['items']]
+    upvote_counts = [item["up_vote_count"] for item in response["items"]]
+    down_vote_counts = [item["down_vote_count"] for item in response["items"]]
     total_up_votes = sum(upvote_counts)
     total_down_votes = sum(down_vote_counts)
-    
-    if type == 'answers':
-        accepted_ans_count = sum(item['is_accepted'] for item in response['items'])
-        v_index = sum(x >= n+1 for n, x in enumerate(sorted(upvote_counts, reverse=True)))
-        reputation = (total_up_votes * 10) + (accepted_ans_count * 15) - (total_down_votes * 2)
-        return {
-            'v_index': v_index,
-            'reputation': reputation
-        }
+
+    if type == "answers":
+        accepted_ans_count = sum(item["is_accepted"]
+                                 for item in response["items"])
+        v_index = sum(
+            x >= n + 1 for n, x in enumerate(sorted(upvote_counts, reverse=True))
+        )
+        reputation = (
+            (total_up_votes * 10) +
+            (accepted_ans_count * 15) - (total_down_votes * 2)
+        )
+        return {"v_index": v_index, "reputation": reputation}
     else:
         reputation = (total_up_votes * 10) - (total_down_votes * 2)
-        return {'reputation': reputation}
+        return {"reputation": reputation}
 
 
 # Preprocess the text
 def code_removal(text):
-  # Remove code snippets enclosed in <code>...</code> tags
-  text = re.sub(r'<pre><code>.*?</code></pre>', '', text, flags=re.DOTALL)
-  text = re.sub(r'<blockquote>.*?</blockquote>', '', text, flags=re.DOTALL)
-  return text
+    # Remove code snippets enclosed in <code>...</code> tags
+    text = re.sub(r"<pre><code>.*?</code></pre>", "", text, flags=re.DOTALL)
+    text = re.sub(r"<blockquote>.*?</blockquote>", "", text, flags=re.DOTALL)
+    return text
 
 
 def text_preprocessor(text):
     text = code_removal(text)
     soup = BeautifulSoup(text, "html.parser")
     paragraphs = soup.find_all("p", recursive=False)
-    paragraphs = [p for p in paragraphs if not any(tag in str(p) for tag in ["<table>", "<tr>", "<td>", "<section>"])]
+    paragraphs = [
+        p
+        for p in paragraphs
+        if not any(tag in str(p) for tag in ["<table>", "<tr>", "<td>", "<section>"])
+    ]
     content = "\n".join(str(paragraph) for paragraph in paragraphs)
-    content = re.sub(r'<[^>]*>', '', content)
-    content = ' '.join(content.split())
+    content = re.sub(r"<[^>]*>", "", content)
+    content = " ".join(content.split())
     return content
 
 
 def validate_tf_api_name(name):
-  """Validates that the given name is a valid TensorFlow API name.
+    """Validates that the given name is a valid TensorFlow API name.
 
-  Args:
-    name: The name to be validated.
+    Args:
+      name: The name to be validated.
 
-  Raises:
-    ValueError: If the name is not in the correct format.
-  """
+    Raises:
+      ValueError: If the name is not in the correct format.
+    """
 
-  if not name.startswith("tf."):
-    raise ValueError(f"Invalid TensorFlow API name '{name}'. API names should always start with 'tf.'.")
-
+    if not name.startswith("tf."):
+        raise ValueError(
+            f"Invalid TensorFlow API name '{name}'. API names should always start with 'tf.'."
+        )
 
 
 def check_url(url):
@@ -246,34 +263,32 @@ def check_url(url):
     except requests.exceptions.RequestException as e:
         print(f"Error checking URL: {e}")
         return False
-    
 
 
 def remove_broken_urls(url_list):
-  """
-  Iterates through a list of URLs, checks their status, and removes non-working ones.
+    """
+    Iterates through a list of URLs, checks their status, and removes non-working ones.
 
-  Args:
-      url_list: A list containing URLs to be checked.
+    Args:
+        url_list: A list containing URLs to be checked.
 
-  Returns:
-      A new list with only working URLs.
-  """
-  working_urls = []
-  for url in url_list:
-    if check_url(url):
-      working_urls.append(url)
-  return working_urls
-
+    Returns:
+        A new list with only working URLs.
+    """
+    working_urls = []
+    for url in url_list:
+        if check_url(url):
+            working_urls.append(url)
+    return working_urls
 
 
 def create_markdown_file(response, filename):
     """Creates and saves a Markdown file with the given response."""
     path = os.path.join(s.ROOT, "doc_customizer_llm")
-    with open( os.path.join(path, filename), "w") as file:
+    with open(os.path.join(path, filename), "w") as file:
         file.write(str(response))
     print(f"Response saved in {path} folder")
 
 
 def update_cell(df, column: str, row_index: int, value: str):
-  df.loc[row_index, column] = value
+    df.loc[row_index, column] = value
