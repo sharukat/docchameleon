@@ -29,7 +29,7 @@ To bridge this gap, DocChameleon uses LLMs and RAG to enrich TensorFlow API docu
 <p align="center">
   <a href="https://go-skill-icons.vercel.app/">
     <img
-      src="https://go-skill-icons.vercel.app/api/icons?i=python,typescript,flask,nextjs,tailwindcss,langchain,groq,deepseek,"
+      src="https://go-skill-icons.vercel.app/api/icons?i=python,flask,langchain,chatgpt,huggingface,scikitlearn,pandas,numpy,pytorch,stackoverflow,seaborn"
     />
   </a>
 </p>
